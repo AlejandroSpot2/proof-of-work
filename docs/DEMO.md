@@ -26,3 +26,16 @@ If the Kerf correction was made, step 3 shows it: the release task is taken out 
 - Live mode is not part of the demo: keys are not set. Say so if asked.
 - The workbench (`/studio`) has every control on one page for free exploring.
 - Rehearse with `npm run walkthrough` (guided demo, screenshots to `walkthrough-v2/`) or `npm run walkthrough:workbench`.
+
+## Live mode (verified, not part of the 3-minute demo)
+
+The owner's Anthropic key is in `.env.local` (gitignored, never printed). `AI_MODEL=anthropic:claude-sonnet-5-5` was checked against Anthropic's model list endpoint: the ID is available to this key, so the config stays as it is.
+
+`npm run test:live` runs one bounded smoke: Rin's EXAMPLE files as sources (no web fetch), three claim calls and one capability call to the model, about 35 seconds. It fails loudly on any model error; there is no fallback to the recorded output. The last run is in `docs/LIVE-SMOKE.md`:
+
+- Every project's claims came from `model:anthropic:claude-sonnet-5-5` (17 kept).
+- Every kept quote was re-checked word for word against its file.
+- The attribution rules held back two model over-reaches: "Rin authored Quietroom" (a README and a commit count are not authorship) and "Rin is a maintainer of Kerf with 3 commits" (a README line and a contributor count).
+- Capabilities cite only confirmed statements: offline conflict resolution and the release process shown in the work, production operation not shown, with one question.
+
+If asked on stage, say the demo runs on the recorded EXAMPLE output so it works offline, and that the live path was verified today with the same checks. The landing shows "Model ready: anthropic:claude-sonnet-5-5" when the key is present.

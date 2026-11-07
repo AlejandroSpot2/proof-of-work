@@ -9,6 +9,7 @@
     "start": "next start -p 3000",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "test:live": "vitest run --config vitest.live.config.ts",
     "db:generate": "drizzle-kit generate",
     "walkthrough": "node scripts/walkthrough-v2.mjs",
     "walkthrough:workbench": "node scripts/walkthrough.mjs"

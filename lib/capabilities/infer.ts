@@ -1,5 +1,6 @@
 import { generateObject } from "ai";
 import { liveModel } from "@/lib/ai/model";
+import { describeModelError } from "@/lib/ai/errors";
 import { proposedCapabilitiesSchema, type LedgerClaim, type ProposedCapabilities } from "./types";
 
 const SYSTEM = [
@@ -34,6 +35,8 @@ export async function inferWithModel(
     system: SYSTEM,
     prompt: `Goal: ${goal}\n\n<approved_claims>\n${JSON.stringify(ledger, null, 1)}\n</approved_claims>`,
     maxRetries: 0,
+  }).catch((e: unknown) => {
+    throw describeModelError(e);
   });
   return { proposal: object, engine: `model:${label}` };
 }

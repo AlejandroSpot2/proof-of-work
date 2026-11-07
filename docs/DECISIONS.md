@@ -79,3 +79,10 @@ Direction and before/after reasoning are in `docs/REDESIGN.md`.
 - **Rehearsal link.** `GET /api/example/start?stage=new|imported|answered&to=…` creates a fresh EXAMPLE workspace in fixture mode, optionally running the same import, confirm and answer steps, and sets the owner cookie. It exists for rehearsal and for the inspector, which cannot click through a session; it never touches the network.
 - **Others' part** on a project card comes from that project's contributors file (names and commit counts only), exposed in the owner snapshot.
 - **Desktop first.** The demo is judged on desktop and projector widths. Every guided step fits one 1440x900 screen (measured by the walkthrough). Phone layouts work but were not polished, at the owner's request.
+
+## Live model verification
+
+- `AI_MODEL=anthropic:claude-sonnet-5-5` verified against `GET /v1/models` with the owner's key (no tokens generated). Config unchanged.
+- The first live smoke failed on all three projects with "response did not match schema". With the schema rule named in the error (a 9-character quote, a 230-character claim), the cause was that length limits lived in the Zod schema, so one bad field rejected a whole project's answer. Root fix: the schemas keep only structure; lengths and counts are enforced per item in `commitProposal` and `validateProposal`, which drop the offending item with a reason. `lib/ai/errors.ts` names the broken schema path in model errors, never the content or the key. Covered by `tests/limits.test.ts`.
+- Model calls keep `maxRetries: 0`, so one budgeted call is one request.
+- The AI SDK warns that `generateObject` is deprecated in favour of `generateText` with an output setting. It still works; migrating is left for after the hackathon.

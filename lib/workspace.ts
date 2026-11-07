@@ -6,7 +6,7 @@ import type { Attribution, Audience, ImportReport, Mode, StoredProjection } from
 import { LIMITS } from "@/lib/domain/types";
 import { deriveClaimState, normalizeForQuote, quoteIsLiteral, type Identity, type SourceFacts } from "@/lib/domain/rules";
 import type { FetchedSource } from "@/lib/ingest/types";
-import type { ClaimProposal, StoredSourceForPrompt } from "@/lib/claims/propose";
+import { CLAIM_TEXT_MAX, type ClaimProposal, type StoredSourceForPrompt } from "@/lib/claims/propose";
 import type { LedgerClaim, ProposedCapabilities } from "@/lib/capabilities/types";
 import { validateProposal } from "@/lib/capabilities/validate";
 
@@ -269,6 +269,10 @@ export function commitProposal(
   const origin = proposal.engine.startsWith("model:") ? ("model" as const) : ("fixture" as const);
 
   for (const c of proposal.claims.slice(0, LIMITS.claimsPerProject)) {
+    if (c.text.length < 8 || c.text.length > CLAIM_TEXT_MAX) {
+      report.discarded.push({ text: c.text.slice(0, CLAIM_TEXT_MAX), reason: `Its wording is ${c.text.length < 8 ? "too short" : `over ${CLAIM_TEXT_MAX} characters`} to review as one statement.` });
+      continue;
+    }
     const literal = c.quotes.filter((q) => {
       const s = byId.get(q.sourceId);
       return !!s && quoteIsLiteral(q.quote, s.snippetStore);

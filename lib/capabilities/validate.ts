@@ -16,12 +16,15 @@ export function toCited(c: LedgerClaim): CitedClaim {
   };
 }
 
+const NAME_MAX = 140;
+
 type Citation = { name: string; support: Support; claimIds: string[]; evidenceIds: string[]; limits: string[] };
 
 function makeChecker(approved: LedgerClaim[]) {
   const byId = new Map(approved.map((c) => [c.id, c]));
   const evidenceOwner = new Map(approved.flatMap((c) => c.evidence.map((e) => [e.id, c.id] as const)));
   return (p: Citation, key: string): { ok: true; cap: StoredCapability } | { ok: false; reason: string } => {
+    if (!p.name.trim() || p.name.length > NAME_MAX) return { ok: false, reason: `Its name is ${p.name.trim() ? `over ${NAME_MAX} characters` : "empty"}.` };
     const bad = p.claimIds.find((id) => !byId.has(id)) ?? p.evidenceIds.find((id) => !evidenceOwner.has(id));
     if (bad) return { ok: false, reason: `Cited ${bad}, which is not an approved claim or its evidence.` };
     const claimIds = [...new Set(p.claimIds)];
@@ -31,7 +34,7 @@ function makeChecker(approved: LedgerClaim[]) {
       ? p.evidenceIds.filter((id) => claimIds.includes(evidenceOwner.get(id)!))
       : ownEvidence;
     const support = cited.length ? capSupport(p.support, supportCeiling(cited)) : "unknown";
-    const limits = [...new Set([...derivedLimits(cited), ...p.limits])];
+    const limits = [...new Set([...derivedLimits(cited), ...p.limits.map((l) => l.trim()).filter((l) => l && l.length <= 300).slice(0, 3)])];
     if (support !== p.support) limits.push(`Capped at ${support}: the cited claims cannot carry ${p.support}.`);
     return {
       ok: true,
@@ -70,12 +73,12 @@ export function validateProposal(
   if (proposal.nextBuild) {
     const gaps = [...proposal.nextBuild.gaps];
     const parts: StoredCapability[] = [];
-    proposal.nextBuild.parts.forEach((p, i) => {
+    proposal.nextBuild.parts.slice(0, 5).forEach((p, i) => {
       const r = check({ ...p, support: "demonstrated", limits: [] }, `part-${i + 1}`);
       if (r.ok && r.cap.claimRefs.length) parts.push(r.cap);
       else if (!r.ok) discarded.push({ name: p.name, reason: r.reason });
     });
-    if (parts.length) nextBuild = { title: proposal.nextBuild.title, summary: proposal.nextBuild.summary, parts, gaps };
+    if (parts.length) nextBuild = { title: proposal.nextBuild.title.slice(0, 120), summary: proposal.nextBuild.summary.slice(0, 400), parts, gaps: gaps.slice(0, 3) };
   }
 
   return {
@@ -83,8 +86,8 @@ export function validateProposal(
     ledgerRevision: meta.ledgerRevision,
     engine: meta.engine,
     capabilities,
-    gaps: proposal.gaps.slice(0, 3),
-    question: proposal.question ?? null,
+    gaps: proposal.gaps.map((x) => x.trim()).filter(Boolean).slice(0, 3),
+    question: proposal.question?.trim() ? proposal.question.trim() : null,
     discarded,
     nextBuild,
   };

@@ -1,7 +1,10 @@
 import { generateObject } from "ai";
 import { z } from "zod";
 import { ATTRIBUTIONS, CLAIM_KINDS, LIMITS, type Attribution, type ClaimKind } from "@/lib/domain/types";
+
+export const CLAIM_TEXT_MAX = 200;
 import { liveModel } from "@/lib/ai/model";
+import { describeModelError } from "@/lib/ai/errors";
 import { recordedClaims } from "@/lib/fixtures/rin";
 
 export type StoredSourceForPrompt = { id: string; url: string; locator: string; kind: string; text: string };
@@ -17,28 +20,29 @@ export type ProposedClaim = {
 
 export type ClaimProposal = { claims: ProposedClaim[]; questions: string[]; engine: string };
 
+/**
+ * Structure only. Length and count limits are enforced per item after parsing (commitProposal and the
+ * mapping below), so one over-long claim or one short quote drops that item instead of the whole answer.
+ */
 const claimSchema = z.object({
   claims: z
     .array(
       z.object({
-        text: z.string().min(8).max(200).describe("One factual claim about what the person did, third person, no adjectives"),
+        text: z.string().describe(`One factual claim about what the person did, third person, no adjectives, at most ${CLAIM_TEXT_MAX} characters`),
         kind: z.enum(CLAIM_KINDS),
         attribution: z.enum(ATTRIBUTIONS).describe("The person's role in this specific work, as the sources show it"),
-        tags: z.array(z.string().max(30)).max(5).describe("Lowercase skill tags such as sync, kotlin, storage"),
+        tags: z.array(z.string()).describe("Up to 5 lowercase skill tags such as sync, kotlin, storage"),
         legalFlag: z
           .string()
-          .max(200)
           .nullable()
           .describe("Only if an immigration attorney might care (award, press, original contribution). Phrase as a suggestion."),
         quotes: z
-          .array(z.object({ sourceRef: z.string().describe("S1, S2, ..."), quote: z.string().min(12).max(400) }))
-          .min(1)
-          .max(3)
-          .describe("Copied character for character from the source text"),
+          .array(z.object({ sourceRef: z.string().describe("S1, S2, ..."), quote: z.string() }))
+          .describe("1 to 3 quotes of at least 12 characters, copied character for character from the source text"),
       }),
     )
-    .max(LIMITS.claimsPerProject),
-  questions: z.array(z.string().max(200)).max(LIMITS.questionsPerProject),
+    .describe(`At most ${LIMITS.claimsPerProject} claims`),
+  questions: z.array(z.string()).describe(`At most ${LIMITS.questionsPerProject} short follow-up questions`),
 });
 
 const SYSTEM = [
@@ -68,18 +72,20 @@ export async function proposeClaimsWithModel(input: {
         `<source ref="${s.ref}" kind="${s.kind}" locator="${s.locator}" url="${s.url}">\n${s.text.slice(0, 12000)}\n</source>`,
     ),
   ].join("\n\n");
-  const { object } = await generateObject({ model, schema: claimSchema, system: SYSTEM, prompt, maxRetries: 0 });
+  const { object } = await generateObject({ model, schema: claimSchema, system: SYSTEM, prompt, maxRetries: 0 }).catch((e: unknown) => {
+    throw describeModelError(e);
+  });
   const idByRef = new Map(refs.map((s) => [s.ref, s.id]));
   return {
     engine: `model:${label}`,
-    questions: object.questions,
+    questions: object.questions.map((q) => q.trim()).filter(Boolean).slice(0, LIMITS.questionsPerProject),
     claims: object.claims.map((c) => ({
-      text: c.text,
+      text: c.text.trim(),
       kind: c.kind,
       attribution: c.attribution,
-      tags: c.tags.map((t) => t.toLowerCase()),
-      legalFlag: c.legalFlag,
-      quotes: c.quotes.flatMap((q) => {
+      tags: c.tags.map((t) => t.toLowerCase().trim().slice(0, 30)).filter(Boolean).slice(0, 5),
+      legalFlag: c.legalFlag?.trim() ? c.legalFlag.trim().slice(0, 240) : null,
+      quotes: c.quotes.slice(0, 3).flatMap((q) => {
         const sourceId = idByRef.get(q.sourceRef);
         return sourceId ? [{ sourceId, quote: q.quote }] : [];
       }),

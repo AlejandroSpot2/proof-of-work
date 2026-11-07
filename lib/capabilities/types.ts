@@ -27,34 +27,35 @@ export type LedgerClaim = {
   evidence: LedgerEvidence[];
 };
 
+/** Structure only. validateProposal enforces counts and lengths per item, so one long field never sinks the answer. */
 export const proposedCapabilitiesSchema = z.object({
   capabilities: z
     .array(
       z.object({
-        name: z.string().min(3).max(120).describe("What could be entrusted, as a short verb phrase"),
+        name: z.string().describe("What could be entrusted, as a short verb phrase of at most 12 words"),
         support: z.enum(["demonstrated", "inferred", "unknown"]),
-        claimIds: z.array(z.string()).max(8).describe("IDs of approved claims that support it; empty when unknown"),
-        evidenceIds: z.array(z.string()).max(12),
-        limits: z.array(z.string().max(200)).max(3).describe("What this evidence does not show"),
+        claimIds: z.array(z.string()).describe("IDs of approved claims that support it; empty when unknown"),
+        evidenceIds: z.array(z.string()),
+        limits: z.array(z.string()).describe("Up to 3 short notes on what this evidence does not show"),
       }),
     )
-    .max(LIMITS.capabilities),
-  gaps: z.array(z.string().max(200)).max(3),
-  question: z.string().max(240).nullable().describe("At most one bounded question that would close the biggest gap"),
+    .describe(`At most ${LIMITS.capabilities} capabilities`),
+  gaps: z.array(z.string()).describe("Up to 3 short gaps"),
+  question: z.string().nullable().describe("At most one bounded question that would close the biggest gap"),
   nextBuild: z
     .object({
-      title: z.string().max(80).describe("A bounded MVP this person could build next, combining their evidenced work"),
-      summary: z.string().max(240),
+      title: z.string().describe("A bounded MVP this person could build next, combining their evidenced work, at most 8 words"),
+      summary: z.string().describe("One or two sentences"),
       parts: z
         .array(
           z.object({
-            name: z.string().max(100),
-            claimIds: z.array(z.string()).min(1).max(6),
-            evidenceIds: z.array(z.string()).max(10),
+            name: z.string(),
+            claimIds: z.array(z.string()),
+            evidenceIds: z.array(z.string()),
           }),
         )
-        .max(4),
-      gaps: z.array(z.string().max(200)).max(3).describe("What the evidence does not cover for this MVP"),
+        .describe("Up to 4 parts, each citing at least one approved claim"),
+      gaps: z.array(z.string()).describe("Up to 3 things the evidence does not cover for this MVP"),
     })
     .nullable()
     .describe("A proposal, not a promise of timeline or ability. null if the claims do not combine into anything."),

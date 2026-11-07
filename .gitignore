@@ -12,3 +12,4 @@ data/*.db-*
 walkthrough/*.png
 !walkthrough/.gitkeep
 walkthrough-v2/*.png
+tests-live/out
