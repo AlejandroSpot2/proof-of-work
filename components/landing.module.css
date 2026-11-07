@@ -30,6 +30,7 @@
   position: relative;
   display: grid;
   grid-template-columns: var(--axis) 1fr;
+  grid-template-rows: minmax(0, 1fr);
 }
 
 .cvSheet {
@@ -63,13 +64,50 @@
   line-height: 1.5;
 }
 
-.cvCaption {
+.cards {
   grid-column: 1;
   grid-row: 1;
   align-self: end;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
   padding: 24px;
+}
+
+.card {
+  background: var(--field);
+  color: var(--field-ink);
+  padding: 16px;
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  animation: rise 600ms var(--ease) both;
+}
+
+.card:nth-child(2) {
+  animation-delay: 140ms;
+}
+
+.cardLine {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 1.0625rem;
+  color: var(--field-muted);
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+
+.cardVerdict {
+  font-size: 0.9375rem;
+  line-height: 1.35;
+}
+
+.sideNote {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  align-self: end;
   font-size: var(--step-small);
-  max-width: 34ch;
+  max-width: 30ch;
+  padding-right: 24px;
 }
 
 .titleBlock {
@@ -245,8 +283,17 @@
     margin: 24px auto 0;
     padding: 24px;
   }
-  .cvCaption {
-    display: none;
+  .cards {
+    grid-row: 2;
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+  .masthead {
+    height: auto;
+    grid-template-rows: auto auto;
+  }
+  .sideNote {
+    grid-row: auto;
   }
   .step {
     grid-column: 1 / -1;

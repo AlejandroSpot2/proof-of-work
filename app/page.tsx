@@ -45,10 +45,24 @@ export default function Home() {
             </p>
           ))}
         </div>
-        <p className={s.cvCaption}>The CV of {profile.name}, a fictional builder. Every line is a claim. None of them shows its proof.</p>
+        <div className={s.cards}>
+          <div className={s.card}>
+            <p className={s.cardLine}>Kerf. Maintainer.</p>
+            <p className={s.cardVerdict}>
+              The sources show {kerf.rin.length} commits by Rin on docs and releases, and {kerf.other.length} by someone else on the deploy engine.
+            </p>
+          </div>
+          <div className={s.card}>
+            <p className={s.cardLine}>Conflict resolution.</p>
+            <p className={s.cardVerdict}>A merged pull request and a commit by Rin, quoted word for word. Demonstrated, not claimed.</p>
+          </div>
+        </div>
       </section>
 
       <section className={s.titleBlock}>
+        <p className={s.sideNote}>
+          Above: the CV of {profile.name}, a fictional builder. Every line is a claim. None of them shows its proof.
+        </p>
         <h1 className={s.h1}>A resume says what you claim.</h1>
         <div className={s.stand}>
           <p className={s.lead}>

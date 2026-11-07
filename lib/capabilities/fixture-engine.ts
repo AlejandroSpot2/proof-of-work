@@ -67,7 +67,11 @@ const NEXT_BUILD = {
   ],
 };
 
-const cite = (claims: LedgerClaim[], tags: string[]) => claims.filter((c) => c.tags.some((t) => tags.includes(t)));
+const KIND_ORDER = { contribution: 0, recognition: 1, impact: 2, skill: 3 } as const;
+
+/** Strongest first: what the person did, then what it achieved, then described practice. */
+const cite = (claims: LedgerClaim[], tags: string[]) =>
+  claims.filter((c) => c.tags.some((t) => tags.includes(t))).sort((a, b) => KIND_ORDER[a.kind] - KIND_ORDER[b.kind]);
 
 export function inferWithFixtureRules(goal: string, claims: LedgerClaim[]): ProposedCapabilities {
   const g = ` ${goal.toLowerCase()} `;
