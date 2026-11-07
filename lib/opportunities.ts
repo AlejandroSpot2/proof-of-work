@@ -6,7 +6,12 @@ import { SIGNAL_COPY, type EmployerRecord } from "@/lib/signals";
 
 export type Opportunity = Omit<EmployerRecord, "matches"> & {
   signal: { label: string; caveat: string };
-  fit: { name: string; support: Support; evidenceIds: string[] }[];
+  fit: {
+    name: string;
+    support: Support;
+    evidenceIds: string[];
+    evidence: { id: string; sourceId: string; quote: string; locator: string; projectTitle: string }[];
+  }[];
 };
 
 export function loadEmployerRecords(): EmployerRecord[] {
@@ -19,9 +24,14 @@ export function opportunitiesFor(entrust: Entrust, records = loadEmployerRecords
   const pool = [...entrust.capabilities, ...(entrust.nextBuild?.parts ?? [])].filter((c) => c.support !== "unknown");
   return records.map(({ matches, ...r }) => {
     const fit = pool
-      .filter((c) => matches.some((m) => c.name.toLowerCase().includes(m.toLowerCase())))
-      .map((c) => ({ name: c.name, support: c.support, evidenceIds: c.evidence.map((e) => e.id) }));
-    const unique = [...new Map(fit.map((f) => [f.name, f])).values()];
+      .filter((c) => matches.some((m) => new RegExp(`\\b${m.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`, "i").test(c.name)))
+      .map((c) => ({
+        name: c.name,
+        support: c.support,
+        evidenceIds: c.evidence.map((e) => e.id),
+        evidence: c.evidence.map((e) => ({ id: e.id, sourceId: e.sourceId, quote: e.quote, locator: e.locator, projectTitle: e.projectTitle })),
+      }));
+    const unique = [...new Map(fit.map((f) => [[...f.evidenceIds].sort().join(","), f])).values()];
     return { ...r, signal: SIGNAL_COPY[r.signalType] ?? SIGNAL_COPY.unknown, fit: unique };
   });
 }

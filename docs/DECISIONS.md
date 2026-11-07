@@ -46,7 +46,9 @@ Calls made during the build, with the reason for each. The contract is `docs/hac
 
 - Three fictional employers in `fixtures/example-rin/employers/employers.json`. Each shows company, entity, location, role, source id, literal snippet, retrieved date, signal type and status. Missing fields render as "unknown".
 - Signal copy is fixed in `lib/signals.ts`. Historical filings render as "Past filings only" with "Historical filings are not current policy".
-- Role fit is a proposal: it lists only live capabilities with evidence whose names match the record's keywords.
+- The panel is its own chapter between the capabilities and the two views, following the addendum's flow: work, capabilities, contribution to an opportunity, sponsorship signal, attorney questions. "What could Rin build next" stays as the close.
+- Role fit is a proposal: it lists only live capabilities with evidence whose names match the record's keywords as whole words, shows each fit's evidence ids as links that open the quote in its source, and lists a body of evidence once per role.
+- No real employer data is in the fixtures. If it is ever added, it goes in a visually separate panel and never into the claims ledger.
 - The dossier opens with "No eligibility assessment" and generates attorney questions from the ledger (documented vs self-attested, shared work, corrections, gaps). A test checks that it contains no eligibility, visa-category or approval language.
 
 ## What next (Addendum 1 closing beat)

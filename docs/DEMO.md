@@ -13,9 +13,11 @@ Start state: dev server running, browser at `http://localhost:3000/`, window at 
 - Demonstrated, with a "shared work" limit: own releases and preview deploys.
 - Unknown: run it in production. One question would settle it.
 
+**1:45 Where this work could land.** Rin is an international builder outside the US who wants to move to SF. Scroll to the three fictional employers. Point at the signal line: one current posting that literally says it sponsors, one with past filings only ("Historical filings ≠ current policy"), one unknown. Under each, the proposed fit cites evidence ids; click one to open its quote. Say: not legal advice, no job or visa outcome implied.
+
 **2:00 Human correction.** Under "Own releases and preview deploys", click `Correct "Co-maintains Kerf, including its release process"`. Click "Use Rin's correction (EXAMPLE)", then "Save correction". The page scrolls to "Two views, one ledger": the ribbon says the capability was withdrawn from both views, the client portfolio no longer shows it, and the dossier lists it as withdrawn after human review. Click "Re-evaluate from the corrected ledger" in the ribbon: it returns as Inferred, with the limit "Corrected by the builder (rev 2)". Both views agree.
 
-**2:40 Close.** Scroll to "What could Rin build next?": an offline field-notes app with AI tagging, each part linked to its evidence, with the gaps stated. Beside it, three fictional employers with their sponsorship signal, labeled "Historical filings ≠ current policy" and "Not legal advice". Optionally click "Create private link" on the dossier and open it: "No eligibility assessment", questions for the attorney, the review log.
+**2:40 Close.** Scroll to "What could Rin build next?": an offline field-notes app with AI tagging, each part linked to its evidence, with the gaps stated. Optionally click "Create private link" on the dossier and open it: "No eligibility assessment", questions for the attorney, the review log.
 
 ## If something goes wrong
 

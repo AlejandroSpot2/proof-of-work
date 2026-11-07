@@ -364,6 +364,21 @@ export function Studio() {
         </section>
       )}
 
+      {state.opportunities.length > 0 && (entrust.status === "current" || entrust.status === "ledger-changed") && (
+        <section className={s.chapter} id="opportunities">
+          <div className={s.side}>
+            <h2 className={s.h2}>Where this work could land</h2>
+            <p className={s.note}>
+              {person.replace(" (EXAMPLE)", "")} is an international builder, outside the US, who wants to move to San Francisco. Each record pairs a role with what its source literally says about sponsorship, and proposes which evidenced capabilities fit it.
+            </p>
+            <p className={s.note}>No job or visa outcome is implied anywhere.</p>
+          </div>
+          <div className={s.main}>
+            <Opportunities items={state.opportunities} onOpen={openSource} />
+          </div>
+        </section>
+      )}
+
       {entrust.status === "current" || entrust.status === "ledger-changed" ? (
         <section className={`${s.field} on-field`} id="views">
           <div className={s.fieldHead}>
@@ -411,7 +426,7 @@ export function Studio() {
         <section className={s.chapter} id="next">
           <div className={s.side}>
             <h2 className={s.h2}>What could {person.replace(" (EXAMPLE)", "").split(" ")[0]} build next?</h2>
-            <p className={s.note}>A proposal assembled only from approved evidence. Not a promise of timeline or ability.</p>
+            <p className={s.note}>A useful next step for an international builder: something concrete to build and show, assembled only from approved evidence. A proposal, not a promise of timeline, ability, a job or a visa.</p>
           </div>
           <div className={s.main}>
             <div className={s.next}>
@@ -441,7 +456,6 @@ export function Studio() {
                 </ul>
               )}
             </div>
-            {state.opportunities.length > 0 && <Opportunities items={state.opportunities} />}
           </div>
         </section>
       )}

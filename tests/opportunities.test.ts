@@ -53,6 +53,23 @@ describe("opportunities panel", () => {
     expect(block.match(/>unknown</g)?.length).toBeGreaterThanOrEqual(3);
   });
 
+  it("renders the evidence ids each proposed fit cites", async () => {
+    const { items, html } = await rendered();
+    const ids = items.flatMap((o) => o.fit.flatMap((f) => f.evidenceIds));
+    expect(ids.length).toBeGreaterThan(0);
+    for (const id of ids) expect(html).toContain(id);
+  });
+
+  it("matches roles on whole words and lists each body of evidence once", async () => {
+    const { items } = await rendered();
+    const ai = items.find((o) => o.signalType === "historical_filings")!;
+    expect(ai.fit.map((f) => f.name).some((n) => n.startsWith("Triage"))).toBe(false);
+    for (const o of items) {
+      const keys = o.fit.map((f) => [...f.evidenceIds].sort().join(","));
+      expect(new Set(keys).size).toBe(keys.length);
+    }
+  });
+
   it("maps a role only to live, evidenced capabilities", async () => {
     const { items } = await rendered();
     for (const o of items) for (const f of o.fit) {

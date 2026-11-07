@@ -103,7 +103,11 @@ await shot("11-what-next-and-opportunities");
 await page.screenshot({ path: path.join(OUT, "15-studio-full.png"), fullPage: true });
 const nextText = await page.locator("#next").innerText();
 check(nextText.includes("Offline field-notes app with AI tagging"), "what-next proposal shown");
-check(nextText.includes("Past filings only") && nextText.includes("Historical filings are not current policy"), "historical filings labeled as not current");
+const oppText = await page.locator("#opportunities").innerText();
+check(oppText.includes("Past filings only") && oppText.includes("Historical filings ≠ current policy") && oppText.includes("Not legal advice"), "historical filings labeled as not current, not legal advice");
+check(/Evidence\s+ev_/.test(oppText), "role fit cites evidence ids");
+await page.locator("#opportunities").scrollIntoViewIfNeeded();
+await shot("11b-opportunities");
 
 const [portfolioTab] = await Promise.all([
   context.waitForEvent("page"),
