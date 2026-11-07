@@ -1,6 +1,7 @@
 import { getDb } from "@/lib/db/client";
 import { ownerCookie } from "@/lib/auth";
-import { createWorkspace, importProjects, reviewClaim, setGoal, evaluateGoal } from "@/lib/workspace";
+import { createWorkspace, importProjects, reviewClaim, setGoal, evaluateGoal, createPresentation } from "@/lib/workspace";
+import { updatePortfolioSettings } from "@/lib/portfolio";
 import { loadProfile } from "@/lib/fixtures/rin";
 import { loadSnapshot } from "@/lib/views/project";
 import { fixtureDeps } from "@/lib/deps";
@@ -19,15 +20,21 @@ export async function GET(req: Request) {
   const db = getDb();
   const profile = loadProfile();
   const { workspaceId, token } = createWorkspace(db, { personName: profile.name, githubHandle: profile.handle, mode: "fixture" });
-  if (stage === "imported" || stage === "answered") {
+  const full = stage === "answered" || stage === "published";
+  if (stage === "imported" || full) {
     await importProjects(db, token, profile.projects.map((p) => ({ title: p.title, role: p.role, urls: [{ url: p.url }] })), fixtureDeps);
   }
-  if (stage === "answered") {
+  if (full) {
     for (const c of loadSnapshot(db, workspaceId)!.projects.flatMap((p) => p.claims)) {
       if (c.reviewStatus === "proposed" && c.state !== "unverified") reviewClaim(db, token, c.id, { action: "approve" });
     }
     setGoal(db, token, profile.goal);
     await evaluateGoal(db, token, fixtureDeps);
+    updatePortfolioSettings(db, workspaceId, { builtAt: Date.now() });
+  }
+  if (stage === "published") {
+    const pres = createPresentation(db, token, "portfolio");
+    return new Response(null, { status: 303, headers: { Location: `/p/${pres.token}`, "Set-Cookie": ownerCookie(token), "Cache-Control": "no-store" } });
   }
   return new Response(null, { status: 303, headers: { Location: target, "Set-Cookie": ownerCookie(token), "Cache-Control": "no-store" } });
 }
