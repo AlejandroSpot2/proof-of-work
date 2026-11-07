@@ -23,7 +23,7 @@ If the Kerf correction was made, step 3 shows it: the release task is taken out 
 ## If something goes wrong
 
 - Blank screen or "Opening Rin's example" stuck: open the rehearsal link above.
-- Live mode is not part of the demo: keys are not set. Say so if asked.
+- Live mode is not part of the 3-minute demo. It is verified (see below); the guided demo uses the recorded EXAMPLE output so it works offline.
 - The workbench (`/studio`) has every control on one page for free exploring.
 - Rehearse with `npm run walkthrough` (guided demo, screenshots to `walkthrough-v2/`) or `npm run walkthrough:workbench`.
 
