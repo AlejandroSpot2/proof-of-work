@@ -106,12 +106,10 @@ export async function importProjects(
     emit({ type: "project", projectId: project.id, title: project.title });
 
     const allUrls = input.urls.map((u) => u.url);
-    const fetched: FetchedSource[] = [];
-    for (const u of input.urls) fetched.push(...(await deps.fetchSources(u.url, !!u.ownPage, allUrls, who)));
-    const kept = fetched.slice(0, LIMITS.sourcesPerProject);
-    const skippedSources = fetched
-      .slice(LIMITS.sourcesPerProject)
-      .map((s) => ({ url: s.url, locator: s.locator, reason: `Budget: ${LIMITS.sourcesPerProject} sources per project` }));
+    const groups: FetchedSource[][] = [];
+    for (const u of input.urls) groups.push(await deps.fetchSources(u.url, !!u.ownPage, allUrls, who));
+    const { kept, skipped } = fitBudget(groups, LIMITS.sourcesPerProject);
+    const skippedSources = skipped.map((s) => ({ url: s.url, locator: s.locator, reason: `Budget: ${LIMITS.sourcesPerProject} sources per project` }));
 
     const stored: (typeof t.sources.$inferSelect)[] = [];
     for (const f of kept) {
@@ -184,6 +182,22 @@ export async function importProjects(
   }
 
   emit({ type: "done", ledgerRevision: bumpLedger(db, ws.id) });
+}
+
+/** Every URL the user typed keeps at least one slot, so a blocked or missing page is always shown. */
+export function fitBudget(groups: FetchedSource[][], limit: number) {
+  const firsts = new Set(groups.map((g) => g[0]).filter((x): x is FetchedSource => !!x));
+  const ordered = groups.flat();
+  const kept: FetchedSource[] = [];
+  let room = limit - firsts.size;
+  for (const s of ordered) {
+    if (firsts.has(s)) kept.push(s);
+    else if (room > 0) {
+      kept.push(s);
+      room--;
+    }
+  }
+  return { kept: kept.slice(0, limit), skipped: ordered.filter((s) => !kept.slice(0, limit).includes(s)) };
 }
 
 function countClaims(db: Db, projectId: string) {

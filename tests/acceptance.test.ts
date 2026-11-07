@@ -345,3 +345,16 @@ describe("privacy", () => {
     }
   });
 });
+
+describe("source budget", () => {
+  it("keeps a slot for every URL the user typed, so a blocked page is shown", async () => {
+    const { fitBudget } = await import("@/lib/workspace");
+    const src = (url: string, locator: string) => ({ url, locator, kind: "github" as const, status: "ok" as const, statusDetail: "", text: "x" });
+    const gh = ["repository", "README", "languages", "contributors", "commits"].map((l) => src("https://github.com/o/r", l));
+    const blocked = { ...src("http://169.254.169.254/", "page"), status: "blocked" as const };
+    const { kept, skipped } = fitBudget([gh, [blocked]], 5);
+    expect(kept).toHaveLength(5);
+    expect(kept).toContain(blocked);
+    expect(skipped.map((s) => s.locator)).toEqual(["commits"]);
+  });
+});

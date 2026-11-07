@@ -1,0 +1,59 @@
+# Decisions
+
+Calls made during the build, with the reason for each. The contract is `docs/hackathon-plan.md` plus the two addenda (`docs/t3-addendum-fixtures.md`, `docs/t3-addendum-immigration.md`).
+
+## Architecture
+
+- **One ledger, derived views.** Claims, evidence, sources and reviews live in SQLite through Drizzle. Capabilities are stored as one JSON projection per goal that records the claim revisions it cited. `lib/views/project.ts` derives the portfolio and the dossier from the same `deriveEntrust` call, so a correction cannot reach one view and miss the other.
+- **Withdrawal before re-evaluation.** A capability is live only while every claim it cites is still approved at the cited revision. A correction withdraws it from both views on the next read, with the reason. Re-evaluating runs the engine again on the new ledger. Two visible steps make the propagation legible on stage: the capability leaves, then comes back with its new support level and limit.
+- **Support levels are computed, not chosen.** The engine (model or fixture rules) proposes a level. `supportCeiling` caps it from the cited claims. Skills, language-only evidence and claims that rest on the builder's word cap at inferred. A claim with no backing caps at unknown.
+- **SQLite only today.** No Neon. `DATABASE_PATH` points at the file, default `data/proof-of-work.db`.
+
+## Evidence rules
+
+- **Literal quotes.** A quote must appear in its source after normalizing whitespace, curly quotes and dashes only. Case and wording must match. Quotes under 12 characters do not count. A claim with no surviving quote is discarded and listed in the import report.
+- **Authorship is per quote, not per repository.** A quote backs an authorship claim only if it is a line the person wrote (a commit whose author is their handle, a PR or notes file whose header names them) or a source that names them. A repository where the handle has no commits never backs authorship. Quotes that fail this are kept as context evidence and the claim becomes unverified with its attribution set to unknown and the reason stored.
+- **Independent sources.** Sources from one repository, or one host, are one origin. Corroborated needs two origins. A page the owner marks as their own counts as `user_attested`, not as an independent source.
+- **Corrections.** Changing a claim's wording makes it `user_attested`, because the sources back the old wording and the new scope rests on the builder's word. Changing only the attribution re-derives the state from the existing evidence. Every correction bumps the claim revision and logs before and after.
+
+## Budgets
+
+- Max 3 projects, 5 sources per project (extra sources are listed as skipped), 2 follow-up questions per project, 8 claims per project.
+- One claim call per project per distinct source content. Re-import with unchanged content hashes makes no call and leaves sources and reviews alone.
+- One capability call per goal per ledger revision. Asking again with nothing changed returns the stored answer. After a correction the ledger revision moves, so re-evaluating is allowed one more call. This is how "regeneration" is read against the "1 per goal" budget.
+- At most 3 capabilities and 1 question per goal.
+
+## Privacy and security
+
+- Owner session: random token in an HttpOnly, Secure, SameSite=Strict cookie, stored as a SHA-256 hash. Every mutation requires it and checks the target belongs to the session's workspace. Mutations accept JSON only.
+- Presentation tokens are random, stored hashed, revocable, and open exactly one presentation. A portfolio token cannot open the dossier. A token can open a source only if its own view shows evidence from that source.
+- SSRF: https only, no credentials in URLs, port 443 only, allowlist of github.com, api.github.com, raw.githubusercontent.com and the hosts the user typed for that project. Localhost, private, link-local, metadata and other non-public IPv4/IPv6 ranges are blocked at parse time and again at DNS connect time through an undici Agent lookup (closes the rebinding window). Every redirect is re-checked. 200 KB cap, 8 s timeout.
+- Source text enters prompts inside delimited `<source>` blocks with an instruction to treat it as data.
+- `.env.example` has placeholders only. The app never logs keys.
+
+## Fixtures (Addendum 1)
+
+- The demo person is Rin Okafor (EXAMPLE). Fixture ids use `example://`, so nothing looks like a real website or GitHub account.
+- Fixture claims are a recorded output (`fixtures/example-rin/recorded/claims.json`), labeled "recorded output (EXAMPLE)" in the UI. They contain no planted errors. They pass through the same quote check and attribution rules as live output.
+- Fixture capabilities come from deterministic rules over the approved claims (`lib/capabilities/fixture-engine.ts`), labeled "fixture rules (no model)". The rules read the live ledger, so corrections change their output.
+- `fixtures/example-rin/expected.json` is used only by tests.
+- The Kerf correction text lives in `profile.json` as Rin's own correction in the story. The UI offers it as "Use Rin's correction (EXAMPLE)" inside the normal correction form. The README names two maintainers without saying who owns what, so the correction adds information the sources lack.
+- Illustrations are local SVGs marked "EXAMPLE illustration".
+
+## Opportunities and the dossier (Addendum 2)
+
+- Three fictional employers in `fixtures/example-rin/employers/employers.json`. Each shows company, entity, location, role, source id, literal snippet, retrieved date, signal type and status. Missing fields render as "unknown".
+- Signal copy is fixed in `lib/signals.ts`. Historical filings render as "Past filings only" with "Historical filings are not current policy".
+- Role fit is a proposal: it lists only live capabilities with evidence whose names match the record's keywords.
+- The dossier opens with "No eligibility assessment" and generates attorney questions from the ledger (documented vs self-attested, shared work, corrections, gaps). A test checks that it contains no eligibility, visa-category or approval language.
+
+## What next (Addendum 1 closing beat)
+
+- The capability call also returns an optional `nextBuild` proposal. Its parts go through the same citation check as capabilities, take their support from the ledger ceiling, and are withdrawn on correction like capabilities. In fixture mode a rule assembles it from tags.
+
+## Skipped or deferred
+
+- **Jev (TypeSafe System One)**: skipped. Nothing in the demo needed relevance ranking, and it can never verify truth.
+- **Print-CSS PDF**: the dossier and CV pages have print styles. No PDF generation library.
+- **Presentation `selectedClaimIds`/order**: stored as null, meaning every eligible claim. The portfolio shows approved, publishable claims; the dossier shows every approved claim.
+- **Live mode** is wired end to end but needs `AI_MODEL` and a provider key in `.env.local`. Without them, live import still fetches and shows sources, and the claims step reports that the model is not configured.
