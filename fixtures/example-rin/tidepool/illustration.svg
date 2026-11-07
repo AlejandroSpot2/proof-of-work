@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" aria-label="Tidepool: two offline edits merged per field (EXAMPLE)">
-<rect width="480" height="300" fill="#e9e4d8"/>
+<rect width="480" height="300" fill="#e1dfd9"/>
 
-<g font-family="Georgia, serif" font-size="14" fill="#1d1b16">
-<rect x="24" y="36" width="170" height="92" fill="#f6f2ea"/><text x="38" y="62">Device A, offline</text><text x="38" y="88">title: Pump 4</text><text x="38" y="110" fill="#0d5c4a">status: leaking</text>
-<rect x="24" y="152" width="170" height="92" fill="#f6f2ea"/><text x="38" y="178">Device B, offline</text><text x="38" y="204" fill="#0d5c4a">title: Pump 4, east</text><text x="38" y="226">status: ok</text>
-<path d="M194 82 L276 140 M194 198 L276 160" stroke="#1d1b16" stroke-width="2" fill="none"/>
-<rect x="276" y="104" width="180" height="92" fill="#0d5c4a"/><text x="290" y="130" fill="#f6f2ea">Merged by field</text><text x="290" y="156" fill="#f6f2ea">title: Pump 4, east</text><text x="290" y="178" fill="#f6f2ea">status: leaking</text>
+<g font-family="Switzer, Arial, sans-serif" font-size="14" fill="#2a340b">
+<rect x="24" y="36" width="170" height="92" fill="#f3f3f1"/><text x="38" y="62">Device A, offline</text><text x="38" y="88">title: Pump 4</text><text x="38" y="110" fill="#38450f">status: leaking</text>
+<rect x="24" y="152" width="170" height="92" fill="#f3f3f1"/><text x="38" y="178">Device B, offline</text><text x="38" y="204" fill="#38450f">title: Pump 4, east</text><text x="38" y="226">status: ok</text>
+<path d="M194 82 L276 140 M194 198 L276 160" stroke="#2a340b" stroke-width="2" fill="none"/>
+<rect x="276" y="104" width="180" height="92" fill="#38450f"/><text x="290" y="130" fill="#f3f3f1">Merged by field</text><text x="290" y="156" fill="#f3f3f1">title: Pump 4, east</text><text x="290" y="178" fill="#f3f3f1">status: leaking</text>
 </g>
-<text x="24" y="282" font-family="Georgia, serif" font-size="13" fill="#4a4538">EXAMPLE illustration</text>
+<text x="24" y="282" font-family="Switzer, Arial, sans-serif" font-size="13" fill="#5d683a">EXAMPLE illustration</text>
 </svg>

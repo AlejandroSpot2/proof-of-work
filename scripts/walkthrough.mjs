@@ -94,6 +94,7 @@ check(JSON.stringify(pAfter) === JSON.stringify(dAfter), `both views agree after
 
 await page.locator("#next").scrollIntoViewIfNeeded();
 await shot("11-what-next-and-opportunities");
+await page.screenshot({ path: path.join(OUT, "15-studio-full.png"), fullPage: true });
 const nextText = await page.locator("#next").innerText();
 check(nextText.includes("Offline field-notes app with AI tagging"), "what-next proposal shown");
 check(nextText.includes("Past filings only") && nextText.includes("Historical filings are not current policy"), "historical filings labeled as not current");
