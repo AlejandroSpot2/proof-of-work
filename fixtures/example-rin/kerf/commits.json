@@ -1,0 +1,37 @@
+[
+  {
+    "sha": "0e7f3a1",
+    "author": "contributor-c",
+    "message": "Create a preview environment per pull request"
+  },
+  {
+    "sha": "b81c2d4",
+    "author": "contributor-c",
+    "message": "Tear down previews on merge"
+  },
+  {
+    "sha": "9a4d6e2",
+    "author": "contributor-c",
+    "message": "Add provider interface for deploy targets"
+  },
+  {
+    "sha": "37c0b95",
+    "author": "contributor-c",
+    "message": "Retry failed deploys with backoff"
+  },
+  {
+    "sha": "c5e1f08",
+    "author": "rin",
+    "message": "Automate changelog and tag publishing"
+  },
+  {
+    "sha": "6d2a9b3",
+    "author": "rin",
+    "message": "Rewrite the getting-started guide"
+  },
+  {
+    "sha": "e8f4c71",
+    "author": "rin",
+    "message": "Document the release checklist"
+  }
+]

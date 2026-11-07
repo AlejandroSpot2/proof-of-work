@@ -94,7 +94,8 @@ CREATE TABLE `sources` (
 	`fetched_at` integer NOT NULL,
 	`content_hash` text NOT NULL,
 	`snippet_store` text NOT NULL,
-	`meta` text
+	`meta` text,
+	`authorship` text
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `sources_project_url_locator` ON `sources` (`project_id`,`url`,`locator`);--> statement-breakpoint

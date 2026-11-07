@@ -11,7 +11,7 @@ import type {
   ReviewAction,
   ImportReport,
 } from "@/lib/domain/types";
-import type { SourceKind, SourceStatus, GithubMeta } from "@/lib/ingest/types";
+import type { SourceKind, SourceStatus, GithubMeta, Authorship } from "@/lib/ingest/types";
 
 export const workspaces = sqliteTable("workspaces", {
   id: text("id").primaryKey(),
@@ -56,6 +56,7 @@ export const sources = sqliteTable(
     contentHash: text("content_hash").notNull(),
     snippetStore: text("snippet_store").notNull(),
     meta: text("meta", { mode: "json" }).$type<GithubMeta | null>(),
+    authorship: text("authorship").$type<Authorship | null>(),
   },
   (t) => [uniqueIndex("sources_project_url_locator").on(t.projectId, t.url, t.locator)],
 );

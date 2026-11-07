@@ -1,4 +1,7 @@
-export type SourceKind = "github" | "web" | "user";
+export type SourceKind = "github" | "web" | "user" | "fixture";
+
+/** all-by-handle: every line was written by the person. line-prefix: lines read "<sha> <author>: <message>". */
+export type Authorship = "all-by-handle" | "line-prefix";
 export type SourceStatus = "ok" | "unavailable" | "blocked";
 
 export type GithubMeta = {
@@ -19,4 +22,5 @@ export type FetchedSource = {
   locator: string;
   text: string;
   meta?: GithubMeta;
+  authorship?: Authorship;
 };

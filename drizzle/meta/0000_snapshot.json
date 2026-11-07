@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "0f9004ad-34ad-4df6-ae09-287c386d9ffb",
+  "id": "a1bca56f-5081-4809-a031-0796df0c542e",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "claims": {
@@ -606,6 +606,13 @@
         },
         "meta": {
           "name": "meta",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "authorship": {
+          "name": "authorship",
           "type": "text",
           "primaryKey": false,
           "notNull": false,

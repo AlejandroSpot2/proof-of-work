@@ -1,0 +1,26 @@
+{
+  "example": true,
+  "disclaimer": "EXAMPLE. Rin Okafor is a fictional builder. Every project, file, commit, employer and number here is synthetic and was written for a demo. Nothing describes a real person or company.",
+  "name": "Rin Okafor (EXAMPLE)",
+  "handle": "rin",
+  "role": "Engineer building tools for small product teams, out of interest",
+  "bio": "An international builder, currently outside the US, who wants to move to San Francisco. Builds small tools for small teams: offline-first sync, structured AI pipelines, and release tooling.",
+  "goal": "Founding engineer for our field-inspection app: offline sync, releases, and running it in production",
+  "projects": [
+    {
+      "title": "Tidepool",
+      "role": "Author",
+      "url": "example://rin/tidepool"
+    },
+    {
+      "title": "Quietroom",
+      "role": "Author",
+      "url": "example://rin/quietroom"
+    },
+    {
+      "title": "Kerf",
+      "role": "Maintainer",
+      "url": "example://rin/kerf"
+    }
+  ]
+}

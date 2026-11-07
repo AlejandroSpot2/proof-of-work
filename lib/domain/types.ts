@@ -42,6 +42,14 @@ export type StoredProjection = {
   gaps: string[];
   question: string | null;
   discarded: { name: string; reason: string }[];
+  nextBuild: StoredNextBuild | null;
+};
+
+export type StoredNextBuild = {
+  title: string;
+  summary: string;
+  parts: StoredCapability[];
+  gaps: string[];
 };
 
 export const SUPPORT_RANK: Record<Support, number> = { unknown: 0, inferred: 1, demonstrated: 2 };

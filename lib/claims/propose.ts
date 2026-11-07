@@ -2,7 +2,7 @@ import { generateObject } from "ai";
 import { z } from "zod";
 import { ATTRIBUTIONS, CLAIM_KINDS, LIMITS, type Attribution, type ClaimKind } from "@/lib/domain/types";
 import { liveModel } from "@/lib/ai/model";
-import { FIXTURE_PROPOSALS } from "@/lib/fixtures/example";
+import { recordedClaims } from "@/lib/fixtures/rin";
 
 export type StoredSourceForPrompt = { id: string; url: string; locator: string; kind: string; text: string };
 
@@ -87,22 +87,19 @@ export async function proposeClaimsWithModel(input: {
   };
 }
 
-export function proposeClaimsFromFixture(
-  projectTitle: string,
-  sources: { id: string; url: string; locator: string }[],
-): ClaimProposal {
-  const fixture = FIXTURE_PROPOSALS[projectTitle] ?? { claims: [], questions: [] };
+export function proposeClaimsFromRecording(projectTitle: string, sources: { id: string; url: string }[]): ClaimProposal {
+  const rec = recordedClaims(projectTitle);
   return {
-    engine: "fixture",
-    questions: fixture.questions,
-    claims: fixture.claims.map((c) => ({
+    engine: rec.label,
+    questions: rec.questions,
+    claims: rec.claims.map((c) => ({
       text: c.text,
       kind: c.kind,
       attribution: c.attribution,
       tags: c.tags,
       legalFlag: c.legalFlag,
       quotes: c.quotes.flatMap((q) => {
-        const s = sources.find((x) => x.url === q.url && x.locator === q.locator);
+        const s = sources.find((x) => x.url === q.source);
         return s ? [{ sourceId: s.id, quote: q.quote }] : [];
       }),
     })),

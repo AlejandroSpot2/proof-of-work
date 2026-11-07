@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" aria-label="Kerf: one preview deploy per pull request (EXAMPLE)">
+<rect width="480" height="300" fill="#e9e4d8"/>
+
+<g font-family="Georgia, serif" font-size="14" fill="#1d1b16">
+<rect x="24" y="60" width="120" height="50" fill="#f6f2ea"/><text x="38" y="90">PR opened</text>
+<rect x="180" y="60" width="140" height="50" fill="#0d5c4a"/><text x="194" y="90" fill="#f6f2ea">preview deploy</text>
+<rect x="356" y="60" width="100" height="50" fill="#f6f2ea"/><text x="370" y="90">merged</text>
+<path d="M144 85 L180 85 M320 85 L356 85" stroke="#1d1b16" stroke-width="2"/>
+<rect x="180" y="160" width="276" height="60" fill="#f6f2ea"/><text x="194" y="186">release: changelog + tag</text><text x="194" y="208" fill="#4a4538">every two weeks</text>
+</g>
+<text x="24" y="282" font-family="Georgia, serif" font-size="13" fill="#4a4538">EXAMPLE illustration</text>
+</svg>

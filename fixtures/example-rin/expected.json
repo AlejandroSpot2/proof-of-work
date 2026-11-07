@@ -1,0 +1,31 @@
+{
+  "note": "For tests only. Never displayed as live AI output.",
+  "beforeCorrection": {
+    "claimStates": {
+      "Authored Tidepool's per-field conflict resolution for offline edits": "fetched",
+      "Co-maintains Kerf, including its release process": "fetched",
+      "Ranks product issues by how many distinct users raised them": "fetched"
+    },
+    "capabilities": {
+      "Design and ship offline-first sync with conflict resolution": "demonstrated",
+      "Own releases and preview deploys": "demonstrated",
+      "Run it in production": "unknown"
+    }
+  },
+  "kerfCorrection": {
+    "claim": "Co-maintains Kerf, including its release process",
+    "text": "Runs Kerf's docs and release process; the deploy engine and its infrastructure are Contributor C's",
+    "attribution": "contributor",
+    "note": "Preview deploys were built and are run by Contributor C (EXAMPLE)."
+  },
+  "afterCorrection": {
+    "claimStates": {
+      "Runs Kerf's docs and release process; the deploy engine and its infrastructure are Contributor C's": "user_attested"
+    },
+    "capabilities": {
+      "Design and ship offline-first sync with conflict resolution": "demonstrated",
+      "Own releases and preview deploys": "inferred",
+      "Run it in production": "unknown"
+    }
+  }
+}

@@ -41,6 +41,23 @@ export const proposedCapabilitiesSchema = z.object({
     .max(LIMITS.capabilities),
   gaps: z.array(z.string().max(200)).max(3),
   question: z.string().max(240).nullable().describe("At most one bounded question that would close the biggest gap"),
+  nextBuild: z
+    .object({
+      title: z.string().max(80).describe("A bounded MVP this person could build next, combining their evidenced work"),
+      summary: z.string().max(240),
+      parts: z
+        .array(
+          z.object({
+            name: z.string().max(100),
+            claimIds: z.array(z.string()).min(1).max(6),
+            evidenceIds: z.array(z.string()).max(10),
+          }),
+        )
+        .max(4),
+      gaps: z.array(z.string().max(200)).max(3).describe("What the evidence does not cover for this MVP"),
+    })
+    .nullable()
+    .describe("A proposal, not a promise of timeline or ability. null if the claims do not combine into anything."),
 });
 
 export type ProposedCapabilities = z.infer<typeof proposedCapabilitiesSchema>;

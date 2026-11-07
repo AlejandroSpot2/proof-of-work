@@ -1,0 +1,32 @@
+[
+  {
+    "sha": "3f1a9c2",
+    "author": "rin",
+    "message": "Resolve concurrent edits per field with last-writer-wins"
+  },
+  {
+    "sha": "8b20d41",
+    "author": "rin",
+    "message": "Stamp every local event with a hybrid logical clock"
+  },
+  {
+    "sha": "c77e019",
+    "author": "rin",
+    "message": "Replay the event log to rebuild the timeline"
+  },
+  {
+    "sha": "1d9e3aa",
+    "author": "contributor-b",
+    "message": "Add IndexedDB storage adapter"
+  },
+  {
+    "sha": "5ac0f62",
+    "author": "contributor-b",
+    "message": "Add SQLite storage adapter for desktop"
+  },
+  {
+    "sha": "e40b7d3",
+    "author": "rin",
+    "message": "Add synthetic replay benchmark"
+  }
+]
