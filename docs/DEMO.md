@@ -1,26 +1,28 @@
-# Demo script (3 minutes, fixture mode)
+# Demo script (3 minutes, desktop, no keys)
 
-Start state: dev server running, browser at `http://localhost:3000/`, window at 1440 wide. No keys needed. To reset, open `/` again and click "Open the EXAMPLE workspace": each click starts a fresh workspace.
+Start state: dev server running, browser at `http://localhost:3000/`, window 1440 wide or a projector at 1280 or more. Everything is EXAMPLE data. The rehearsal link `http://localhost:3000/api/example/start?to=/demo` starts a fresh run at any time; "Start over" in the step list does the same.
 
-**0:00 The hook.** The landing page shows Rin Okafor's flat CV, labeled EXAMPLE. Say: "A resume says what you claim. This shows what your work proves." Point at the two olive cards: "Kerf. Maintainer." is struck through, with what the sources really show.
+Move with the **Next** button (top right), **Back**, the step list on the left, or the arrow keys.
 
-**0:20 Import.** Click "Open the EXAMPLE workspace", then "Import 3 projects". Fifteen sources appear, each with its status. Say: fixture mode reads only EXAMPLE files, no network, no model; live mode reads GitHub's public API through an allowlist.
+**0:00 Start.** The landing page says "Turn your projects into proof", with a CV line beside what its files really show. Say: "A resume says what you claim. This shows what your work proves." Click **See the 3-minute example**.
 
-**0:50 Claims with literal quotes.** Scroll to "Every claim carries its quote". Click any quote: the source opens with the quote highlighted where it appears. Say: a claim survives only if its quote is in the source word for word; a README naming you is not authorship; commits by someone else never count for you. Click "Approve all 8 quoted claims" (or approve one by hand, then the rest).
+**0:15 The CV (step 1).** Rin Okafor's flat CV, fictional. Say: every line is a claim, none shows who did what. Point at the three things Proof of Work does instead. Click **Read Rin's 3 projects**.
 
-**1:20 The question.** The goal is prefilled: "Founding engineer for our field-inspection app: offline sync, releases, and running it in production". Click "Ask". Read the heading: "What can you entrust to Rin Okafor, and why?" Three answers:
-- Demonstrated: offline-first sync with conflict resolution. Click a quote to show the PR.
-- Demonstrated, with a "shared work" limit: own releases and preview deploys.
-- Unknown: run it in production. One question would settle it.
+**0:35 What Rin built (step 2).** The fifteen files appear as they are read, then three project cards: what each project is, Rin's part, others' part (by name, from the commit history), and the outcome or what is not shown yet. Click **See the proof** on Tidepool: the quotes, word for word; click one to open its file with the quote highlighted. Close it. Click **Rin confirms all 8**: nothing reaches a client before Rin confirms it.
 
-**1:45 Where this work could land.** Rin is an international builder outside the US who wants to move to SF. Scroll to the three fictional employers. Point at the signal line: one current posting that literally says it sponsors, one with past filings only ("Historical filings ≠ current policy"), one unknown. Under each, the proposed fit cites evidence ids; click one to open its quote. Say: not legal advice, no job or visa outcome implied.
+**1:05 What Rin can do (step 3).** Click **Answer for this client**. Three tasks for the client's need: two **Shown in the work**, one **Not shown yet** with the one question that would settle it. Each task has **See the proof**. Say: the level is capped by the proof; no AI model in this example.
 
-**2:00 Human correction.** Under "Own releases and preview deploys", click `Correct "Co-maintains Kerf, including its release process"`. Click "Use Rin's correction (EXAMPLE)", then "Save correction". The page scrolls to "Two views, one ledger": the ribbon says the capability was withdrawn from both views, the client portfolio no longer shows it, and the dossier lists it as withdrawn after human review. Click "Re-evaluate from the corrected ledger" in the ribbon: it returns as Inferred, with the limit "Corrected by the builder (rev 2)". Both views agree.
+**1:35 Where it could lead (step 4).** Rin is outside the US. Three fictional San Francisco roles: one whose current posting says it sponsors visas, one with past filings only, one unknown. Each lists which of Rin's tasks fit, with proof. The caveats sit in one row: not legal advice, historical filings ≠ current policy, one role's sponsorship ≠ all visa types.
 
-**2:40 Close.** Scroll to "What could Rin build next?": an offline field-notes app with AI tagging, each part linked to its evidence, with the gaps stated. Optionally click "Create private link" on the dossier and open it: "No eligibility assessment", questions for the attorney, the review log.
+**2:00 For an attorney (step 5).** Rin's contributions with Rin's part, and the questions for a first consult. "No eligibility assessment." Optional trust beat: **Try Rin's Kerf correction** → **Use Rin's correction (EXAMPLE)** → **Save correction**; then **Compare both views** shows the client portfolio and the dossier changed together. **Open the private dossier** opens the revocable link.
+
+**2:30 What Rin builds next (step 6, the close).** An offline field-notes app with AI tagging, built from parts already shown in Tidepool and Quietroom, each with proof, and what it still needs. On the right, the next steps toward San Francisco: build it as a public demo, close the biggest gap, show it to the role whose posting says it sponsors (with its caveat), take the dossier to a first consult. Say: a proposal, not a promise.
+
+If the Kerf correction was made, step 3 shows it: the release task is taken out of both views until **Check again**, then returns as **Likely, not proven**.
 
 ## If something goes wrong
 
-- Blank studio: the owner cookie is missing. Go to `/` and click "Open the EXAMPLE workspace".
-- Live mode on stage: only with `AI_MODEL` and a key in `.env.local`. Without them, import still shows GitHub sources and reports that the model is not configured. Say so; do not pretend.
-- Scripted rehearsal: `npm run walkthrough` drives the whole flow and saves screenshots to `walkthrough/`.
+- Blank screen or "Opening Rin's example" stuck: open the rehearsal link above.
+- Live mode is not part of the demo: keys are not set. Say so if asked.
+- The workbench (`/studio`) has every control on one page for free exploring.
+- Rehearse with `npm run walkthrough` (guided demo, screenshots to `walkthrough-v2/`) or `npm run walkthrough:workbench`.

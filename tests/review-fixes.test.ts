@@ -67,9 +67,9 @@ describe("review fixes", () => {
     const kerf = claimByText(db, workspaceId, "Co-maintains Kerf, including its release process");
     reviewClaim(db, token, kerf.id, { action: "publishable", publishable: false });
     const portfolio = portfolioView(snap(db, workspaceId));
-    expect(portfolio.capabilities.map((c) => c.name)).not.toContain("Own releases and preview deploys");
+    expect(portfolio.capabilities.map((c) => c.name)).not.toContain("Own the release and deploy process");
     expect(JSON.stringify(portfolio)).not.toContain("Co-maintains Kerf");
-    expect(attorneyView(snap(db, workspaceId)).capabilities.map((c) => c.name)).toContain("Own releases and preview deploys");
+    expect(attorneyView(snap(db, workspaceId)).capabilities.map((c) => c.name)).toContain("Own the release and deploy process");
   });
 
   it("resubmitting the same goal costs no call and keeps rejected readings", async () => {

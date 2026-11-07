@@ -65,3 +65,17 @@ An independent review of the full diff found no blockers and eight issues: stale
 - **Print-CSS PDF**: the dossier and CV pages have print styles. No PDF generation library.
 - **Presentation `selectedClaimIds`/order**: stored as null, meaning every eligible claim. The portfolio shows approved, publishable claims; the dossier shows every approved claim.
 - **Live mode** is wired end to end but needs `AI_MODEL` and a provider key in `.env.local`. Without them, live import still fetches and shows sources, and the claims step reports that the model is not configured.
+
+## Redesign pass (guided demo)
+
+Direction and before/after reasoning are in `docs/REDESIGN.md`.
+
+- **Two modes.** `/demo` is the guided story in six steps, one view each, with Back, Next, a step list and arrow keys. `/studio` stays as the workbench with every control. Both read the same API and the same ledger.
+- **Style.** App-screen rules, `framed-sheet` dealt with seed 1071196506, brand olive and Switzer kept. The frame is tinted from the olive; the olive sits only on "Shown in the work", the strongest sponsorship signal, proof counts and the finale panel.
+- **Plain words.** Support levels read "Shown in the work", "Likely, not proven" and "Not shown yet" everywhere, including the shared view documents. Capabilities are tasks ("Build offline sync that merges conflicting edits"). "Statements" replaces "claims" in the guided screens and the dossier questions. The engine note moved to a footnote.
+- **Proof on demand.** Every statement, task, role fit, MVP part and next step has a proof button opening a drawer of the literal quotes; each quote opens its file with the quote highlighted. Confirm and correct live in that drawer.
+- **Honest progress.** "Read Rin's 3 projects" runs the real fixture import and lists each file as the server reports it. Confirming statements and answering the need are visible clicks.
+- **Next steps.** `lib/next-steps.ts` builds the finale's steps from data already on screen: the evidenced MVP, the open question, the role whose current posting states sponsorship (with its caveat), and the dossier. Tested to cite only approved evidence and to promise nothing.
+- **Rehearsal link.** `GET /api/example/start?stage=new|imported|answered&to=…` creates a fresh EXAMPLE workspace in fixture mode, optionally running the same import, confirm and answer steps, and sets the owner cookie. It exists for rehearsal and for the inspector, which cannot click through a session; it never touches the network.
+- **Others' part** on a project card comes from that project's contributors file (names and commit counts only), exposed in the owner snapshot.
+- **Desktop first.** The demo is judged on desktop and projector widths. Every guided step fits one 1440x900 screen (measured by the walkthrough). Phone layouts work but were not polished, at the owner's request.

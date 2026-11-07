@@ -7,9 +7,9 @@
       "Ranks product issues by how many distinct users raised them": "fetched"
     },
     "capabilities": {
-      "Design and ship offline-first sync with conflict resolution": "demonstrated",
-      "Own releases and preview deploys": "demonstrated",
-      "Run it in production": "unknown"
+      "Build offline sync that merges conflicting edits": "demonstrated",
+      "Own the release and deploy process": "demonstrated",
+      "Run it in production for real users": "unknown"
     }
   },
   "kerfCorrection": {
@@ -23,9 +23,9 @@
       "Runs Kerf's docs and release process; the deploy engine and its infrastructure are Contributor C's": "user_attested"
     },
     "capabilities": {
-      "Design and ship offline-first sync with conflict resolution": "demonstrated",
-      "Own releases and preview deploys": "inferred",
-      "Run it in production": "unknown"
+      "Build offline sync that merges conflicting edits": "demonstrated",
+      "Own the release and deploy process": "inferred",
+      "Run it in production for real users": "unknown"
     }
   }
 }

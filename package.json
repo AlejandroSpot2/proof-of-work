@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "db:generate": "drizzle-kit generate",
-    "walkthrough": "node scripts/walkthrough.mjs"
+    "walkthrough": "node scripts/walkthrough-v2.mjs",
+    "walkthrough:workbench": "node scripts/walkthrough.mjs"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.99",

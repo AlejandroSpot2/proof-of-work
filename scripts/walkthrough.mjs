@@ -4,10 +4,7 @@ import path from "node:path";
 
 const BASE = process.env.BASE_URL ?? "http://localhost:3000";
 const OUT = path.resolve(process.argv[2] ?? "walkthrough");
-const SHOTS = path.resolve("public", "shots");
 fs.mkdirSync(OUT, { recursive: true });
-fs.mkdirSync(SHOTS, { recursive: true });
-const crop = (locator, name) => locator.screenshot({ path: path.join(SHOTS, `${name}.png`) });
 
 const started = Date.now();
 const results = [];
@@ -34,11 +31,7 @@ const shot = async (name, opts = {}) => {
   await page.screenshot({ path: path.join(OUT, `${name}.png`), ...opts });
 };
 
-await page.goto(BASE + "/");
-await shot("01-hook-flat-cv");
-check(await page.getByRole("heading", { level: 1, name: "A resume says what you claim." }).isVisible(), "hook headline visible on first screen");
-
-await page.getByRole("button", { name: "Open the EXAMPLE workspace" }).first().click();
+await page.goto(BASE + "/api/example/start?to=/studio");
 await page.waitForURL("**/studio");
 await page.getByRole("button", { name: "Import 3 projects" }).click();
 await page.getByText("Approve all").waitFor();
@@ -51,7 +44,6 @@ await page.locator("#claims").scrollIntoViewIfNeeded();
 await page.locator("#claims button[title='Open in source']").first().click();
 await page.locator("dialog[open] mark").waitFor();
 await shot("03-quote-in-source");
-await crop(page.locator("dialog[open]"), "quote-in-source");
 check(await page.locator("dialog[open] mark").isVisible(), "clicked quote is highlighted inside its source");
 await page.locator("dialog[open]").getByRole("button", { name: "Close" }).click();
 
@@ -64,13 +56,13 @@ await page.getByRole("button", { name: "Ask" }).click();
 await page.getByRole("heading", { name: /What can you entrust to Rin Okafor, and why\?/ }).waitFor();
 await page.locator("#entrust").scrollIntoViewIfNeeded();
 await shot("05-entrust-answer", { fullPage: false });
-const supports = await page.locator("#entrust article [class*='support']").allInnerTexts();
-check(JSON.stringify(supports) === JSON.stringify(["Demonstrated", "Demonstrated", "Unknown"]), `capabilities before correction: ${supports.join(", ")}`);
+const supports = await page.locator("#entrust article [data-support-word]").evaluateAll((els) => els.map((e) => e.getAttribute("data-support-word")));
+check(JSON.stringify(supports) === JSON.stringify(["demonstrated", "demonstrated", "unknown"]), `capabilities before correction: ${supports.join(", ")}`);
 
 await page.locator("#views").scrollIntoViewIfNeeded();
 await shot("06-two-views-before");
 const viewsBefore = await page.locator("#views").innerText();
-check(viewsBefore.includes("Own releases and preview deploys"), "both views show the deploy capability before correction");
+check(viewsBefore.includes("Own the release and deploy process"), "both views show the deploy capability before correction");
 
 await page.locator("#entrust").getByRole("button", { name: /Correct “Co-maintains Kerf/ }).click();
 await page.getByRole("button", { name: "Use Rin's correction (EXAMPLE)" }).click();
@@ -81,19 +73,17 @@ await page.locator("#views").scrollIntoViewIfNeeded();
 await shot("08-views-capability-withdrawn");
 const portfolioText = await page.locator("[data-doc=portfolio]").innerText();
 const dossierText = await page.locator("[data-doc=attorney]").innerText();
-check(!portfolioText.includes("Own releases and preview deploys"), "portfolio dropped the obsolete capability");
-check(dossierText.includes("Withdrawn after human review") && dossierText.includes("Own releases and preview deploys"), "dossier records the withdrawal");
+check(!portfolioText.includes("Own the release and deploy process"), "portfolio dropped the obsolete capability");
+check(dossierText.includes("Withdrawn after human review") && dossierText.includes("Own the release and deploy process"), "dossier records the withdrawal");
 
 await page.getByRole("button", { name: "Re-evaluate from the corrected ledger" }).click();
 await page.getByText("The ledger changed since this answer.").waitFor({ state: "detached" });
 await page.locator("#entrust").scrollIntoViewIfNeeded();
 await shot("09-entrust-after-correction");
-await crop(page.locator("#entrust [class*='capList']"), "entrust-answer");
-const after = await page.locator("#entrust article [class*='support']").allInnerTexts();
-check(JSON.stringify(after) === JSON.stringify(["Demonstrated", "Inferred", "Unknown"]), `capabilities after correction: ${after.join(", ")}`);
+const after = await page.locator("#entrust article [data-support-word]").evaluateAll((els) => els.map((e) => e.getAttribute("data-support-word")));
+check(JSON.stringify(after) === JSON.stringify(["demonstrated", "inferred", "unknown"]), `capabilities after correction: ${after.join(", ")}`);
 await page.locator("#views").scrollIntoViewIfNeeded();
 await shot("10-two-views-after");
-await crop(page.locator("#views [class*='views']").first(), "two-views");
 const pAfter = await page.locator("[data-doc=portfolio] [data-support]").evaluateAll((els) => els.map((e) => e.getAttribute("data-support")));
 const dAfter = await page.locator("[data-doc=attorney] [data-support]").evaluateAll((els) => els.map((e) => e.getAttribute("data-support")));
 check(JSON.stringify(pAfter) === JSON.stringify(dAfter), `both views agree after correction: ${pAfter.join(", ")}`);
@@ -137,9 +127,6 @@ check(res.status() === 404, `revoked portfolio link returns 404 (got ${res.statu
 const noSession = await anon.request.post(BASE + "/api/goal", { data: { text: "x" } });
 check(noSession.status() === 401 || noSession.status() === 403, `no session cannot edit (got ${noSession.status()})`);
 
-await page.goto(BASE + "/");
-await page.setViewportSize({ width: 390, height: 844 });
-await shot("14-hook-phone");
 
 await browser.close();
 const failed = results.filter((r) => !r.ok);

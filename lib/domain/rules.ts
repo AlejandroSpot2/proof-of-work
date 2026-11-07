@@ -154,7 +154,7 @@ export function derivedLimits(cited: CitedClaim[]): string[] {
     if (c.state === "user_attested")
       out.push(
         c.revision > 1
-          ? `Corrected by the builder (rev ${c.revision}). The sources back the earlier wording; this scope rests on the builder's word.`
+          ? `Corrected by the builder: the files back the earlier wording, so this now rests on the builder's word.`
           : `Only the builder says this: "${c.text}"`,
       );
     if (c.kind === "skill") out.push(`A described practice, not a shipped result: "${c.text}"`);

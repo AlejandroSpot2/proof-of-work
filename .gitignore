@@ -11,3 +11,4 @@ data/*.db-*
 .taste-skill
 walkthrough/*.png
 !walkthrough/.gitkeep
+walkthrough-v2/*.png

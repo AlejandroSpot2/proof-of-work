@@ -3,7 +3,7 @@ import styles from "./docs.module.css";
 
 export type OpenSource = (sourceId: string, quote: string) => void;
 
-const SUPPORT_WORD = { demonstrated: "Demonstrated", inferred: "Inferred", unknown: "Unknown" } as const;
+export const SUPPORT_WORD = { demonstrated: "Shown in the work", inferred: "Likely, not proven", unknown: "Not shown yet" } as const;
 const STATE_WORD: Record<string, string> = {
   fetched: "A source says it",
   corroborated: "Two independent sources",
@@ -19,7 +19,11 @@ const ATTRIBUTION_WORD: Record<string, string> = {
 };
 
 export function SupportMark({ support }: { support: keyof typeof SUPPORT_WORD }) {
-  return <span className={`${styles.support} ${styles[support]}`}>{SUPPORT_WORD[support]}</span>;
+  return (
+    <span className={`${styles.support} ${styles[support]}`} data-support-word={support}>
+      {SUPPORT_WORD[support]}
+    </span>
+  );
 }
 
 export function stateWord(s: string) {

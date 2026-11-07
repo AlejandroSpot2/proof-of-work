@@ -15,37 +15,37 @@ type Template = {
 const TEMPLATES: Template[] = [
   {
     goalWords: ["sync", "offline", "conflict", "local-first", "replication"],
-    name: "Design and ship offline-first sync with conflict resolution",
+    name: "Build offline sync that merges conflicting edits",
     tags: ["sync", "conflict-resolution"],
     ifUnknown: {
-      gap: "No source in the ledger shows sync work.",
+      gap: "No file shows sync work.",
       question: "Which project of yours shows sync or conflict resolution working?",
     },
   },
   {
     goalWords: [" ai ", " ai,", "llm", "model", "tagging", "structured"],
-    name: "Build AI features with schema-checked output and injection defenses",
+    name: "Build AI features with checked, injection-safe output",
     tags: ["structured-outputs", "prompt-injection"],
     ifUnknown: {
-      gap: "No source in the ledger shows AI feature work.",
+      gap: "No file shows AI feature work.",
       question: "Can you link an AI feature you shipped, with how its output was checked?",
     },
   },
   {
     goalWords: ["release", "deploy", "shipping", "ci/cd"],
-    name: "Own releases and preview deploys",
+    name: "Own the release and deploy process",
     tags: ["releases", "deployment"],
     ifUnknown: {
-      gap: "No source in the ledger shows release or deploy work.",
+      gap: "No file shows release or deploy work.",
       question: "Can you link a release process or deploy pipeline you ran?",
     },
   },
   {
     goalWords: ["production", "scale", "on-call", "operate", "reliability"],
-    name: "Run it in production",
+    name: "Run it in production for real users",
     tags: ["operations", "on-call", "production"],
     ifUnknown: {
-      gap: "Nothing in the ledger shows real users, production traffic, or on-call work. Every benchmark and eval is synthetic.",
+      gap: "No file shows real users, production traffic or on-call work. Every benchmark and eval is synthetic.",
       question: "Has any of this run in production with real users? A postmortem, usage log or on-call rotation would settle it.",
     },
   },
@@ -87,7 +87,7 @@ export function inferWithFixtureRules(goal: string, claims: LedgerClaim[]): Prop
   if (!matched.length) {
     return {
       capabilities: [],
-      gaps: [`Nothing in the approved claims relates to "${goal}".`],
+      gaps: [`Nothing in the confirmed statements relates to "${goal}".`],
       question: `What work of yours shows this: "${goal}"? Link a repository, pull request or write-up.`,
       nextBuild,
     };

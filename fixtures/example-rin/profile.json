@@ -10,17 +10,20 @@
     {
       "title": "Tidepool",
       "role": "Author",
-      "url": "example://rin/tidepool"
+      "url": "example://rin/tidepool",
+      "summary": "An offline-first sync engine for field teams who work without signal."
     },
     {
       "title": "Quietroom",
       "role": "Author",
-      "url": "example://rin/quietroom"
+      "url": "example://rin/quietroom",
+      "summary": "Turns raw user feedback into drafted issues, using an AI model whose output must match a schema."
     },
     {
       "title": "Kerf",
       "role": "Maintainer",
-      "url": "example://rin/kerf"
+      "url": "example://rin/kerf",
+      "summary": "A command-line tool that creates a preview of every pull request and removes it on merge."
     }
   ],
   "exampleCorrection": {

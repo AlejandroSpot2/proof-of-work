@@ -34,7 +34,9 @@ export function loadSnapshot(db: Db, workspaceId: string) {
     workspace,
     projects: projects.map((p) => ({
       ...p,
-      sources: sources.filter((s) => s.projectId === p.id).map(({ snippetStore, ...s }) => ({ ...s, chars: snippetStore.length })),
+      sources: sources
+        .filter((s) => s.projectId === p.id)
+        .map(({ snippetStore, ...s }) => ({ ...s, chars: snippetStore.length, contributors: s.locator === "contributors" ? snippetStore : null })),
       claims: claimRows.filter((c) => c.projectId === p.id),
     })),
     goal,
@@ -193,12 +195,12 @@ export function attorneyView(s: Snapshot) {
   const questions: string[] = [];
   if (documented.length)
     questions.push(
-      `${documented.length} approved claim${documented.length === 1 ? " is" : "s are"} backed by quoted sources. Which of those sources count as independent documentation for your purposes?`,
+      `${documented.length} confirmed statement${documented.length === 1 ? " is" : "s are"} backed by quotes from files. Which of those files count as independent documentation?`,
     );
-  for (const c of selfOnly) questions.push(`This rests on the builder's own word: "${c.text}". What documentation would you need for it, if any?`);
-  for (const c of shared) questions.push(`This is shared work: "${c.text}". How should the builder's part be described?`);
-  if (corrections.length) questions.push(`The builder corrected ${corrections.length} claim${corrections.length === 1 ? "" : "s"} (see the review log). Should corrected claims be presented, and how?`);
-  if (entrust.gaps.length) questions.push(`Gaps in the evidence: ${entrust.gaps.join(" ")} Do any of these matter for the case you are considering?`);
+  for (const c of selfOnly) questions.push(`Only the builder's word backs "${c.text}". What documentation would it need?`);
+  for (const c of shared) questions.push(`"${c.text}" is shared work. How should the builder's part be described?`);
+  if (corrections.length) questions.push(`The builder corrected ${corrections.length} statement${corrections.length === 1 ? "" : "s"} (see the review log). Should corrected statements be presented, and how?`);
+  if (entrust.gaps.length) questions.push(`Do these gaps matter for the case you are considering? ${entrust.gaps.join(" ")}`);
 
   return {
     audience: "attorney" as const,
