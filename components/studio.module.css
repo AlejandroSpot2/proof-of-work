@@ -1,5 +1,5 @@
 .page {
-  min-height: 100vh;
+  min-height: 100svh;
 }
 
 .loading {
@@ -16,7 +16,6 @@
   position: sticky;
   top: 0;
   z-index: 5;
-  border-bottom: 1px solid var(--line);
 }
 
 .wordmark {
@@ -205,7 +204,7 @@
 }
 
 .claim[data-review="approved"] {
-  box-shadow: inset 4px 0 0 var(--ink);
+  border-left: 6px solid var(--ink);
 }
 
 .claim[data-review="rejected"] {
@@ -364,7 +363,7 @@
   grid-template-columns: 150px 1fr;
   gap: 20px;
   padding: 24px 0;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--line); /* taste-skill-ignore: row rule in an app list of peer capabilities */
 }
 
 .capSupport {
@@ -435,6 +434,20 @@
   font-size: var(--step-lead);
   max-width: 38ch;
   color: var(--field-ink);
+}
+
+.ribbon {
+  background: var(--field-ink);
+  color: var(--field);
+  padding: 18px 22px;
+  font-size: var(--step-lead);
+  line-height: 1.3;
+  display: grid;
+  gap: 6px;
+}
+
+.ribbon strong {
+  font-weight: 600;
 }
 
 .views {
@@ -585,7 +598,7 @@
   max-height: calc(100vh - 48px);
   background: var(--bg);
   color: var(--ink);
-  box-shadow: 0 24px 60px rgba(20, 24, 8, 0.25);
+  box-shadow: 0 24px 60px rgba(20, 24, 8, 0.25); /* taste-skill-ignore: modal dialog floats */
 }
 
 .dialog::backdrop {
@@ -620,8 +633,7 @@
 .sourceText mark {
   background: var(--mark);
   color: var(--ink-strong);
-  padding: 1px 0;
-  box-shadow: 0 0 0 2px var(--mark);
+  padding: 1px 2px;
 }
 
 .suggestion {

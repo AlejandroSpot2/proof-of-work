@@ -12,7 +12,7 @@ export default function CvPage() {
         <span className={s.wordmark}>Proof of Work</span>
         <span className="small">The flat CV, the before. It is not evidence of itself. Print to save a PDF.</span>
       </header>
-      <article className={s.sheet} style={{ fontFamily: "'Times New Roman', Times, serif", color: "#2b2a26", background: "#fbfaf7", padding: "48px" }}>
+      <article className={s.sheet} style={{ fontFamily: "'Times New Roman', Times, serif", color: "#2b2a26", background: "#f7f7f5", padding: "48px" }}>
         <p className="example-flag" style={{ fontFamily: "Switzer, sans-serif" }}>EXAMPLE</p>
         {lines.map((l, i) =>
           l.startsWith("# ") ? (

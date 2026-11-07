@@ -12,9 +12,9 @@
   --field: #38450f;
   --field-ink: #ecebe7;
   --field-muted: #c5cba8;
-  --paper: #f4f3ef;
+  --paper: #f3f3f1;
 
-  --step-small: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
+  --step-small: clamp(0.875rem, 0.85rem + 0.1vw, 0.9375rem);
   --step-body: clamp(1rem, 0.97rem + 0.18vw, 1.125rem);
   --step-lead: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
   --step-head: clamp(2rem, 1.3rem + 2.6vw, 3.5rem);

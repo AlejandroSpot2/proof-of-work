@@ -372,6 +372,21 @@ export function Studio() {
               Both are projections of the same approved facts, rebuilt on every change. A correction lands in both at once.
             </p>
           </div>
+          {entrust.withdrawn.length > 0 ? (
+            <div className={`${s.ribbon} rise`} role="status">
+              {entrust.withdrawn.map((w) => (
+                <p key={w.name}>
+                  Withdrawn from both views: <strong>{w.name}</strong>. {w.reason}
+                </p>
+              ))}
+            </div>
+          ) : snapshot.reviews.some((r) => r.action === "correct") ? (
+            <div className={`${s.ribbon} rise`} role="status">
+              <p>
+                Both views rebuilt from ledger revision {snapshot.workspace.ledgerRevision}, after {snapshot.reviews.filter((r) => r.action === "correct").length === 1 ? "one human correction" : `${snapshot.reviews.filter((r) => r.action === "correct").length} human corrections`}.
+              </p>
+            </div>
+          ) : null}
           <div className={s.views}>
             <div className={s.viewCol}>
               <ViewLinks audience="portfolio" label="Client portfolio" links={links} setLinks={setLinks} run={run} />
