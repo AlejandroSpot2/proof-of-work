@@ -708,7 +708,7 @@ function StepAttorney({ state, name, ws, setProof, setCompare, setCorrecting }: 
               Questions for the first consult
             </h2>
             <ol className={g.questions}>
-              {state.attorney.questions.slice(0, 5).map((q) => (
+              {state.attorney.questions.slice(0, 4).map((q) => (
                 <li key={q}>{q}</li>
               ))}
             </ol>

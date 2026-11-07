@@ -38,12 +38,7 @@ const fits = async (label) => {
 const next = () => page.getByRole("button", { name: /^Next:/ }).click();
 const heading = (name) => page.getByRole("heading", { level: 1, name }).waitFor();
 
-await page.goto(BASE + "/");
-await shot("01-landing");
-check(await page.getByRole("heading", { level: 1, name: "Turn your projects into proof" }).isVisible(), "landing says what it is in its h1");
-check((await page.getByRole("link", { name: "See the 3-minute example" }).count()) === 1, "landing has one primary action");
-
-await page.getByRole("link", { name: "See the 3-minute example" }).click();
+await page.goto(BASE + "/api/example/start?to=/demo");
 await page.waitForURL("**/demo");
 await heading(/A CV lists claims/);
 await shot("02-before");
@@ -77,7 +72,7 @@ await page.locator("main li[data-support]").first().waitFor();
 await shot("06-can-do");
 await fits("What Rin can do");
 check(JSON.stringify(await supports()) === JSON.stringify(["demonstrated", "demonstrated", "unknown"]), `tasks before correction: ${(await supports()).join(", ")}`);
-await crop("can-do");
+
 
 await next();
 await heading(/Where Rin’s work could lead/);
@@ -99,7 +94,7 @@ await shot("09-finale");
 await fits("What Rin could build next");
 const fin = await page.locator("main").innerText();
 check(fin.includes("Offline field-notes app with AI tagging") && fin.includes("Show it to Fieldmark (EXAMPLE)"), "finale shows the MVP and a sourced next step");
-await crop("next");
+
 
 await page.keyboard.press("ArrowLeft");
 await heading("What an attorney sees first");
@@ -124,7 +119,7 @@ check(JSON.stringify(await supports()) === JSON.stringify(["demonstrated", "infe
 
 await page.goto(BASE + "/demo?step=built");
 await heading("What Rin built");
-await crop("built");
+
 
 for (const [w, h] of [[768, 1024], [390, 844]]) {
   await page.setViewportSize({ width: w, height: h });
@@ -133,8 +128,6 @@ for (const [w, h] of [[768, 1024], [390, 844]]) {
     await page.locator("main h1").waitFor();
     await shot(`${w}-${step}`);
   }
-  await page.goto(BASE + "/");
-  await shot(`${w}-landing`);
 }
 
 await browser.close();

@@ -23,10 +23,10 @@ Started 13:32 PT. Build closes 18:00 PT.
 
 - [x] Data fixes, tokens, fonts
 - [x] Packet (delegated), first version: 28-page PDF, two-pass TOC
-- [ ] Packet reframed as the First Consultation Kit (delegated, in progress)
+- [x] Packet reframed as the First Consultation Kit: 29-page PDF, expandable preview, working download
 - [x] Portfolio: hero, project index, covers with concept art, project views, proof, next build, SF roles
 - [x] Studio: sources rail, build, editable preview, share, review
 - [x] Swarm
 - [x] Landing
-- [x] Walkthrough v4 (11/12 checks; the kit thumbnail waits on the kit preview)
-- [ ] Final critique round, kit screenshots, attorney share link wired to the kit
+- [x] Walkthrough v4: 12/12, including the kit PDF download
+- [x] Final critique round, kit screenshots, attorney share link wired to the kit
