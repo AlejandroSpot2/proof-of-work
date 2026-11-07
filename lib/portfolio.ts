@@ -56,6 +56,10 @@ function parseCommits(text: string, handle: string): Commit[] {
     .map((m) => ({ sha: m[1]!, author: m[2]!, message: m[3]!, date: m[4] ?? null, mine: m[2]!.toLowerCase() === handle.toLowerCase() }));
 }
 
+/** EXAMPLE handles read as names ("contributor-b" → "Contributor B"); real handles keep their @. */
+const displayName = (handle: string, example: boolean) =>
+  example ? handle.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ") : `@${handle}`;
+
 const lowerFirst = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
 const sentence = (s: string) => (/[.!?]$/.test(s) ? s : `${s}.`);
 
@@ -104,11 +108,15 @@ export function buildPortfolio(db: Db, workspaceId: string, opts: { audience: "o
         .sort((a, b) => Number(!a.locator.startsWith("PR-")) - Number(!b.locator.startsWith("PR-")))
         .map((s) => {
           const [head, ...rest] = s.snippetStore.trim().split("\n");
-          return { locator: s.locator, title: (head ?? s.locator).replace(/^#+\s*/, ""), body: rest.join("\n").trim().slice(0, 1400) };
+          const body = rest.filter((l) => !/^\s*```/.test(l)).join("\n").trim().slice(0, 1400);
+          return { locator: s.locator, title: (head ?? s.locator).replace(/^#+\s*/, ""), body };
         });
       const commits = parseCommits(commitText, ws.githubHandle);
       const otherMap = new Map<string, Commit[]>();
-      for (const c of commits.filter((c) => !c.mine)) otherMap.set(c.author, [...(otherMap.get(c.author) ?? []), c]);
+      for (const c of commits.filter((c) => !c.mine)) {
+        const who = displayName(c.author, example);
+        otherMap.set(who, [...(otherMap.get(who) ?? []), { ...c, author: who }]);
+      }
       const others = [...otherMap].map(([who, cs]) => ({ who, commits: cs }));
       const dates = commits.map((c) => c.date).filter((d): d is string => !!d).sort();
       const rinPart = claims

@@ -636,7 +636,7 @@
 
 @media (max-width: 900px) {
   .app {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto auto minmax(0, 1fr);
     height: auto;
     min-height: 100svh;
@@ -647,9 +647,19 @@
   }
   .barActions {
     width: 100%;
+    flex-wrap: wrap;
+  }
+  .scope {
+    display: none;
   }
   .rail {
+    grid-column: 1;
     overflow: visible;
+    padding: 8px 16px 16px;
+  }
+  .sharePop {
+    left: 12px;
+    width: auto;
   }
   .canvas {
     grid-column: 1;

@@ -29,7 +29,7 @@ export default function Home() {
         </span>
         <nav className={s.nav} aria-label="Examples">
           <a href={PORTFOLIO}>Example portfolio</a>
-          <a href={PACKET}>Example attorney packet</a>
+          <a href={PACKET}>Example consultation kit</a>
           <a className={s.navCta} href={STUDIO}>
             Open the Studio
           </a>
@@ -40,7 +40,7 @@ export default function Home() {
         <div className={s.heroText}>
           <h1 className={s.h1}>Turn your projects into proof</h1>
           <p className={s.lead}>
-            Proof of Work reads what you built and turns it into a portfolio worth sharing and an evidence packet an attorney can use. Every sentence links to the file it came from.
+            Proof of Work reads what you built and turns it into a portfolio worth sharing and a First Consultation Kit to bring to an immigration attorney. Every sentence links to the file it came from.
           </p>
           <div className={s.ctas}>
             <a className={s.cta} href={STUDIO}>
@@ -93,9 +93,9 @@ export default function Home() {
           </a>
           <a className={s.output} href={PACKET}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/shots/packet.png" alt="The cover of Rin's evidence packet for a first attorney consult" width={1440} height={900} loading="lazy" />
-            <span className={s.outputName}>An attorney packet</span>
-            <span className={s.outputLine}>A typeset PDF for a first consult: contributions, chronology, exhibits with page references, and the questions to ask.</span>
+            <img src="/shots/packet.png" alt="Rin's First Consultation Kit, prepared for a first meeting with an attorney" width={1440} height={900} loading="lazy" />
+            <span className={s.outputName}>A First Consultation Kit</span>
+            <span className={s.outputLine}>A typeset PDF Rin prepares for an attorney: a one-page summary, the dossier with exhibits, what is still missing, and questions to ask.</span>
           </a>
         </div>
       </section>

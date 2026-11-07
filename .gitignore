@@ -13,3 +13,6 @@ walkthrough/*.png
 !walkthrough/.gitkeep
 walkthrough-v2/*.png
 tests-live/out
+walkthrough-v3/
+walkthrough-v4/*.png
+walkthrough-v4/*.pdf

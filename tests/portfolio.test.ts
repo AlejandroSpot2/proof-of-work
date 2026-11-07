@@ -16,8 +16,8 @@ describe("portfolio model", () => {
     const { db, workspaceId } = await built();
     const m = buildPortfolio(db, workspaceId, { audience: "public" })!;
     const kerf = m.projects.find((p) => p.slug === "kerf")!;
-    expect(kerf.others.map((o) => o.who)).toEqual(["contributor-c"]);
-    expect(kerf.contribution).toMatch(/contributor-c wrote 4 changes here/);
+    expect(kerf.others.map((o) => o.who)).toEqual(["Contributor C"]);
+    expect(kerf.contribution).toMatch(/Contributor C wrote 4 changes here/);
     expect(kerf.rinPart.some((r) => /deploy engine|infrastructure/i.test(r.text))).toBe(false);
     const tidepool = m.projects.find((p) => p.slug === "tidepool")!;
     expect(tidepool.others[0]!.commits.map((c) => c.message)).toContain("Add IndexedDB storage adapter");

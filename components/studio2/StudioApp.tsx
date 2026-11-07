@@ -140,7 +140,7 @@ export function StudioApp() {
         </span>
         <div className={s.barActions}>
           <a className={s.ghost} href="/packet" aria-disabled={!built} onClick={(e) => !built && e.preventDefault()}>
-            Attorney packet
+            Consultation kit
           </a>
           <a className={s.ghost} href="/portfolio" target="_blank" rel="noreferrer" aria-disabled={!built} onClick={(e) => !built && e.preventDefault()}>
             Preview as a visitor
@@ -279,11 +279,11 @@ export function StudioApp() {
                 Outputs
               </h2>
               <a className={s.outLink} href="/packet">
-                <span>Attorney packet</span>
-                <span className={s.outMeta}>Evidence packet for a first consult</span>
+                <span>First Consultation Kit</span>
+                <span className={s.outMeta}>Summary, dossier, what is missing, questions for the attorney</span>
               </a>
               <a className={s.outLink} href="/api/packet/pdf">
-                <span>Download the packet (PDF)</span>
+                <span>Download the kit (PDF)</span>
                 <span className={s.outMeta}>Typeset, with exhibits and page references</span>
               </a>
             </section>
