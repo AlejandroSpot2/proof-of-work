@@ -32,5 +32,8 @@
     "attribution": "contributor",
     "attributionNote": "Preview deploys were built and are run by Contributor C (EXAMPLE).",
     "why": "Rin's own correction, part of the EXAMPLE story: the README lists two maintainers but does not say who owns what."
-  }
+  },
+  "headline": "Builds offline-first sync and AI features that check their own output.",
+  "intro": "Rin builds small tools for small teams. Three projects, read from their own files: what Rin did, what others did, and where the record stops.",
+  "location": "Outside the US · looking at roles in San Francisco"
 }

@@ -146,7 +146,7 @@ export function Guided() {
           </ol>
         </nav>
         <div className={g.sideFoot}>
-          <a href="/studio">Open the workbench</a>
+          <a href="/workbench">Open the workbench</a>
           <a href="/api/example/start?to=/demo">Start over</a>
         </div>
       </aside>
@@ -170,7 +170,7 @@ export function Guided() {
               Next: {next.label.replace("Rin", name)}
             </button>
           ) : (
-            <a className={g.btnPrimary} href="/studio">
+            <a className={g.btnPrimary} href="/workbench">
               Explore the workbench
             </a>
           )}

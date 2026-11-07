@@ -18,6 +18,9 @@ export type ExampleProfile = {
   role: string;
   bio: string;
   goal: string;
+  headline: string;
+  intro: string;
+  location: string;
   projects: { title: string; role: string; url: string; summary: string }[];
   exampleCorrection: { claim: string; text: string; attribution: "contributor"; attributionNote: string; why: string };
 };

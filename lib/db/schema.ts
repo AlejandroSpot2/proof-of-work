@@ -20,7 +20,10 @@ export const workspaces = sqliteTable("workspaces", {
   mode: text("mode").$type<Mode>().notNull(),
   ledgerRevision: integer("ledger_revision").notNull().default(0),
   createdAt: integer("created_at").notNull(),
+  portfolioSettings: text("portfolio_settings", { mode: "json" }).$type<PortfolioSettings | null>(),
 });
+
+export type PortfolioSettings = { headline?: string; intro?: string; hidden?: string[]; builtAt?: number };
 
 export const sessions = sqliteTable("sessions", {
   id: text("id").primaryKey(),

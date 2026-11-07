@@ -35,7 +35,7 @@ export async function post(url: string, body: unknown) {
   return data;
 }
 
-export function useWorkspace() {
+export function useWorkspace(home = "/demo") {
   const [state, setState] = useState<WorkspaceState | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -44,11 +44,11 @@ export function useWorkspace() {
   const refresh = useCallback(async () => {
     const res = await fetch("/api/state", { cache: "no-store" });
     if (res.status === 401) {
-      window.location.href = "/api/example/start?to=/demo";
+      window.location.href = `/api/example/start?to=${encodeURIComponent(home)}`;
       return;
     }
     setState((await res.json()) as WorkspaceState);
-  }, []);
+  }, [home]);
 
   useEffect(() => {
     refresh().catch((e) => setError(String(e)));

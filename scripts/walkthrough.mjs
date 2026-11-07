@@ -31,8 +31,8 @@ const shot = async (name, opts = {}) => {
   await page.screenshot({ path: path.join(OUT, `${name}.png`), ...opts });
 };
 
-await page.goto(BASE + "/api/example/start?to=/studio");
-await page.waitForURL("**/studio");
+await page.goto(BASE + "/api/example/start?to=/workbench");
+await page.waitForURL("**/workbench");
 await page.getByRole("button", { name: "Import 3 projects" }).click();
 await page.getByText("Approve all").waitFor();
 await page.locator("#projects").scrollIntoViewIfNeeded();

@@ -1,0 +1,1 @@
+ALTER TABLE `workspaces` ADD `portfolio_settings` text;
