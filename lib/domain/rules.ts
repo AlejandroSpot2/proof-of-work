@@ -158,7 +158,7 @@ export function derivedLimits(cited: CitedClaim[]): string[] {
           : `Only the builder says this: "${c.text}"`,
       );
     if (c.kind === "skill") out.push(`A described practice, not a shipped result: "${c.text}"`);
-    if (c.attribution === "co_author") out.push(`Shared work${c.attributionNote ? `. ${c.attributionNote}` : `: "${c.text}"`}`);
+    if (c.attribution === "co_author") out.push(c.attributionNote ? `Shared work. ${c.attributionNote}` : "Shared with other maintainers, not one person's work alone.");
     if (c.attribution === "contributor")
       out.push(`Contribution to work led by others${c.attributionNote ? `. ${c.attributionNote}` : ""}`);
     if (c.attribution === "reviewer") out.push(`Reviewed, did not author: "${c.text}"`);
