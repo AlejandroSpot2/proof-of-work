@@ -57,6 +57,14 @@ function usePlayhead(start: number, autoplay: boolean) {
   return { t, set, ref };
 }
 
+function Check() {
+  return (
+    <svg width="11" height="11" viewBox="0 0 12 12" aria-hidden="true">
+      <path d="M2 6.5 L5 9.2 L10 3" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 export function ConceptTag() {
   return <span className={a.tag}>Concept illustration</span>;
 }
@@ -220,7 +228,9 @@ export function QuietroomArt({ size = "cover" }: { size?: "cover" | "detail" }) 
               <span className={a.draft}>Draft issue</span>
               <strong>{s.title}</strong>
               <span className={a.checks}>
-                <em>schema ✓</em>
+                <em>
+                  schema <Check />
+                </em>
                 <em>priority: {s.priority}</em>
               </span>
             </li>
@@ -253,7 +263,9 @@ export function KerfArt({ size = "cover" }: { size?: "cover" | "detail" }) {
             <p className={a.docName}>RELEASING.md</p>
             {["Cut from main", "Build binaries", "Publish changelog", "Push version tag"].map((x) => (
               <p key={x} className={a.check}>
-                <i aria-hidden="true">✓</i>
+                <i aria-hidden="true">
+                  <Check />
+                </i>
                 {x}
               </p>
             ))}
