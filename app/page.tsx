@@ -56,7 +56,7 @@ export default function Home() {
               </li>
               <li>The deploy engine: {k.other.length} commits by Contributor C (EXAMPLE), not Rin</li>
             </ul>
-            <p className={s.proofFoot}>Each line opens the file it came from.</p>
+            <p className={s.proofFoot}>In the example, every line like these opens the file it came from.</p>
           </div>
         </div>
       </section>
