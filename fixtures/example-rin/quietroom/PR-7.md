@@ -2,6 +2,7 @@
 
 Author: rin
 Status: merged into main
+Merged: 2025-08-05
 
 Wraps feedback in delimited data blocks and takes priority out of the model's control.
 

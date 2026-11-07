@@ -2,31 +2,37 @@
   {
     "sha": "3f1a9c2",
     "author": "rin",
-    "message": "Resolve concurrent edits per field with last-writer-wins"
+    "message": "Resolve concurrent edits per field with last-writer-wins",
+    "date": "2025-03-04"
   },
   {
     "sha": "8b20d41",
     "author": "rin",
-    "message": "Stamp every local event with a hybrid logical clock"
+    "message": "Stamp every local event with a hybrid logical clock",
+    "date": "2025-02-18"
   },
   {
     "sha": "c77e019",
     "author": "rin",
-    "message": "Replay the event log to rebuild the timeline"
+    "message": "Replay the event log to rebuild the timeline",
+    "date": "2025-03-21"
   },
   {
     "sha": "1d9e3aa",
     "author": "contributor-b",
-    "message": "Add IndexedDB storage adapter"
+    "message": "Add IndexedDB storage adapter",
+    "date": "2025-04-02"
   },
   {
     "sha": "5ac0f62",
     "author": "contributor-b",
-    "message": "Add SQLite storage adapter for desktop"
+    "message": "Add SQLite storage adapter for desktop",
+    "date": "2025-04-09"
   },
   {
     "sha": "e40b7d3",
     "author": "rin",
-    "message": "Add synthetic replay benchmark"
+    "message": "Add synthetic replay benchmark",
+    "date": "2025-05-12"
   }
 ]

@@ -30,7 +30,7 @@ export function loadCv(): string {
   return fs.readFileSync(path.join(ROOT, "cv.md"), "utf8");
 }
 
-type Commit = { sha: string; author: string; message: string };
+type Commit = { sha: string; author: string; message: string; date?: string };
 
 export function detectAuthorship(text: string, who: { handle: string; personName: string }): Authorship | undefined {
   const header = text.split("\n").slice(0, 8).join("\n").toLowerCase();
@@ -85,7 +85,7 @@ export function fixtureSourcesFor(projectUrl: string, who: { handle: string; per
       ...base,
       url: `${projectUrl}/commits`,
       locator: "commits",
-      text: commits.map((c) => `${c.sha} ${c.author}: ${c.message}`).join("\n"),
+      text: commits.map((c) => `${c.sha} ${c.author}: ${c.message}${c.date ? ` (${c.date})` : ""}`).join("\n"),
       authorship: "line-prefix",
     },
     {

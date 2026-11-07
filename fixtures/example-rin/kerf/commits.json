@@ -2,36 +2,43 @@
   {
     "sha": "0e7f3a1",
     "author": "contributor-c",
-    "message": "Create a preview environment per pull request"
+    "message": "Create a preview environment per pull request",
+    "date": "2025-09-02"
   },
   {
     "sha": "b81c2d4",
     "author": "contributor-c",
-    "message": "Tear down previews on merge"
+    "message": "Tear down previews on merge",
+    "date": "2025-09-10"
   },
   {
     "sha": "9a4d6e2",
     "author": "contributor-c",
-    "message": "Add provider interface for deploy targets"
+    "message": "Add provider interface for deploy targets",
+    "date": "2025-09-24"
   },
   {
     "sha": "37c0b95",
     "author": "contributor-c",
-    "message": "Retry failed deploys with backoff"
+    "message": "Retry failed deploys with backoff",
+    "date": "2025-10-07"
   },
   {
     "sha": "c5e1f08",
     "author": "rin",
-    "message": "Automate changelog and tag publishing"
+    "message": "Automate changelog and tag publishing",
+    "date": "2025-10-21"
   },
   {
     "sha": "6d2a9b3",
     "author": "rin",
-    "message": "Rewrite the getting-started guide"
+    "message": "Rewrite the getting-started guide",
+    "date": "2025-11-04"
   },
   {
     "sha": "e8f4c71",
     "author": "rin",
-    "message": "Document the release checklist"
+    "message": "Document the release checklist",
+    "date": "2025-11-18"
   }
 ]

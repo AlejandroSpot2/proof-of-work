@@ -2,26 +2,31 @@
   {
     "sha": "a0c4e51",
     "author": "rin",
-    "message": "Draft issues against a JSON schema and reject invalid output"
+    "message": "Draft issues against a JSON schema and reject invalid output",
+    "date": "2025-07-08"
   },
   {
     "sha": "71d2b8f",
     "author": "rin",
-    "message": "Cluster feedback and rank clusters by distinct users"
+    "message": "Cluster feedback and rank clusters by distinct users",
+    "date": "2025-07-15"
   },
   {
     "sha": "d93f0e7",
     "author": "rin",
-    "message": "Treat feedback text as data, never instructions (fixes #6)"
+    "message": "Treat feedback text as data, never instructions (fixes #6)",
+    "date": "2025-08-05"
   },
   {
     "sha": "4be61c0",
     "author": "rin",
-    "message": "Compute priority from cluster size in code"
+    "message": "Compute priority from cluster size in code",
+    "date": "2025-08-06"
   },
   {
     "sha": "f2a7d19",
     "author": "rin",
-    "message": "Add 20-example synthetic eval"
+    "message": "Add 20-example synthetic eval",
+    "date": "2025-08-19"
   }
 ]

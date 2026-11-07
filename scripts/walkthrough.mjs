@@ -62,7 +62,7 @@ check(JSON.stringify(supports) === JSON.stringify(["demonstrated", "demonstrated
 await page.locator("#views").scrollIntoViewIfNeeded();
 await shot("06-two-views-before");
 const viewsBefore = await page.locator("#views").innerText();
-check(viewsBefore.includes("Own the release and deploy process"), "both views show the deploy capability before correction");
+check(viewsBefore.includes("Run the release process: changelog, version tags, release docs"), "both views show the deploy capability before correction");
 
 await page.locator("#entrust").getByRole("button", { name: /Correct “Co-maintains Kerf/ }).click();
 await page.getByRole("button", { name: "Use Rin's correction (EXAMPLE)" }).click();
@@ -73,8 +73,8 @@ await page.locator("#views").scrollIntoViewIfNeeded();
 await shot("08-views-capability-withdrawn");
 const portfolioText = await page.locator("[data-doc=portfolio]").innerText();
 const dossierText = await page.locator("[data-doc=attorney]").innerText();
-check(!portfolioText.includes("Own the release and deploy process"), "portfolio dropped the obsolete capability");
-check(dossierText.includes("Withdrawn after human review") && dossierText.includes("Own the release and deploy process"), "dossier records the withdrawal");
+check(!portfolioText.includes("Run the release process: changelog, version tags, release docs"), "portfolio dropped the obsolete capability");
+check(dossierText.includes("Withdrawn after human review") && dossierText.includes("Run the release process: changelog, version tags, release docs"), "dossier records the withdrawal");
 
 await page.getByRole("button", { name: "Re-evaluate from the corrected ledger" }).click();
 await page.getByText("The ledger changed since this answer.").waitFor({ state: "detached" });

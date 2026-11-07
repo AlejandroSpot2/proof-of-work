@@ -213,7 +213,7 @@ describe("entrust question", () => {
 
   it("'what next' proposal only cites approved evidence", async () => {
     const { db, token, workspaceId, profile } = await exampleWorkspace();
-    const kerf = claimByText(db, workspaceId, "Co-maintains Kerf, including its release process");
+    const kerf = claimByText(db, workspaceId, "Co-maintains Kerf's docs and release process");
     reviewClaim(db, token, kerf.id, { action: "reject" });
     await approveAllAndEvaluate(db, token, workspaceId, profile.goal);
     const entrust = deriveEntrust(snap(db, workspaceId));
@@ -231,7 +231,7 @@ describe("propagation", () => {
     const { db, token, workspaceId, profile } = await exampleWorkspace();
     await approveAllAndEvaluate(db, token, workspaceId, profile.goal);
     const before = portfolioView(snap(db, workspaceId));
-    expect(before.capabilities.map((c) => c.name)).toContain("Own the release and deploy process");
+    expect(before.capabilities.map((c) => c.name)).toContain("Run the release process: changelog, version tags, release docs");
 
     const kerf = claimByText(db, workspaceId, expected.kerfCorrection.claim);
     reviewClaim(db, token, kerf.id, { action: "correct", text: expected.kerfCorrection.text, attribution: expected.kerfCorrection.attribution, attributionNote: expected.kerfCorrection.note });
@@ -239,9 +239,9 @@ describe("propagation", () => {
     const s = snap(db, workspaceId);
     const portfolio = portfolioView(s);
     const dossier = attorneyView(s);
-    expect(portfolio.capabilities.map((c) => c.name)).not.toContain("Own the release and deploy process");
+    expect(portfolio.capabilities.map((c) => c.name)).not.toContain("Run the release process: changelog, version tags, release docs");
     expect(portfolio.capabilities.map((c) => c.key)).toEqual(dossier.capabilities.map((c) => c.key));
-    expect(dossier.withdrawn.map((w) => w.name)).toContain("Own the release and deploy process");
+    expect(dossier.withdrawn.map((w) => w.name)).toContain("Run the release process: changelog, version tags, release docs");
 
     const re = await evaluateGoal(db, token, fixtureDeps);
     expect(capSupports(re.capabilities)).toEqual(expected.afterCorrection.capabilities);

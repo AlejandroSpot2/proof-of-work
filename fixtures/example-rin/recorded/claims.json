@@ -141,12 +141,12 @@
       ],
       "claims": [
         {
-          "text": "Co-maintains Kerf, including its release process",
+          "text": "Co-maintains Kerf's docs and release process",
           "kind": "contribution",
           "attribution": "co_author",
           "tags": [
             "releases",
-            "deployment"
+            "docs"
           ],
           "legalFlag": null,
           "quotes": [

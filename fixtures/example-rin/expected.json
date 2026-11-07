@@ -3,17 +3,17 @@
   "beforeCorrection": {
     "claimStates": {
       "Authored Tidepool's per-field conflict resolution for offline edits": "fetched",
-      "Co-maintains Kerf, including its release process": "fetched",
+      "Co-maintains Kerf's docs and release process": "fetched",
       "Ranks product issues by how many distinct users raised them": "fetched"
     },
     "capabilities": {
       "Build offline sync that merges conflicting edits": "demonstrated",
-      "Own the release and deploy process": "demonstrated",
+      "Run the release process: changelog, version tags, release docs": "demonstrated",
       "Run it in production for real users": "unknown"
     }
   },
   "kerfCorrection": {
-    "claim": "Co-maintains Kerf, including its release process",
+    "claim": "Co-maintains Kerf's docs and release process",
     "text": "Runs Kerf's docs and release process; the deploy engine and its infrastructure are Contributor C's",
     "attribution": "contributor",
     "note": "Preview deploys were built and are run by Contributor C (EXAMPLE)."
@@ -24,7 +24,7 @@
     },
     "capabilities": {
       "Build offline sync that merges conflicting edits": "demonstrated",
-      "Own the release and deploy process": "inferred",
+      "Run the release process: changelog, version tags, release docs": "inferred",
       "Run it in production for real users": "unknown"
     }
   }

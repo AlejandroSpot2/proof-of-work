@@ -19,7 +19,7 @@ describe("review fixes", () => {
       ...fixtureDeps,
       fetchSources: async (url, own, all, w) =>
         (await fixtureDeps.fetchSources(url, own, all, w)).map((s) =>
-          s.locator === "commits" && url.endsWith("tidepool") ? { ...s, text: s.text.replace("c77e019 rin: Replay the event log to rebuild the timeline\n", "") } : s,
+          s.locator === "commits" && url.endsWith("tidepool") ? { ...s, text: s.text.replace(/c77e019 rin: Replay the event log to rebuild the timeline[^\n]*\n/, "") } : s,
         ),
     };
     await importProjects(db, token, projectsOf(profile), edited);
@@ -56,7 +56,7 @@ describe("review fixes", () => {
 
   it("raising your own attribution makes the claim rest on your word", async () => {
     const { db, token, workspaceId } = await exampleWorkspace();
-    const kerf = claimByText(db, workspaceId, "Co-maintains Kerf, including its release process");
+    const kerf = claimByText(db, workspaceId, "Co-maintains Kerf's docs and release process");
     reviewClaim(db, token, kerf.id, { action: "correct", attribution: "author" });
     expect(claimByText(db, workspaceId, kerf.text).state).toBe("user_attested");
   });
@@ -64,12 +64,12 @@ describe("review fixes", () => {
   it("the portfolio drops capabilities whose cited claims are all private, and leaks none of their text", async () => {
     const { db, token, workspaceId, profile } = await exampleWorkspace();
     await approveAllAndEvaluate(db, token, workspaceId, profile.goal);
-    const kerf = claimByText(db, workspaceId, "Co-maintains Kerf, including its release process");
+    const kerf = claimByText(db, workspaceId, "Co-maintains Kerf's docs and release process");
     reviewClaim(db, token, kerf.id, { action: "publishable", publishable: false });
     const portfolio = portfolioView(snap(db, workspaceId));
-    expect(portfolio.capabilities.map((c) => c.name)).not.toContain("Own the release and deploy process");
+    expect(portfolio.capabilities.map((c) => c.name)).not.toContain("Run the release process: changelog, version tags, release docs");
     expect(JSON.stringify(portfolio)).not.toContain("Co-maintains Kerf");
-    expect(attorneyView(snap(db, workspaceId)).capabilities.map((c) => c.name)).toContain("Own the release and deploy process");
+    expect(attorneyView(snap(db, workspaceId)).capabilities.map((c) => c.name)).toContain("Run the release process: changelog, version tags, release docs");
   });
 
   it("resubmitting the same goal costs no call and keeps rejected readings", async () => {

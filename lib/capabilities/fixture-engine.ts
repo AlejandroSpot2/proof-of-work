@@ -32,9 +32,9 @@ const TEMPLATES: Template[] = [
     },
   },
   {
-    goalWords: ["release", "deploy", "shipping", "ci/cd"],
-    name: "Own the release and deploy process",
-    tags: ["releases", "deployment"],
+    goalWords: ["release", "shipping", "ci/cd"],
+    name: "Run the release process: changelog, version tags, release docs",
+    tags: ["releases"],
     ifUnknown: {
       gap: "No file shows release or deploy work.",
       question: "Can you link a release process or deploy pipeline you ran?",

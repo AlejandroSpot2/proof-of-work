@@ -27,7 +27,7 @@
     }
   ],
   "exampleCorrection": {
-    "claim": "Co-maintains Kerf, including its release process",
+    "claim": "Co-maintains Kerf's docs and release process",
     "text": "Runs Kerf's docs and release process; the deploy engine and its infrastructure are Contributor C's",
     "attribution": "contributor",
     "attributionNote": "Preview deploys were built and are run by Contributor C (EXAMPLE).",

@@ -1,18 +1,23 @@
 :root {
-  --bg: #ecebe7;
-  --surface: #e1dfd9;
-  --surface-2: #d6d3cb;
-  --ink: #38450f;
-  --ink-strong: #2a340b;
-  --muted: #5d683a;
-  --accent: #38450f;
-  --accent-ink: #ecebe7;
-  --mark: #d3d7a9;
-  --line: #cfccc3;
-  --field: #38450f;
-  --field-ink: #ecebe7;
-  --field-muted: #c5cba8;
-  --paper: #f3f3f1;
+  /* Paper and cobalt: ink on paper, one cobalt accent for actions, selection and proof. */
+  --bg: #f7f7f5;
+  --surface: #eeeeeb;
+  --surface-2: #e4e4e0;
+  --ink: #0e1116;
+  --ink-strong: #0a0c10;
+  --muted: #565c68;
+  --accent: #2747e8;
+  --accent-ink: #ffffff;
+  --accent-soft: #e6ebff;
+  --mark: #dde4ff;
+  --line: #e1e1dc;
+  --field: #0e1116;
+  --field-ink: #f7f7f5;
+  --field-muted: #a9afbb;
+  --paper: #ffffff;
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
   --step-small: clamp(0.875rem, 0.85rem + 0.1vw, 0.9375rem);
   --step-body: clamp(1rem, 0.97rem + 0.18vw, 1.125rem);
@@ -23,7 +28,7 @@
   --margin: clamp(16px, 2.2vw, 32px);
   --axis: 42%;
   --radius: 0px;
-  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
   color-scheme: light;
 }
 
@@ -41,7 +46,7 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: "Switzer", ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-sans);
   font-size: var(--step-body);
   line-height: 1.5;
   letter-spacing: -0.005em;
