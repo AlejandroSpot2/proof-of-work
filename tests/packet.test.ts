@@ -1,8 +1,8 @@
 import { describe, expect, test } from "vitest";
 import { exampleWorkspace, approveAllAndEvaluate, snap, claimByText } from "./helpers";
 import { buildPacket, CLASSIFICATION_OF } from "@/lib/packet/model";
-import { renderPacketBody } from "@/components/packet/document";
-import { renderPacket, locateHeadings } from "@/lib/packet/pdf";
+import { NOTICE, PROJECTS_ALONE, QUESTIONS_NOTE, renderPacketBody } from "@/components/packet/document";
+import { renderPacket, locateHeadings, PDF_FILENAME } from "@/lib/packet/pdf";
 import { reviewClaim } from "@/lib/workspace";
 
 async function answered() {
@@ -13,7 +13,7 @@ async function answered() {
 
 const visibleText = (html: string) => html.replace(/<style[\s\S]*?<\/style>/g, "").replace(/<svg[\s\S]*?<\/svg>/g, "").replace(/<[^>]+>/g, " ");
 
-describe("attorney evidence packet", () => {
+describe("first consultation kit", () => {
   test("covers every confirmed statement, each citing an exhibit", async () => {
     const { db, workspaceId, packet } = await answered();
     const approved = snap(db, workspaceId).projects.flatMap((p) => p.claims.filter((c) => c.reviewStatus === "approved"));
@@ -54,7 +54,7 @@ describe("attorney evidence packet", () => {
     const states = new Map(snap(db, workspaceId).projects.flatMap((p) => p.claims.map((c) => [c.id, c.state] as const)));
     for (const s of packet.projects.flatMap((p) => p.statements)) expect(s.classification).toBe(CLASSIFICATION_OF[states.get(s.id)!]);
     expect(packet.summary.byClass.Independent).toBe(0);
-    expect(packet.gaps[0]).toMatchObject({ priority: "High" });
+    expect(packet.checklist[0]).toMatchObject({ priority: "High", scope: "record", status: "Missing from the record" });
 
     const kerf = claimByText(db, workspaceId, "Co-maintains Kerf's docs and release process");
     reviewClaim(db, token, kerf.id, { action: "correct", text: "Runs Kerf's docs and release process; the deploy engine and its infrastructure are Contributor C's", attribution: "author" });
@@ -76,12 +76,65 @@ describe("attorney evidence packet", () => {
     for (const row of packet.chronology.filter((r) => /deploy|preview environment/i.test(r.event))) expect(row.isRin).toBe(false);
   });
 
-  test("the document makes no legal judgment and names no visa category", async () => {
+  test("the kit runs cover, contents, the four parts in order, then the annexes", async () => {
+    const { packet } = await answered();
+    const html = renderPacketBody(packet, null);
+    const at = (needle: string) => {
+      const i = html.indexOf(needle);
+      expect(i, needle).toBeGreaterThanOrEqual(0);
+      return i;
+    };
+    const order = [
+      at('class="cover-title">First Consultation Kit<'),
+      at('id="sec-contents"'),
+      at('id="part-summary"'),
+      at('id="part-dossier"'),
+      at('id="sec-contributions"'),
+      at('id="sec-impact"'),
+      at('id="sec-chronology"'),
+      at('id="sec-index"'),
+      at('id="part-missing"'),
+      at('id="part-questions"'),
+      at('id="ex-E-01"'),
+    ];
+    expect(order).toEqual([...order].sort((a, b) => a - b));
+    const text = visibleText(html);
+    expect(text).toContain("Prepared by Rin Okafor (EXAMPLE) for a first meeting with an immigration attorney");
+    expect(text).toContain(NOTICE);
+    expect(packet.objective).toMatch(/outside the US, interested in roles in San Francisco/);
+    expect(packet.contributions.length).toBe(packet.summary.statements);
+    for (const c of packet.contributions) expect(c.exhibitIds.length).toBeGreaterThan(0);
+    expect(packet.recordLines.map((l) => l.shows)).toEqual([true, true, false]);
+    expect(PDF_FILENAME).toBe("rin-okafor-first-consultation-kit-EXAMPLE.pdf");
+  });
+
+  test("the missing checklist names record gaps and outside items without inventing them", async () => {
+    const { packet } = await answered();
+    const items = packet.checklist.map((c) => c.item);
+    expect(items).toContain("An independent account of any contribution");
+    expect(items).toContain("Evidence of production use or real users");
+    expect(items).toContain("Results measured on real data");
+    expect(items.some((i) => i.startsWith("Kerf:"))).toBe(true);
+    const outside = packet.checklist.filter((c) => c.scope === "outside");
+    expect(outside.map((c) => c.item)).toEqual(
+      expect.arrayContaining(["Current immigration status and history", "A job offer or prospective employer", "Employment history and any employer letters", "Education credentials", "Recognition or publications"]),
+    );
+    for (const c of outside) expect(["Unknown", "Not collected by this tool", "None in this record"]).toContain(c.status);
+    expect(outside.find((c) => c.item.startsWith("Current immigration"))!.who).toMatch(/Not stored here/);
+    const ranks = packet.checklist.map((c) => ["High", "Medium", "Low"].indexOf(c.priority));
+    expect(ranks).toEqual([...ranks].sort((a, b) => a - b));
+    const html = renderPacketBody(packet, null);
+    expect(visibleText(html)).toContain(PROJECTS_ALONE);
+    expect(html.match(/class="box"/g)?.length).toBe(packet.checklist.length);
+  });
+
+  test("the kit makes no legal judgment and names no visa category", async () => {
     const { packet } = await answered();
     const text = visibleText(renderPacketBody(packet, null));
-    expect(text).toContain("SYNTHETIC EXAMPLE MATERIAL. Not legal advice. No eligibility assessment.");
-    const rest = text.replaceAll("No eligibility assessment", "");
-    for (const banned of [/eligib/i, /\bO-1/, /H-1B/i, /\bEB-\d/, /\bL-1\b/, /petition/i, /probabilit/i, /approved/i, /\bawards?\b/i, /\bpress\b/i, /signature/i, /letters? of/i, /guarantee/i, /\bvisa\b/i])
+    expect(text).toContain(QUESTIONS_NOTE);
+    let rest = text;
+    for (const allowed of [NOTICE, QUESTIONS_NOTE, PROJECTS_ALONE]) rest = rest.replaceAll(allowed, "");
+    for (const banned of [/eligib/i, /\bO-1/, /H-1B/i, /\bEB-\d/, /\bL-1\b/, /petition/i, /probabilit/i, /approved/i, /\bawards?\b/i, /\bpress\b/i, /signature/i, /letters? of/i, /guarantee/i, /\bvisa\b/i, /(?<!not )ready to file/i, /endorse/i])
       expect(rest, String(banned)).not.toMatch(banned);
   });
 
@@ -107,7 +160,11 @@ describe("attorney evidence packet", () => {
     const r = await renderPacket(packet);
     expect(r.pdf.subarray(0, 4).toString()).toBe("%PDF");
     expect(r.pageCount).toBeGreaterThan(5);
-    expect(r.pages["sec-profile"]).toBe(3);
-    for (const e of packet.exhibits) expect(r.pages[e.anchor], e.id).toBeGreaterThan(r.pages["sec-questions"]!);
+    expect(r.pages["part-summary"]).toBe(3);
+    expect(r.pages["part-dossier"]).toBe(4);
+    const order = ["part-summary", "part-dossier", "sec-contributions", "sec-impact", "sec-chronology", "sec-index", "part-missing", "part-questions"].map((a) => r.pages[a]!);
+    expect(order.every((n) => n > 0)).toBe(true);
+    expect(order).toEqual([...order].sort((a, b) => a - b));
+    for (const e of packet.exhibits) expect(r.pages[e.anchor], e.id).toBeGreaterThan(r.pages["part-questions"]!);
   }, 120_000);
 });

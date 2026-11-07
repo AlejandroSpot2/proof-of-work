@@ -8,7 +8,7 @@ import { PacketScreen } from "@/components/packet/PacketScreen";
 import s from "@/components/packet/screen.module.css";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Evidence packet | Proof of Work", robots: { index: false, follow: false } };
+export const metadata = { title: "First Consultation Kit | Proof of Work", robots: { index: false, follow: false } };
 
 export default async function PacketPage() {
   const token = (await cookies()).get(OWNER_COOKIE)?.value ?? null;

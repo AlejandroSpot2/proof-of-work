@@ -542,7 +542,7 @@ export function buildPacket(db: Db, workspaceId: string, now = Date.now()): Pack
     {
       shows: false,
       text: missing.length
-        ? `It does not show ${missing.length > 1 ? `${missing.slice(0, -1).join(", ")}, or ${missing.at(-1)}` : missing[0]}.`
+        ? (missing.length > 1 ? `${missing.slice(0, -1).join(", ")}, or ${missing.at(-1)}.` : `${missing[0]}.`).replace(/^./, (c) => c.toUpperCase())
         : "Nothing in the record is marked as missing; see Part 3 for items outside the projects.",
     },
   ];

@@ -81,7 +81,7 @@ function cover(p: Packet, pages: PageMap | null) {
     ["Record revision", `<span class="mono">${p.ledgerRevision}</span>`],
   ];
   return `<section class="sheet cover">
-  <div class="cover-top"><span>Draft for attorney review</span><span class="mono">${p.generated}</span></div>
+  <div class="cover-top"><span>A draft for an attorney to review. Not ready to file.</span><span class="mono">${p.generated}</span></div>
   <div class="cover-main">
     <h1 class="cover-title">${TITLE}</h1>
     <p class="cover-sub">${esc(subtitle(p))}</p>
@@ -116,7 +116,7 @@ function onePage(p: Packet, pages: PageMap | null) {
   <dl class="facts">
     <div><dt>Name</dt><dd>${esc(p.person.name)}</dd></div>
     ${p.person.role ? `<div><dt>Role</dt><dd>${esc(p.person.role)}</dd></div>` : ""}
-    ${p.person.location ? `<div><dt>Location</dt><dd>${esc(p.person.location)}</dd></div>` : ""}
+    <div><dt>Handle in the records</dt><dd class="mono">${esc(p.person.handle)}</dd></div>
   </dl>
   ${p.person.bio ? `<p class="prose bio">${esc(p.person.bio)}</p>` : ""}
   <h2>Objective</h2>
@@ -253,7 +253,7 @@ function checkRows(items: ChecklistItem[]) {
       (c) => `<tr>
       <td class="box-cell"><span class="box" aria-hidden="true"></span></td>
       <td><span class="prio prio-${c.priority.toLowerCase()}">${c.priority}</span></td>
-      <td><span class="strong">${esc(c.item)}</span><span class="why">${esc(c.why)}</span></td>
+      <td><span class="strong">${esc(c.item)}</span><span class="why">${esc(c.why).replace(/E-\d{2}/g, (m) => `<span class="nowrap">${m}</span>`)}</span></td>
       <td><span class="status status-${c.scope}">${esc(c.status)}</span></td>
       <td class="who">${esc(c.who)}</td>
     </tr>`,
@@ -265,7 +265,7 @@ function missing(p: Packet) {
   const { total, high } = checklistCounts(p);
   const group = (title: string, lead: string, items: ChecklistItem[]) =>
     items.length
-      ? `<h2>${title}</h2><p class="note group-lead">${lead}</p><table class="grid check"><thead><tr><th></th><th>Priority</th><th>Item and why it matters</th><th>Status</th><th>Who would provide it</th></tr></thead><tbody>${checkRows(items)}</tbody></table>`
+      ? `<div class="cgroup"><h2>${title}</h2><p class="note group-lead">${lead}</p><table class="grid check"><thead><tr><th></th><th>Priority</th><th>Item and why it matters</th><th>Status</th><th>Who would provide it</th></tr></thead><tbody>${checkRows(items)}</tbody></table></div>`
       : "";
   return `<section class="sheet">
   ${head(PARTS[2]!, `${total} items to gather, ${high} high priority. Bring each one if relevant. Nothing here is a form to fill in.`)}
@@ -281,10 +281,7 @@ function questions(p: Packet) {
   return `<section class="sheet">
   ${head(PARTS[3]!, QUESTIONS_NOTE)}
   <ol class="qs">${p.questions.map((q) => `<li><p>${esc(q)}</p>${RULED(3)}</li>`).join("")}</ol>
-</section>
-<section class="sheet notes">
-  <header class="sh"><h1>Notes</h1><p class="lead">For anything the attorney asks to bring next time.</p></header>
-  ${RULED(26)}
+  <div class="notes"><h2>Notes</h2><p class="note">For anything the attorney asks to bring next time.</p>${RULED(16)}</div>
 </section>`;
 }
 

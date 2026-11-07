@@ -3,7 +3,7 @@ import path from "node:path";
 import type { Browser } from "playwright";
 import type { Db } from "@/lib/db/client";
 import { buildPacket, type Packet, type PageMap } from "@/lib/packet/model";
-import { TITLE, headingMarks, renderPacketBody } from "@/components/packet/document";
+import { RUNNING_HEAD, TITLE, headingMarks, renderPacketBody } from "@/components/packet/document";
 import { PACKET_CSS } from "@/components/packet/styles";
 
 const FONT_DIR = path.join(process.cwd(), "node_modules", "geist", "dist", "fonts");
@@ -35,7 +35,7 @@ ${PACKET_CSS}</style></head><body>${renderPacketBody(packet, pages)}</body></htm
 const chrome = (inner: string) =>
   `<div style="width:100%;padding:0 0.85in;font-family:Geist,Arial,sans-serif;font-size:7pt;color:#565c68;display:flex;justify-content:space-between;-webkit-print-color-adjust:exact;">${inner}</div>`;
 
-const HEADER = (name: string) => chrome(`<span>${name} · ${TITLE} · Draft</span><span></span>`);
+const HEADER = (name: string) => chrome(`<span>${name} · ${RUNNING_HEAD}</span><span></span>`);
 const FOOTER = chrome(`<span>Synthetic EXAMPLE material · Not legal advice</span><span>Page <span class="pageNumber"></span> of <span class="totalPages"></span></span>`);
 
 const g = globalThis as unknown as { __pow_pdf_browser?: Promise<Browser>; __pow_pdf_cache?: Map<string, Promise<RenderedPacket>> };
@@ -138,7 +138,7 @@ export function packetFor(db: Db, workspaceId: string): Promise<RenderedPacket> 
   return hit;
 }
 
-export const PDF_FILENAME = "rin-okafor-evidence-packet-EXAMPLE.pdf";
+export const PDF_FILENAME = "rin-okafor-first-consultation-kit-EXAMPLE.pdf";
 
 export function pdfResponse(r: RenderedPacket): Response {
   return new Response(new Uint8Array(r.pdf), {
