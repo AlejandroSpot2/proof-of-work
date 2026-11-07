@@ -31,7 +31,7 @@ export function opportunitiesFor(entrust: Entrust, records = loadEmployerRecords
         evidenceIds: c.evidence.map((e) => e.id),
         evidence: c.evidence.map((e) => ({ id: e.id, sourceId: e.sourceId, quote: e.quote, locator: e.locator, projectTitle: e.projectTitle })),
       }));
-    const unique = [...new Map(fit.map((f) => [[...f.evidenceIds].sort().join(","), f])).values()];
+    const unique = fit.filter((f, i) => fit.findIndex((g) => [...g.evidenceIds].sort().join(",") === [...f.evidenceIds].sort().join(",")) === i);
     return { ...r, signal: SIGNAL_COPY[r.signalType] ?? SIGNAL_COPY.unknown, fit: unique };
   });
 }
