@@ -99,6 +99,29 @@ export default function Home() {
         </div>
       </section>
 
+      <section className={s.shots} aria-labelledby="shots-title">
+        <h2 id="shots-title" className={s.shotsTitle}>
+          What a client gets
+        </h2>
+        <div className={s.mosaic}>
+          <figure className={s.shot}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/shots/entrust-answer.png" alt="The entrust answer for Rin Okafor (EXAMPLE): one capability demonstrated, one inferred after a correction, one unknown, each with quotes and limits" width={752} height={1091} loading="lazy" />
+            <figcaption>Capabilities for one goal, each demonstrated, inferred or unknown, with its quotes and its limits.</figcaption>
+          </figure>
+          <figure className={s.shot}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/shots/quote-in-source.png" alt="A quoted claim opened inside its source file, highlighted where it appears" width={760} height={516} loading="lazy" />
+            <figcaption>Every quote opens in its source, highlighted where it appears.</figcaption>
+          </figure>
+          <figure className={s.shot}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/shots/two-views.png" alt="The client portfolio and the private attorney dossier side by side, built from the same ledger" width={1378} height={1325} loading="lazy" />
+            <figcaption>A client portfolio and a private attorney dossier from the same facts.</figcaption>
+          </figure>
+        </div>
+      </section>
+
       <section className={s.stairs} aria-label="How it works">
         <div className={s.step} style={{ ["--col" as string]: 1 }}>
           <h2 className={s.stepLine}>First, bring three projects.</h2>

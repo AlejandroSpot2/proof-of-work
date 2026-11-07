@@ -211,6 +211,55 @@
   font-size: 1.125rem;
 }
 
+.shots {
+  padding: clamp(96px, 12vw, 200px) var(--margin) 0;
+  display: grid;
+  gap: 32px;
+}
+
+.shotsTitle {
+  font-size: var(--step-head);
+  letter-spacing: -0.04em;
+  padding-left: var(--axis);
+}
+
+.mosaic {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr 1.3fr;
+  gap: 0;
+  background: var(--surface);
+}
+
+.shot {
+  margin: 0;
+  display: grid;
+  grid-template-rows: 440px auto;
+}
+
+.shot img {
+  width: 100%;
+  height: 440px;
+  object-fit: cover;
+  object-position: top left;
+  display: block;
+  animation: drift 18s ease-in-out infinite alternate;
+}
+
+.shot figcaption {
+  padding: 16px 20px 20px;
+  font-size: var(--step-body);
+  max-width: 34ch;
+}
+
+@keyframes drift {
+  from {
+    object-position: top left;
+  }
+  to {
+    object-position: 0 18%;
+  }
+}
+
 .stairs {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -311,6 +360,12 @@
   .sideNote {
     grid-row: auto;
   }
+  .mosaic {
+    grid-template-columns: 1fr;
+  }
+  .shotsTitle {
+    padding-left: 0;
+  }
   .step {
     grid-column: 1 / -1;
     padding-left: calc((var(--col) - 1) * 3vw);
@@ -319,7 +374,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .cvSheet,
-  .step {
+  .step,
+  .shot img {
     animation: none;
   }
 }
