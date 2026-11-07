@@ -3,6 +3,8 @@ import type { Db } from "@/lib/db/client";
 import * as t from "@/lib/db/schema";
 import type { StoredCapability, Support } from "@/lib/domain/types";
 
+const KIND_ORDER = { contribution: 0, recognition: 1, impact: 2, skill: 3 } as const;
+
 export function loadSnapshot(db: Db, workspaceId: string) {
   const workspace = db.select().from(t.workspaces).where(eq(t.workspaces.id, workspaceId)).get();
   if (!workspace) return null;
@@ -17,7 +19,7 @@ export function loadSnapshot(db: Db, workspaceId: string) {
 
   const sourceById = new Map(sources.map((s) => [s.id, s]));
   const claimRows = claims
-    .sort((a, b) => a.createdAt - b.createdAt)
+    .sort((a, b) => a.createdAt - b.createdAt || KIND_ORDER[a.kind] - KIND_ORDER[b.kind])
     .map((c) => ({
       ...c,
       evidence: evidence
