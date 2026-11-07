@@ -46,6 +46,7 @@ export type SnapshotClaim = Snapshot["projects"][number]["claims"][number];
 
 export type ResolvedEvidence = {
   id: string;
+  sourceId: string;
   quote: string;
   locator: string;
   sourceUrl: string;
@@ -113,7 +114,7 @@ export function deriveEntrust(s: Snapshot): Entrust {
       evidence: cited.flatMap((c) =>
         c.evidence
           .filter((e) => cap.evidenceIds.includes(e.id))
-          .map((e) => ({ id: e.id, quote: e.quote, locator: e.locator, sourceUrl: e.sourceUrl, claimId: c.id, claimText: c.text, projectTitle: c.projectTitle, publishable: c.publishable })),
+          .map((e) => ({ id: e.id, sourceId: e.sourceId, quote: e.quote, locator: e.locator, sourceUrl: e.sourceUrl, claimId: c.id, claimText: c.text, projectTitle: c.projectTitle, publishable: c.publishable })),
       ),
     };
   };
@@ -158,7 +159,7 @@ export function portfolioView(s: Snapshot) {
       role: p.role,
       claims: p.claims
         .filter((c) => c.reviewStatus === "approved" && c.publishable)
-        .map((c) => ({ id: c.id, text: c.text, state: c.state, attribution: c.attribution, evidence: c.evidence.map((e) => ({ id: e.id, quote: e.quote, locator: e.locator, sourceUrl: e.sourceUrl })) })),
+        .map((c) => ({ id: c.id, text: c.text, state: c.state, attribution: c.attribution, evidence: c.evidence.map((e) => ({ id: e.id, sourceId: e.sourceId, quote: e.quote, locator: e.locator, sourceUrl: e.sourceUrl })) })),
     })),
   };
 }
@@ -212,3 +213,12 @@ export function attorneyView(s: Snapshot) {
 
 export type PortfolioView = ReturnType<typeof portfolioView>;
 export type AttorneyView = ReturnType<typeof attorneyView>;
+
+/** Source ids a presentation shows evidence from; a token may open only these. */
+export function visibleSourceIds(view: PortfolioView | AttorneyView): Set<string> {
+  const caps = [...view.capabilities, ...(view.nextBuild?.parts ?? [])];
+  return new Set([
+    ...caps.flatMap((c) => c.evidence.map((e) => e.sourceId)),
+    ...view.projects.flatMap((p) => p.claims.flatMap((c) => c.evidence.map((e) => e.sourceId))),
+  ]);
+}

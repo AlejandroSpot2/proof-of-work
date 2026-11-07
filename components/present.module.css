@@ -1,0 +1,33 @@
+.page {
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+
+.bar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 16px var(--margin);
+}
+
+.wordmark {
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  font-size: 1.125rem;
+}
+
+.sheet {
+  max-width: 920px;
+  margin: 24px auto 0;
+  padding: 0 var(--margin);
+}
+
+@media print {
+  .sheet {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+}

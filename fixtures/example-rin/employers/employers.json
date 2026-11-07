@@ -1,0 +1,42 @@
+{
+  "example": true,
+  "disclaimer": "EXAMPLE. Fictional companies with synthetic records, written for a demo. Not real employers, postings or filings.",
+  "records": [
+    {
+      "id": "example://employers/fieldmark/careers/founding-engineer",
+      "company": "Fieldmark (EXAMPLE)",
+      "entityName": "Fieldmark Labs, Inc. (EXAMPLE)",
+      "location": "San Francisco, CA",
+      "role": "Founding engineer, offline sync",
+      "snippet": "We sponsor work visas for this role, including transfers.",
+      "retrieved": "2026-11-02",
+      "signalType": "current_posting_states_sponsorship",
+      "status": "Posting open on retrieval date",
+      "matches": ["sync", "offline", "releases"]
+    },
+    {
+      "id": "example://employers/northdesk/filings/2024",
+      "company": "Northdesk (EXAMPLE)",
+      "entityName": "Northdesk, Inc. (EXAMPLE)",
+      "location": "San Francisco, CA",
+      "role": "AI product engineer",
+      "snippet": "Synthetic filing record: 4 labor condition applications listed for software engineer roles in 2024.",
+      "retrieved": "2026-10-28",
+      "signalType": "historical_filings",
+      "status": "Role listed; current sponsorship not stated",
+      "matches": ["ai", "schema", "instructions"]
+    },
+    {
+      "id": "example://employers/lowtide/careers/release-engineer",
+      "company": "Lowtide Tools (EXAMPLE)",
+      "entityName": null,
+      "location": null,
+      "role": "Release engineer",
+      "snippet": "The posting text does not mention visa sponsorship.",
+      "retrieved": "2026-11-05",
+      "signalType": "unknown",
+      "status": null,
+      "matches": ["release", "deploy"]
+    }
+  ]
+}

@@ -1,0 +1,273 @@
+.page {
+  min-height: 100vh;
+}
+
+.bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px var(--margin);
+}
+
+.wordmark {
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  font-size: 1.125rem;
+}
+
+.start {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+}
+
+.masthead {
+  margin: 0 var(--margin);
+  background: var(--surface);
+  height: 42vh;
+  min-height: 300px;
+  overflow: hidden;
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--axis) 1fr;
+}
+
+.cvSheet {
+  grid-column: 2;
+  background: #fbfaf7;
+  color: #55534c;
+  font-family: "Times New Roman", Times, serif;
+  padding: 36px 44px;
+  margin-top: 36px;
+  width: min(560px, 90%);
+  transform: rotate(-1.2deg);
+  transform-origin: top left;
+  animation: rise 700ms var(--ease) both;
+}
+
+.cvName {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2b2a26;
+  margin-bottom: 6px;
+}
+
+.cvHead {
+  font-weight: 700;
+  margin-top: 12px;
+  color: #2b2a26;
+}
+
+.cvLine {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.cvCaption {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: end;
+  padding: 24px;
+  font-size: var(--step-small);
+  max-width: 34ch;
+}
+
+.titleBlock {
+  display: grid;
+  grid-template-columns: var(--axis) 1fr;
+  padding: 40px var(--margin) 0;
+  gap: 24px 0;
+}
+
+.h1 {
+  grid-column: 2;
+  font-size: clamp(2.5rem, 0.6rem + 5.6vw, 6.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+  max-width: 14ch;
+}
+
+.stand {
+  grid-column: 2;
+  display: grid;
+  gap: 20px;
+  max-width: 46ch;
+  justify-items: start;
+}
+
+.lead {
+  font-size: var(--step-lead);
+  line-height: 1.35;
+  color: var(--ink-strong);
+}
+
+.body {
+  font-size: var(--step-body);
+  max-width: 46ch;
+}
+
+.field {
+  margin-top: clamp(96px, 12vw, 200px);
+  background: var(--field);
+  color: var(--field-ink);
+  padding: clamp(56px, 7vw, 110px) var(--margin);
+  display: grid;
+  gap: 40px;
+}
+
+.fieldTitle {
+  color: var(--field-ink);
+  font-size: var(--step-head);
+  letter-spacing: -0.04em;
+}
+
+.split {
+  display: grid;
+  grid-template-columns: var(--axis) 1fr;
+  gap: 32px 48px;
+  align-items: start;
+}
+
+.before {
+  display: grid;
+  gap: 12px;
+}
+
+.flat {
+  font-family: "Times New Roman", Times, serif;
+  font-size: clamp(1.5rem, 1rem + 1.6vw, 2.25rem);
+  line-height: 1.2;
+}
+
+.fieldSmall {
+  font-size: var(--step-small);
+  color: var(--field-muted);
+}
+
+.after {
+  display: grid;
+  gap: 14px;
+  background: var(--paper);
+  color: var(--ink);
+  padding: 28px;
+  max-width: 640px;
+}
+
+.quote {
+  margin: 0;
+  border-left: 3px solid var(--ink);
+  padding: 6px 12px;
+  background: var(--bg);
+  color: var(--ink-strong);
+}
+
+.verdict {
+  font-weight: 600;
+  color: var(--ink-strong);
+  font-size: 1.125rem;
+}
+
+.stairs {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 56px 16px;
+  padding: clamp(96px, 12vw, 200px) var(--margin);
+}
+
+.step {
+  grid-column: var(--col) / span 6;
+  display: grid;
+  gap: 12px;
+  animation: rise 600ms var(--ease) both;
+}
+
+.stepLine {
+  font-size: clamp(2rem, 0.9rem + 3.4vw, 4.25rem);
+  line-height: 1;
+  letter-spacing: -0.045em;
+}
+
+.stepNote {
+  font-size: 1.0625rem;
+  max-width: 34ch;
+}
+
+.liveBlock {
+  display: grid;
+  grid-template-columns: var(--axis) 1fr;
+  gap: 32px 48px;
+  padding: 0 var(--margin) clamp(96px, 10vw, 160px);
+  align-items: start;
+}
+
+.liveTitle {
+  font-size: var(--step-head);
+  letter-spacing: -0.04em;
+  margin-bottom: 16px;
+}
+
+.liveForm {
+  display: grid;
+  gap: 14px;
+  max-width: 460px;
+  background: var(--surface);
+  padding: 24px;
+}
+
+.footer {
+  background: var(--field);
+  color: var(--field-ink);
+  padding: 48px var(--margin) 40px;
+  display: grid;
+  gap: 16px;
+}
+
+.footName {
+  font-size: clamp(3rem, 1rem + 9vw, 9rem);
+  font-weight: 600;
+  letter-spacing: -0.05em;
+  line-height: 0.9;
+}
+
+@media (max-width: 900px) {
+  .masthead,
+  .titleBlock,
+  .split,
+  .liveBlock {
+    grid-template-columns: 1fr;
+  }
+  .cvSheet,
+  .h1,
+  .stand {
+    grid-column: 1;
+  }
+  .cvSheet {
+    margin: 24px auto 0;
+    padding: 24px;
+  }
+  .cvCaption {
+    display: none;
+  }
+  .step {
+    grid-column: 1 / -1;
+    padding-left: calc((var(--col) - 1) * 3vw);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cvSheet,
+  .step {
+    animation: none;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

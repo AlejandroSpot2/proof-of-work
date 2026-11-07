@@ -22,5 +22,12 @@
       "role": "Maintainer",
       "url": "example://rin/kerf"
     }
-  ]
+  ],
+  "exampleCorrection": {
+    "claim": "Co-maintains Kerf, including its release process",
+    "text": "Runs Kerf's docs and release process; the deploy engine and its infrastructure are Contributor C's",
+    "attribution": "contributor",
+    "attributionNote": "Preview deploys were built and are run by Contributor C (EXAMPLE).",
+    "why": "Rin's own correction, part of the EXAMPLE story: the README lists two maintainers but does not say who owns what."
+  }
 }

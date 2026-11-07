@@ -19,6 +19,7 @@ export type ExampleProfile = {
   bio: string;
   goal: string;
   projects: { title: string; role: string; url: string }[];
+  exampleCorrection: { claim: string; text: string; attribution: "contributor"; attributionNote: string; why: string };
 };
 
 export function loadProfile(): ExampleProfile {
