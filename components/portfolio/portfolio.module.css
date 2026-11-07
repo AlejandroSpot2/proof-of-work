@@ -985,3 +985,46 @@
     animation: none;
   }
 }
+
+/* Scroll reveals, only when script has switched motion on */
+.root[data-motion="on"] [data-reveal] .projectText,
+.root[data-motion="on"] [data-reveal] .trustHead,
+.root[data-motion="on"] [data-reveal] .tasks li,
+.root[data-motion="on"] [data-reveal] .sectionTitle,
+.root[data-motion="on"] [data-reveal] .assembly > *,
+.root[data-motion="on"] [data-reveal] .roles li {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 700ms var(--ease), transform 900ms var(--ease);
+}
+
+.root[data-motion="on"] [data-reveal] .cover {
+  clip-path: inset(12% 8% 12% 8% round 28px);
+  transition: clip-path 1100ms var(--ease), transform 500ms var(--ease);
+}
+
+.root[data-motion="on"] [data-reveal][data-in="true"] .projectText,
+.root[data-motion="on"] [data-reveal][data-in="true"] .trustHead,
+.root[data-motion="on"] [data-reveal][data-in="true"] .tasks li,
+.root[data-motion="on"] [data-reveal][data-in="true"] .sectionTitle,
+.root[data-motion="on"] [data-reveal][data-in="true"] .assembly > *,
+.root[data-motion="on"] [data-reveal][data-in="true"] .roles li {
+  opacity: 1;
+  transform: none;
+}
+
+.root[data-motion="on"] [data-reveal][data-in="true"] .cover {
+  clip-path: inset(0 0 0 0 round 28px);
+}
+
+.root[data-motion="on"] [data-reveal][data-in="true"] .tasks li:nth-child(2),
+.root[data-motion="on"] [data-reveal][data-in="true"] .assembly > :nth-child(2),
+.root[data-motion="on"] [data-reveal][data-in="true"] .roles li:nth-child(2) {
+  transition-delay: 90ms;
+}
+
+.root[data-motion="on"] [data-reveal][data-in="true"] .tasks li:nth-child(3),
+.root[data-motion="on"] [data-reveal][data-in="true"] .assembly > :nth-child(3),
+.root[data-motion="on"] [data-reveal][data-in="true"] .roles li:nth-child(3) {
+  transition-delay: 180ms;
+}

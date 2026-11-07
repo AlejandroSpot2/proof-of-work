@@ -63,9 +63,31 @@ export function Portfolio({
   }, [open, close]);
 
   const editable = !!onEdit;
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [motion, setMotion] = useState(false);
+
+  /** Scroll reveals: enabled by script, so nothing stays hidden without it, and never under reduced motion. */
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    setMotion(true);
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            (e.target as HTMLElement).dataset.in = "true";
+            io.unobserve(e.target);
+          }
+        }
+      },
+      { threshold: 0.18 },
+    );
+    root.querySelectorAll("[data-reveal]").forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [model.projects.length]);
 
   return (
-    <div className={p.root} data-mode={mode}>
+    <div className={p.root} data-mode={mode} data-motion={motion ? "on" : undefined} ref={rootRef}>
       <header className={p.top}>
         <span className={p.topName}>{model.person.name.replace(" (EXAMPLE)", "")}</span>
         {model.example && <span className={p.example}>EXAMPLE portfolio</span>}
@@ -146,7 +168,7 @@ export function Portfolio({
           Selected work
         </h2>
         {visible.map((x, i) => (
-          <article key={x.slug} className={p.project} data-flip={i % 2 === 1} data-swarm={`project-${x.slug}`}>
+          <article key={x.slug} className={p.project} data-flip={i % 2 === 1} data-swarm={`project-${x.slug}`} data-reveal>
             <div className={p.projectText}>
               <p className={p.period}>{x.period ?? ""}</p>
               <h3 className={p.projectTitle} style={{ viewTransitionName: open === x.slug ? undefined : `title-${x.slug}` }}>
@@ -188,7 +210,7 @@ export function Portfolio({
       </section>
 
       {model.capabilities.length > 0 && (
-        <section className={p.trust} id="trust" aria-labelledby="trust-title" data-swarm="trust">
+        <section className={p.trust} id="trust" aria-labelledby="trust-title" data-swarm="trust" data-reveal>
           <div className={p.trustHead}>
             <h2 id="trust-title" className={p.sectionTitle}>
               What you can hand {model.person.firstName}
@@ -215,7 +237,7 @@ export function Portfolio({
       )}
 
       {model.nextBuild && (
-        <section className={p.next} id="next" aria-labelledby="next-title" data-swarm="next">
+        <section className={p.next} id="next" aria-labelledby="next-title" data-swarm="next" data-reveal>
           <h2 id="next-title" className={p.sectionTitle}>
             What {model.person.firstName} could build next
           </h2>
@@ -247,7 +269,7 @@ export function Portfolio({
       )}
 
       {model.roles.length > 0 && (
-        <section className={p.sf} id="sf" aria-labelledby="sf-title" data-swarm="sf">
+        <section className={p.sf} id="sf" aria-labelledby="sf-title" data-swarm="sf" data-reveal>
           <div className={p.sfHead}>
             <h2 id="sf-title" className={p.sectionTitle}>
               Heading to San Francisco
