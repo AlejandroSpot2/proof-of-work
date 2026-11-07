@@ -2,7 +2,7 @@
 
 Start: dev server on :3000, browser at `http://localhost:3000/`, 1440 wide or a projector at 1280x720. Everything shown is EXAMPLE data about Rin Okafor, a fictional builder. A fresh run is one click on **Open the Studio**; each click starts a new workspace.
 
-**0:00 The promise.** The landing says "Turn your projects into proof". Point at the card: a CV line ("Kerf. Maintainer.") struck through, and what Kerf's own files show instead: Rin runs the docs and release process; the deploy engine is Contributor C's. Click **Open the Studio**.
+**0:00 The promise.** The landing says "Portfolios for builders, built from their files". Point at the Studio window over the turning ASCII globe and its "Kerf, checked" card: Rin's 3 commits are docs and releases; the deploy engine stays Contributor C's. If there is time, scroll once: the app frame with the commit log and its marked quotes, the quote check, the portfolio page, the kit. Click **Open the Studio**.
 
 **0:15 Sources and the before.** Left: Rin's three projects as sources, prepared EXAMPLE files so the demo is reproducible (say so). Right: the CV, "all a reader gets today". Click **Build portfolio**.
 
@@ -21,7 +21,8 @@ Start: dev server on :3000, browser at `http://localhost:3000/`, 1440 wide or a 
 - Example portfolio as a visitor sees it: `/api/example/start?stage=published`
 - Example consultation kit: `/api/example/start?stage=answered&to=/packet`
 - The Studio already built: `/api/example/start?stage=answered&to=/studio`
-- Legacy guided tutorial: `/demo`. Old one-page workbench: `/workbench`.
+- Legacy guided tutorial: `/demo`. Old one-page workbench: `/workbench`. Live mode (your own GitHub links): `/live`.
+- The landing is a static page, `public/index.html`, built with the design kit in `public/assets` and served at `/` by a rewrite in `next.config.ts`.
 
 ## If something goes wrong
 

@@ -28,7 +28,7 @@ const shot = async (name, p = page) => {
 
 await page.goto(BASE + "/");
 await shot("01-landing");
-check(await page.getByRole("heading", { level: 1, name: "Turn your projects into proof" }).isVisible(), "landing states what it is");
+check(await page.getByRole("heading", { level: 1, name: "Portfolios for builders, built from their files" }).isVisible(), "landing states what it is");
 
 await page.locator("main").getByRole("link", { name: "Open the Studio" }).first().click();
 await page.waitForURL("**/studio");
