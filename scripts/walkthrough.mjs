@@ -80,7 +80,7 @@ const dossierText = await page.locator("[data-doc=attorney]").innerText();
 check(!portfolioText.includes("Own releases and preview deploys"), "portfolio dropped the obsolete capability");
 check(dossierText.includes("Withdrawn after human review") && dossierText.includes("Own releases and preview deploys"), "dossier records the withdrawal");
 
-await page.getByRole("button", { name: "Re-evaluate" }).click();
+await page.getByRole("button", { name: "Re-evaluate from the corrected ledger" }).click();
 await page.getByText("The ledger changed since this answer.").waitFor({ state: "detached" });
 await page.locator("#entrust").scrollIntoViewIfNeeded();
 await shot("09-entrust-after-correction");

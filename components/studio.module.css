@@ -446,6 +446,12 @@
   gap: 6px;
 }
 
+.ribbon :global(.btn) {
+  background: var(--field);
+  color: var(--field-ink);
+  margin-top: 6px;
+}
+
 .ribbon strong {
   font-weight: 600;
 }

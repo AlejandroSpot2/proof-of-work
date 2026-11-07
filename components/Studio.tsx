@@ -379,6 +379,13 @@ export function Studio() {
                   Withdrawn from both views: <strong>{w.name}</strong>. {w.reason}
                 </p>
               ))}
+              {entrust.status === "ledger-changed" && (
+                <div>
+                  <button className="btn btn-small" disabled={!!busy} onClick={() => run("goal", () => post("/api/goal", {}))}>
+                    {busy === "goal" ? "Re-reading the ledger" : "Re-evaluate from the corrected ledger"}
+                  </button>
+                </div>
+              )}
             </div>
           ) : snapshot.reviews.some((r) => r.action === "correct") ? (
             <div className={`${s.ribbon} rise`} role="status">

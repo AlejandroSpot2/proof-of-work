@@ -101,7 +101,8 @@ export function deriveEntrust(s: Snapshot): Entrust {
       const c = claims.get(ref.claimId);
       if (!c) return withdraw(cap, "A claim it cited no longer exists.");
       if (c.reviewStatus !== "approved") return withdraw(cap, `"${c.text}" is no longer approved.`);
-      if (c.revision !== ref.revision) return withdraw(cap, `"${c.text}" was corrected (rev ${ref.revision} → rev ${c.revision}).`);
+      if (c.revision !== ref.revision)
+        return withdraw(cap, `A claim it cited was corrected by a human (rev ${ref.revision} → rev ${c.revision}). It now reads: "${c.text}"`);
     }
     if (rejected.has(cap.name)) return withdraw(cap, rejected.get(cap.name)!);
     const cited = cap.claimRefs.map((r) => claims.get(r.claimId)!);
