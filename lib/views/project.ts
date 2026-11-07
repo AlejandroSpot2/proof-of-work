@@ -146,17 +146,28 @@ const isExample = (s: Snapshot) => s.workspace.mode === "fixture";
 /** Client / founding-engineer portfolio: approved, publishable facts only. No legal flags, no review log. */
 export function portfolioView(s: Snapshot) {
   const entrust = deriveEntrust(s);
-  const publicCap = (c: ResolvedCapability) => ({ ...c, evidence: c.evidence.filter((e) => e.publishable), claims: c.claims.filter((x) => x.publishable) });
+  const hidden = s.projects.flatMap((p) => p.claims.filter((c) => !c.publishable)).flatMap((c) => [c.text, c.attributionNote].filter((x): x is string => !!x));
+  const publicCap = (c: ResolvedCapability): ResolvedCapability | null => {
+    const claims = c.claims.filter((x) => x.publishable);
+    if (c.claims.length && !claims.length) return null;
+    return {
+      ...c,
+      claims,
+      evidence: c.evidence.filter((e) => e.publishable),
+      limits: c.limits.filter((l) => !hidden.some((h) => l.includes(h))),
+    };
+  };
+  const visible = (list: ResolvedCapability[]) => list.map(publicCap).filter((c): c is ResolvedCapability => !!c);
   return {
     audience: "portfolio" as const,
     example: isExample(s),
     person: { name: s.workspace.personName, handle: s.workspace.githubHandle },
     ledgerRevision: s.workspace.ledgerRevision,
     goal: entrust.goal,
-    capabilities: entrust.capabilities.map(publicCap),
+    capabilities: visible(entrust.capabilities),
     gaps: entrust.gaps,
     question: entrust.question,
-    nextBuild: entrust.nextBuild && { ...entrust.nextBuild, parts: entrust.nextBuild.parts.map(publicCap) },
+    nextBuild: entrust.nextBuild && { ...entrust.nextBuild, parts: visible(entrust.nextBuild.parts) },
     projects: s.projects.map((p) => ({
       title: p.title,
       role: p.role,

@@ -4,7 +4,10 @@ import path from "node:path";
 
 const BASE = process.env.BASE_URL ?? "http://localhost:3000";
 const OUT = path.resolve(process.argv[2] ?? "walkthrough");
+const SHOTS = path.resolve("public", "shots");
 fs.mkdirSync(OUT, { recursive: true });
+fs.mkdirSync(SHOTS, { recursive: true });
+const crop = (locator, name) => locator.screenshot({ path: path.join(SHOTS, `${name}.png`) });
 
 const started = Date.now();
 const results = [];
@@ -48,6 +51,7 @@ await page.locator("#claims").scrollIntoViewIfNeeded();
 await page.locator("#claims button[title='Open in source']").first().click();
 await page.locator("dialog[open] mark").waitFor();
 await shot("03-quote-in-source");
+await crop(page.locator("dialog[open]"), "quote-in-source");
 check(await page.locator("dialog[open] mark").isVisible(), "clicked quote is highlighted inside its source");
 await page.locator("dialog[open]").getByRole("button", { name: "Close" }).click();
 
@@ -84,10 +88,12 @@ await page.getByRole("button", { name: "Re-evaluate from the corrected ledger" }
 await page.getByText("The ledger changed since this answer.").waitFor({ state: "detached" });
 await page.locator("#entrust").scrollIntoViewIfNeeded();
 await shot("09-entrust-after-correction");
+await crop(page.locator("#entrust [class*='capList']"), "entrust-answer");
 const after = await page.locator("#entrust article [class*='support']").allInnerTexts();
 check(JSON.stringify(after) === JSON.stringify(["Demonstrated", "Inferred", "Unknown"]), `capabilities after correction: ${after.join(", ")}`);
 await page.locator("#views").scrollIntoViewIfNeeded();
 await shot("10-two-views-after");
+await crop(page.locator("#views [class*='views']").first(), "two-views");
 const pAfter = await page.locator("[data-doc=portfolio] [data-support]").evaluateAll((els) => els.map((e) => e.getAttribute("data-support")));
 const dAfter = await page.locator("[data-doc=attorney] [data-support]").evaluateAll((els) => els.map((e) => e.getAttribute("data-support")));
 check(JSON.stringify(pAfter) === JSON.stringify(dAfter), `both views agree after correction: ${pAfter.join(", ")}`);

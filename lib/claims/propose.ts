@@ -68,7 +68,7 @@ export async function proposeClaimsWithModel(input: {
         `<source ref="${s.ref}" kind="${s.kind}" locator="${s.locator}" url="${s.url}">\n${s.text.slice(0, 12000)}\n</source>`,
     ),
   ].join("\n\n");
-  const { object } = await generateObject({ model, schema: claimSchema, system: SYSTEM, prompt, maxRetries: 1 });
+  const { object } = await generateObject({ model, schema: claimSchema, system: SYSTEM, prompt, maxRetries: 0 });
   const idByRef = new Map(refs.map((s) => [s.ref, s.id]));
   return {
     engine: `model:${label}`,

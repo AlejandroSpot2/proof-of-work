@@ -21,7 +21,8 @@ export type ReviewAction =
   | "correct"
   | "attest"
   | "reject_reading"
-  | "confirm_reading";
+  | "confirm_reading"
+  | "visibility";
 
 export type ClaimRef = { claimId: string; revision: number };
 

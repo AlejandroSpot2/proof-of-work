@@ -12,20 +12,22 @@ Calls made during the build, with the reason for each. The contract is `docs/hac
 ## Evidence rules
 
 - **Literal quotes.** A quote must appear in its source after normalizing whitespace, curly quotes and dashes only. Case and wording must match. Quotes under 12 characters do not count. A claim with no surviving quote is discarded and listed in the import report.
-- **Authorship is per quote, not per repository.** A quote backs an authorship claim only if it is a line the person wrote (a commit whose author is their handle, a PR or notes file whose header names them) or a source that names them. A repository where the handle has no commits never backs authorship. Quotes that fail this are kept as context evidence and the claim becomes unverified with its attribution set to unknown and the reason stored.
+- **Authorship is per quote, not per repository.** Inside a repository, a quote backs an authorship claim only if it is a line the person wrote: a commit whose author is their handle, or a PR or notes file whose header names them. Owner lines, contributor counts and READMEs that name them do not count. Outside a repository, a page that names them can. A repository where the handle has no commits never backs authorship. Quotes that fail this are kept as context evidence; a claim with none left becomes unverified, its attribution set to unknown, with the reason stored.
 - **Independent sources.** Sources from one repository, or one host, are one origin. Corroborated needs two origins. A page the owner marks as their own counts as `user_attested`, not as an independent source.
-- **Corrections.** Changing a claim's wording makes it `user_attested`, because the sources back the old wording and the new scope rests on the builder's word. Changing only the attribution re-derives the state from the existing evidence. Every correction bumps the claim revision and logs before and after.
+- **Corrections.** Changing a claim's wording, or raising one's own attribution (contributor to author, say), makes it `user_attested`: the sources back the old reading and the new one rests on the builder's word. Narrowing the attribution re-derives the state from the existing evidence. Every correction bumps the claim revision and logs before and after. Visibility toggles are logged as `visibility`, not as corrections.
+- **Changed sources.** When a re-import finds a source's text changed, every quote that cited it is re-checked. Quotes no longer in the source are dropped, the claim's state is re-derived, and its revision is bumped so capabilities built on it are withdrawn. Human corrections are kept.
 
 ## Budgets
 
 - Max 3 projects, 5 sources per project (extra sources are listed as skipped), 2 follow-up questions per project, 8 claims per project.
-- One claim call per project per distinct source content. Re-import with unchanged content hashes makes no call and leaves sources and reviews alone.
-- One capability call per goal per ledger revision. Asking again with nothing changed returns the stored answer. After a correction the ledger revision moves, so re-evaluating is allowed one more call. This is how "regeneration" is read against the "1 per goal" budget.
+- One claim call per project per distinct source content, with a hard ceiling of 3 per project so a page that changes on every fetch cannot loop. Re-import with unchanged content hashes makes no call and leaves sources and reviews alone. Model calls run with `maxRetries: 0`, so one budgeted call is one request.
+- One capability call per goal per ledger revision. Asking again with nothing changed returns the stored answer, and resubmitting the same goal text keeps the goal and its reviewer decisions. After a correction the ledger revision moves, so re-evaluating is allowed one more call. This is how "regeneration" is read against the "1 per goal" budget.
 - At most 3 capabilities and 1 question per goal.
 
 ## Privacy and security
 
 - Owner session: random token in an HttpOnly, Secure, SameSite=Strict cookie, stored as a SHA-256 hash. Every mutation requires it and checks the target belongs to the session's workspace. Mutations accept JSON only.
+- The portfolio drops a capability whose cited claims are all marked private and strips their text from limits. The dossier keeps everything approved.
 - Presentation tokens are random, stored hashed, revocable, and open exactly one presentation. A portfolio token cannot open the dossier. A token can open a source only if its own view shows evidence from that source.
 - SSRF: https only, no credentials in URLs, port 443 only, allowlist of github.com, api.github.com, raw.githubusercontent.com and the hosts the user typed for that project. Localhost, private, link-local, metadata and other non-public IPv4/IPv6 ranges are blocked at parse time and again at DNS connect time through an undici Agent lookup (closes the rebinding window). Every redirect is re-checked. 200 KB cap, 8 s timeout.
 - Source text enters prompts inside delimited `<source>` blocks with an instruction to treat it as data.
@@ -50,6 +52,10 @@ Calls made during the build, with the reason for each. The contract is `docs/hac
 ## What next (Addendum 1 closing beat)
 
 - The capability call also returns an optional `nextBuild` proposal. Its parts go through the same citation check as capabilities, take their support from the ledger ceiling, and are withdrawn on correction like capabilities. In fixture mode a rule assembles it from tags.
+
+## Review
+
+An independent review of the full diff found no blockers and eight issues: stale evidence after re-import, repository owner and contributor lines backing authorship, self-raised attribution staying source-backed, private claim text leaking into portfolio limits, goal resubmits costing calls and dropping rejected readings, SDK retries doubling budgeted calls, visibility toggles logged as corrections, and no hard cap on claim calls. All eight are fixed, each with a regression test in `tests/review-fixes.test.ts`.
 
 ## Skipped or deferred
 

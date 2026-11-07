@@ -33,6 +33,11 @@ export type ImportEvent =
 
 export class OwnerError extends Error {}
 
+/** One call per distinct source content, with a hard ceiling so a page that changes on every fetch cannot loop. */
+export const MAX_CLAIM_CALLS = 3;
+
+const ATTRIBUTION_RANK: Record<Attribution, number> = { unknown: 0, reviewer: 1, contributor: 2, co_author: 3, author: 4 };
+
 export function createWorkspace(db: Db, input: { personName: string; githubHandle: string; mode: Mode }, now = Date.now()) {
   const workspaceId = newId("ws");
   const token = newToken();
@@ -135,7 +140,10 @@ export async function importProjects(
         authorship: f.authorship ?? null,
       };
       if (!prev) db.insert(t.sources).values(row).run();
-      else if (!unchanged) db.update(t.sources).set(row).where(eq(t.sources.id, prev.id)).run();
+      else if (!unchanged) {
+        db.update(t.sources).set(row).where(eq(t.sources.id, prev.id)).run();
+        reverifyEvidence(db, prev.id, who, deps.now());
+      }
       stored.push(row);
       emit({ type: "source", projectId: project.id, url: f.url, locator: f.locator, status: f.status, statusDetail: f.statusDetail, unchanged });
     }
@@ -155,6 +163,10 @@ export async function importProjects(
       continue;
     }
 
+    if (current.claimCalls >= MAX_CLAIM_CALLS) {
+      emit({ type: "error", message: `Budget: claims for "${project.title}" were already proposed ${current.claimCalls} times. Review the existing claims.` });
+      continue;
+    }
     let proposal: ClaimProposal;
     try {
       proposal = await deps.proposeClaims({
@@ -182,6 +194,40 @@ export async function importProjects(
   }
 
   emit({ type: "done", ledgerRevision: bumpLedger(db, ws.id) });
+}
+
+/**
+ * A source's text changed: evidence whose quote is no longer in it is dropped, and every claim that cited it
+ * gets its state re-derived and a new revision, so capabilities built on the old reading are withdrawn.
+ * Human corrections stay; a claim resting on the builder's word stays user_attested.
+ */
+function reverifyEvidence(db: Db, sourceId: string, who: Identity, now: number) {
+  const source = db.select().from(t.sources).where(eq(t.sources.id, sourceId)).get();
+  if (!source) return;
+  const affected = db.select().from(t.evidence).where(eq(t.evidence.sourceId, sourceId)).all();
+  const claimIds = [...new Set(affected.map((e) => e.claimId))];
+  const dropped = new Set<string>();
+  for (const e of affected) {
+    if (source.status !== "ok" || !quoteIsLiteral(e.quote, source.snippetStore)) {
+      db.delete(t.evidence).where(eq(t.evidence.id, e.id)).run();
+      dropped.add(e.claimId);
+    }
+  }
+  for (const claimId of claimIds) {
+    const claim = db.select().from(t.claims).where(eq(t.claims.id, claimId)).get();
+    if (!claim || !dropped.has(claimId)) continue;
+    const ev = db.select().from(t.evidence).where(eq(t.evidence.claimId, claimId)).all();
+    const srcs = ev.length ? db.select().from(t.sources).where(inArray(t.sources.id, ev.map((x) => x.sourceId))).all() : [];
+    const derived = deriveClaimState({
+      kind: claim.kind,
+      attribution: claim.attribution,
+      origin: claim.origin === "owner" ? "owner" : "model",
+      quotes: ev.map((x) => ({ quote: x.quote, source: toFacts(srcs.find((y) => y.id === x.sourceId)!) })),
+      who,
+    });
+    const state = claim.state === "user_attested" && derived.state !== "unverified" ? "user_attested" : derived.state;
+    db.update(t.claims).set({ state, revision: claim.revision + 1, updatedAt: now }).where(eq(t.claims.id, claimId)).run();
+  }
 }
 
 /** Every URL the user typed keeps at least one slot, so a blocked or missing page is always shown. */
@@ -313,7 +359,7 @@ export function reviewClaim(db: Db, sessionToken: string | null, claimId: string
     const attribution = review.attribution ?? claim.attribution;
     const textChanged = text !== claim.text;
     let state = claim.state;
-    if (textChanged) state = "user_attested";
+    if (textChanged || ATTRIBUTION_RANK[attribution] > ATTRIBUTION_RANK[claim.attribution]) state = "user_attested";
     else if (attribution !== claim.attribution) {
       const ev = db.select().from(t.evidence).where(eq(t.evidence.claimId, claim.id)).all();
       const srcs = ev.length ? db.select().from(t.sources).where(inArray(t.sources.id, ev.map((e) => e.sourceId))).all() : [];
@@ -345,7 +391,7 @@ export function reviewClaim(db: Db, sessionToken: string | null, claimId: string
       workspaceId: ws.id,
       targetKind: "claim",
       targetId: claim.id,
-      action: review.action === "publishable" ? "correct" : review.action,
+      action: review.action === "publishable" ? "visibility" : review.action,
       before,
       after: { text: after.text, attribution: after.attribution, state: after.state, reviewStatus: after.reviewStatus, revision: after.revision, publishable: after.publishable },
       note: "note" in review ? (review.note ?? null) : null,
@@ -393,6 +439,8 @@ export function setGoal(db: Db, sessionToken: string | null, text: string, now =
   const ws = requireOwner(db, sessionToken);
   const clean = text.trim().slice(0, 200);
   if (!clean) throw new OwnerError("Goal is empty");
+  const existing = db.select().from(t.goals).where(eq(t.goals.workspaceId, ws.id)).get();
+  if (existing?.text === clean) return existing.id;
   db.delete(t.goals).where(eq(t.goals.workspaceId, ws.id)).run();
   const id = newId("goal");
   db.insert(t.goals).values({ id, workspaceId: ws.id, text: clean, projection: null, inferenceCalls: 0, createdAt: now }).run();

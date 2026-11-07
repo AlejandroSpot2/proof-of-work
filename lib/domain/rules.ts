@@ -52,8 +52,9 @@ function mentions(text: string, who: Identity): boolean {
 
 /**
  * Repo ownership is not authorship, and commits are contribution signals, not exclusive authorship.
- * A quote backs authorship only when it is a line the person wrote (their commit, their PR or notes)
- * or a source that names them. A repository where they have no commits never backs authorship.
+ * Inside a repository, a quote backs authorship only when it is a line the person wrote (their commit,
+ * their PR or notes). Owner lines, contributor counts and READMEs that name them do not. Outside a
+ * repository, a page that names them can. A repository where they have no commits never backs authorship.
  */
 export function quoteBacksAuthorship(quote: string, source: SourceFacts, who: Identity): boolean {
   if (source.meta && source.meta.handleCommitCount === 0) return false;
@@ -64,6 +65,7 @@ export function quoteBacksAuthorship(quote: string, source: SourceFacts, who: Id
     const author = line?.match(/^\s*\S+\s+([^:\s]+):/)?.[1];
     return !!author && author.toLowerCase() === who.handle.toLowerCase();
   }
+  if (source.meta) return false;
   return mentions(quote, who);
 }
 

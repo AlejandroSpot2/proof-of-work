@@ -33,7 +33,7 @@ export async function inferWithModel(
     schema: proposedCapabilitiesSchema,
     system: SYSTEM,
     prompt: `Goal: ${goal}\n\n<approved_claims>\n${JSON.stringify(ledger, null, 1)}\n</approved_claims>`,
-    maxRetries: 1,
+    maxRetries: 0,
   });
   return { proposal: object, engine: `model:${label}` };
 }
