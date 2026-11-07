@@ -1,0 +1,177 @@
+{
+  "which": "scrolled",
+  "events": [
+    {
+      "at": 2691,
+      "what": "overlay mounted",
+      "clipped": [
+        {
+          "swarm": "project-tidepool",
+          "rect": {
+            "x": 390.046875,
+            "y": 190.703125,
+            "width": 991.90625,
+            "height": 436,
+            "top": 190.703125,
+            "right": 1381.953125,
+            "bottom": 626.703125,
+            "left": 390.046875
+          }
+        },
+        {
+          "swarm": "project-quietroom",
+          "rect": {
+            "x": 390.046875,
+            "y": 724.796875,
+            "width": 991.90625,
+            "height": 436,
+            "top": 724.796875,
+            "right": 1381.953125,
+            "bottom": 1160.796875,
+            "left": 390.046875
+          }
+        }
+      ],
+      "cursors": [
+        "NOTES.md",
+        "PR-12.md",
+        "README.md",
+        "commits",
+        "contributors",
+        "NOTES.md"
+      ],
+      "selections": 2,
+      "canvasScroll": 857,
+      "canvasRect": {
+        "x": 340,
+        "y": 56,
+        "width": 1092,
+        "height": 836,
+        "top": 56,
+        "right": 1432,
+        "bottom": 892,
+        "left": 340
+      },
+      "viewport": [
+        1440,
+        900
+      ],
+      "overlayStyle": {
+        "position": "fixed",
+        "zIndex": "60",
+        "pointerEvents": "none"
+      },
+      "allSwarm": [
+        "hero",
+        "name",
+        "headline",
+        "facts",
+        "index",
+        "index-tidepool",
+        "index-quietroom",
+        "index-kerf",
+        "project-tidepool",
+        "project-quietroom",
+        "project-kerf",
+        "trust",
+        "next",
+        "sf"
+      ]
+    },
+    {
+      "at": 2813,
+      "what": "overlay +120 ms",
+      "clipped": [
+        {
+          "swarm": "project-tidepool",
+          "rect": {
+            "x": 390.046875,
+            "y": 190.703125,
+            "width": 991.90625,
+            "height": 436,
+            "top": 190.703125,
+            "right": 1381.953125,
+            "bottom": 626.703125,
+            "left": 390.046875
+          }
+        },
+        {
+          "swarm": "project-quietroom",
+          "rect": {
+            "x": 390.046875,
+            "y": 724.796875,
+            "width": 991.90625,
+            "height": 436,
+            "top": 724.796875,
+            "right": 1381.953125,
+            "bottom": 1160.796875,
+            "left": 390.046875
+          }
+        }
+      ],
+      "cursors": [
+        "NOTES.md",
+        "PR-12.md",
+        "README.md",
+        "commits",
+        "contributors",
+        "NOTES.md"
+      ],
+      "selections": 2,
+      "canvasScroll": 857,
+      "canvasRect": {
+        "x": 340,
+        "y": 56,
+        "width": 1092,
+        "height": 836,
+        "top": 56,
+        "right": 1432,
+        "bottom": 892,
+        "left": 340
+      },
+      "viewport": [
+        1440,
+        900
+      ],
+      "overlayStyle": {
+        "position": "fixed",
+        "zIndex": "60",
+        "pointerEvents": "none"
+      },
+      "allSwarm": [
+        "hero",
+        "name",
+        "headline",
+        "facts",
+        "index",
+        "index-tidepool",
+        "index-quietroom",
+        "index-kerf",
+        "project-tidepool",
+        "project-quietroom",
+        "project-kerf",
+        "trust",
+        "next",
+        "sf"
+      ]
+    },
+    {
+      "at": 4892,
+      "what": "overlay removed"
+    }
+  ],
+  "frames": [
+    {
+      "at": 418,
+      "state": "none|false"
+    },
+    {
+      "at": 2692,
+      "state": "none|true"
+    },
+    {
+      "at": 4893,
+      "state": "none|false"
+    }
+  ]
+}

@@ -1,0 +1,106 @@
+{
+  "which": "reduced",
+  "clickAt": 1105,
+  "frames": [
+    {
+      "at": 1904,
+      "state": "none|false"
+    },
+    {
+      "at": 1924,
+      "state": "none|true"
+    },
+    {
+      "at": 1984,
+      "state": "none|false"
+    }
+  ],
+  "events": [
+    {
+      "at": 1923,
+      "what": "overlay mounted",
+      "clipped": [],
+      "cursors": [],
+      "selections": 0,
+      "canvasScroll": 0,
+      "canvasRect": {
+        "x": 340,
+        "y": 56,
+        "width": 1092,
+        "height": 836,
+        "top": 56,
+        "right": 1432,
+        "bottom": 892,
+        "left": 340
+      },
+      "viewport": [
+        1440,
+        900
+      ],
+      "overlayStyle": {
+        "position": "fixed",
+        "zIndex": "60",
+        "pointerEvents": "none"
+      },
+      "allSwarm": [
+        "hero",
+        "name",
+        "headline",
+        "facts",
+        "index",
+        "index-tidepool",
+        "index-quietroom",
+        "index-kerf",
+        "project-tidepool",
+        "project-quietroom",
+        "project-kerf",
+        "trust",
+        "next",
+        "sf"
+      ]
+    },
+    {
+      "at": 1939,
+      "what": "overlay removed"
+    },
+    {
+      "at": 2054,
+      "what": "overlay +120 ms",
+      "clipped": [],
+      "cursors": [],
+      "selections": 0,
+      "canvasScroll": 0,
+      "canvasRect": {
+        "x": 340,
+        "y": 56,
+        "width": 1092,
+        "height": 836,
+        "top": 56,
+        "right": 1432,
+        "bottom": 892,
+        "left": 340
+      },
+      "viewport": [
+        1440,
+        900
+      ],
+      "overlayStyle": null,
+      "allSwarm": [
+        "hero",
+        "name",
+        "headline",
+        "facts",
+        "index",
+        "index-tidepool",
+        "index-quietroom",
+        "index-kerf",
+        "project-tidepool",
+        "project-quietroom",
+        "project-kerf",
+        "trust",
+        "next",
+        "sf"
+      ]
+    }
+  ]
+}
