@@ -79,7 +79,22 @@ export type ChronoRow = { date: string; project: string; who: string; isRin: boo
 
 export type Outcome = { project: string; text: string; citation: Citation };
 
-export type Gap = { priority: "High" | "Medium" | "Low"; title: string; reason: string };
+export type Priority = "High" | "Medium" | "Low";
+
+/**
+ * One thing still to gather before or at the consult. "record" items are derived from the exhibits;
+ * "outside" items are things an attorney may ask about that this tool neither knows nor stores.
+ */
+export type ChecklistItem = {
+  priority: Priority;
+  scope: "record" | "outside";
+  item: string;
+  why: string;
+  status: "Missing from the record" | "Only synthetic results" | "Partly self-described" | "Handles only" | "Repository dates only" | "Unknown" | "Not collected by this tool" | "None in this record";
+  who: string;
+};
+
+export type Contribution = { project: string; text: string; exhibitIds: ExhibitId[] };
 
 export type Packet = {
   example: boolean;
@@ -87,13 +102,17 @@ export type Packet = {
   ledgerRevision: number;
   generated: string;
   person: { name: string; handle: string; role: string | null; bio: string | null; location: string | null; goal: string | null };
+  objective: string;
+  contributions: Contribution[];
+  /** Three lines for the one-page summary: two on what the record shows, one on what it does not. */
+  recordLines: { shows: boolean; text: string }[];
   summary: { statements: number; byClass: Record<Classification, number>; shared: number; exhibits: number; projects: number; shows: string[]; doesNotShow: string[] };
   projects: PacketProject[];
   outcomes: Outcome[];
   limits: string[];
   chronology: ChronoRow[];
   exhibits: Exhibit[];
-  gaps: Gap[];
+  checklist: ChecklistItem[];
   questions: string[];
 };
 
@@ -368,7 +387,7 @@ export function buildPacket(db: Db, workspaceId: string, now = Date.now()): Pack
   const shows = [
     `${all.length} confirmed statements about Rin's work across ${projects.length} projects, each tied to a literal passage in a file.`,
     ...(shared.length
-      ? [`${shared.length} of them describe shared work; the people who did the rest are named from the commit log.`]
+      ? [`${shared.length} of them ${shared.length === 1 ? "describes" : "describe"} shared work; the people who did the rest are named from the commit log.`]
       : []),
     `${chronology.length} dated events from commit logs and merged pull requests, from ${chronology[0]?.date ?? "unknown"} to ${chronology.at(-1)?.date ?? "unknown"}.`,
   ];
@@ -378,50 +397,154 @@ export function buildPacket(db: Db, workspaceId: string, now = Date.now()): Pack
     ...(synthetic.length ? ["Results are measured on synthetic data only; they are stated with that limit below."] : []),
   ];
 
-  const gaps: Gap[] = [];
-  if (byClass.Independent === 0)
-    gaps.push({
-      priority: "High",
-      title: "No independent third-party source for any contribution",
-      reason: "All exhibits are repository records from projects where Rin committed. None comes from a second, independent origin.",
-    });
-  for (const c of unknownCaps)
-    gaps.push({ priority: "High", title: "No production or real-user evidence", reason: c.limits[0] ?? `Nothing in the files shows: ${c.name}.` });
-  for (const p of projects.filter((x) => x.statements.some((s) => s.shared)))
-    gaps.push({
-      priority: "Medium",
-      title: `${p.title}: the split of shared work rests partly on Rin's own description`,
-      reason: "A project file names the maintainers but not who owns what. The split rests on commit author lines and Rin's account.",
-    });
-  if (synthetic.length)
-    gaps.push({
-      priority: "Medium",
-      title: "Benchmarks and evaluations are synthetic",
-      reason: `${[...new Set(synthetic.map((o) => o.project))]
-        .map((pr) => `${pr} (Ex. ${[...new Set(synthetic.filter((o) => o.project === pr).map((o) => o.citation.exhibitId))].join(", ")})`)
-        .join("; ")}: measured on synthetic data, not on real use.`,
-    });
   const reviewers = [...new Set(projects.flatMap((p) => p.others.filter((o) => o.what.startsWith("Reviewed")).map((o) => o.who)))];
-  if (reviewers.length)
-    gaps.push({
+  const syntheticProjects = [...new Set(synthetic.map((o) => o.project))];
+  const syntheticExhibits = (pr: string) => [...new Set(synthetic.filter((o) => o.project === pr).map((o) => o.citation.exhibitId))].join(", ");
+  const fromRecord: ChecklistItem[] = [
+    ...(byClass.Independent === 0
+      ? [
+          {
+            priority: "High",
+            scope: "record",
+            item: "An independent account of any contribution",
+            why: `All ${exhibits.length} exhibits are files from repositories where Rin committed. None comes from a second, independent origin.`,
+            status: "Missing from the record",
+            who: "Rin, from people outside the projects who saw the work, if any exist",
+          } satisfies ChecklistItem,
+        ]
+      : []),
+    ...unknownCaps.slice(0, 1).map(
+      (c): ChecklistItem => ({
+        priority: "High",
+        scope: "record",
+        item: "Evidence of production use or real users",
+        why: c.limits[0] ?? `Nothing in the files shows: ${c.name}.`,
+        status: "Missing from the record",
+        who: "Rin, if any deployment, usage or customer record exists",
+      }),
+    ),
+    ...(syntheticProjects.length
+      ? [
+          {
+            priority: "Medium",
+            scope: "record",
+            item: "Results measured on real data",
+            why: `${syntheticProjects.map((pr) => `${pr} (Ex. ${syntheticExhibits(pr)})`).join(" and ")} report benchmarks and evals on synthetic data only.`,
+            status: "Only synthetic results",
+            who: "Rin, if any real-data run exists",
+          } satisfies ChecklistItem,
+        ]
+      : []),
+    ...projects
+      .filter((x) => x.statements.some((st) => st.shared))
+      .map(
+        (x): ChecklistItem => ({
+          priority: "Medium",
+          scope: "record",
+          item: `${x.title}: a record of who owns what`,
+          why: `${x.title}'s files name its maintainers but not the split. Rin's part rests on commit author lines and her own description.`,
+          status: "Partly self-described",
+          who: `Rin, or ${x.title}'s other maintainer, from project records`,
+        }),
+      ),
+    ...(reviewers.length
+      ? [
+          {
+            priority: "Low",
+            scope: "record",
+            item: "Reviewers' own words about the work",
+            why: `${reviewers.join(" and ")} reviewed Rin's pull requests, but the record holds only their handles.`,
+            status: "Handles only",
+            who: "Rin, if the reviewers are willing",
+          } satisfies ChecklistItem,
+        ]
+      : []),
+    {
       priority: "Low",
-      title: "Reviewers appear only as handles",
-      reason: `${reviewers.join(", ")} reviewed Rin's pull requests, but the record holds nothing written by them about her work.`,
-    });
-  gaps.push({
-    priority: "Low",
-    title: "Dates come from repository metadata",
-    reason: "Commit and merge dates are recorded by the repository itself and have no outside timestamp.",
-  });
+      scope: "record",
+      item: "An outside timestamp for key dates",
+      why: "Commit and merge dates are recorded by the repositories themselves.",
+      status: "Repository dates only",
+      who: "Rin, from release pages or archives, if relevant",
+    },
+  ];
+  const outside: ChecklistItem[] = [
+    {
+      priority: "High",
+      scope: "outside",
+      item: "Current immigration status and history",
+      why: "Usually among the first things an attorney asks. It frames everything else in this kit.",
+      status: "Unknown",
+      who: "Rin, to discuss with the attorney directly. Not stored here.",
+    },
+    {
+      priority: "High",
+      scope: "outside",
+      item: "A job offer or prospective employer",
+      why: "The roles in this app are fictional EXAMPLEs. Whether a real offer exists is not known here.",
+      status: "Unknown",
+      who: "Rin, if an offer or an employer conversation exists",
+    },
+    {
+      priority: "Medium",
+      scope: "outside",
+      item: "Employment history and any employer letters",
+      why: "Paid work sits outside these projects. This tool does not draft letters.",
+      status: "Not collected by this tool",
+      who: "Rin and her current or former employers",
+    },
+    {
+      priority: "Medium",
+      scope: "outside",
+      item: "Education credentials",
+      why: "Degrees and transcripts sit outside the projects.",
+      status: "Unknown",
+      who: "Rin, bring if relevant",
+    },
+    {
+      priority: "Low",
+      scope: "outside",
+      item: "Recognition or publications",
+      why: "None appear in this record, and nothing here should be presented as recognition.",
+      status: "None in this record",
+      who: "Rin, bring if any exist",
+    },
+  ];
+  const rank: Record<Priority, number> = { High: 0, Medium: 1, Low: 2 };
+  const checklist = [...fromRecord, ...outside].sort((a, b) => rank[a.priority] - rank[b.priority]);
 
   const questions = [
-    ...view.questions,
-    ...projects
-      .filter((p) => p.others.length && p.statements.some((s) => s.shared))
-      .map((p) => `On ${p.title}, others built parts Rin did not. How should her part be presented next to theirs?`),
+    ...view.questions.filter((q) => !q.startsWith("Do these gaps matter")),
     "Which corroboration, if any, should Rin look for first: a reviewer's own account, release records, or records of real use?",
     ...(synthetic.length ? ["Should results measured on synthetic data be included at all, and with what wording?"] : []),
+    "Which items in Part 3 are worth gathering before a second meeting, and which can wait?",
     "In what form should the source files be kept for your review: exports, archived links or copies with their content hashes?",
+  ];
+
+  const goal = snap.goal?.text ?? profile?.goal ?? null;
+  const objective =
+    (goal ? (example ? `Roles like the fictional EXAMPLE posting “${goal}”.` : `Target role: “${goal}”.`) : "No target role recorded.") +
+    (example ? " Currently outside the US, interested in roles in San Francisco." : "");
+  const contributions: Contribution[] = projects.flatMap((x) =>
+    x.statements.map((st) => ({ project: x.title, text: st.text, exhibitIds: [...new Set(st.citations.map((c) => c.exhibitId))] })),
+  );
+  const missing = [
+    byClass.Independent === 0 ? "independent corroboration" : null,
+    unknownCaps.length ? "production use or real users" : null,
+    synthetic.length ? "results on real data (every benchmark and eval is synthetic)" : null,
+  ].filter((x): x is string => !!x);
+  const recordLines = [
+    { shows: true, text: `${all.length} statements Rin confirmed across ${projects.length} projects, each tied to a literal passage in one of ${exhibits.length} exhibits.` },
+    {
+      shows: true,
+      text: `Who did what: ${shared.length ? `${shared.length} ${shared.length === 1 ? "statement is" : "statements are"} shared work, and ` : ""}others' commits are named and not counted as Rin's.`,
+    },
+    {
+      shows: false,
+      text: missing.length
+        ? `It does not show ${missing.length > 1 ? `${missing.slice(0, -1).join(", ")}, or ${missing.at(-1)}` : missing[0]}.`
+        : "Nothing in the record is marked as missing; see Part 3 for items outside the projects.",
+    },
   ];
 
   return {
@@ -435,15 +558,18 @@ export function buildPacket(db: Db, workspaceId: string, now = Date.now()): Pack
       role: profile?.role ?? null,
       bio: profile?.bio ?? null,
       location: (profile as { location?: string } | null)?.location ?? null,
-      goal: snap.goal?.text ?? profile?.goal ?? null,
+      goal,
     },
+    objective,
+    contributions,
+    recordLines,
     summary: { statements: all.length, byClass, shared: shared.length, exhibits: exhibits.length, projects: projects.length, shows, doesNotShow },
     projects,
     outcomes,
     limits: view.gaps,
     chronology,
     exhibits,
-    gaps,
+    checklist,
     questions,
   };
 }

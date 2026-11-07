@@ -1,33 +1,46 @@
-import type { Citation, Classification, Exhibit, ExcerptLine, Packet, PageMap, Statement } from "@/lib/packet/model";
+import type { ChecklistItem, Citation, Classification, Exhibit, ExcerptLine, Packet, PageMap, Statement } from "@/lib/packet/model";
 import { CLASSIFICATION_MEANING } from "@/lib/packet/model";
 
 /**
- * The packet as one HTML string, used both for the on-screen preview and for the PDF.
+ * The kit as one HTML string, used both for the typeset pages on screen and for the PDF.
  * Plain strings rather than React: the PDF route renders it without react-dom/server, and the preview injects the same markup.
  */
 
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
-export const TITLE = "Evidence packet for a first consult";
-export const CAVEAT = "SYNTHETIC EXAMPLE MATERIAL. Not legal advice. No eligibility assessment.";
+export const TITLE = "First Consultation Kit";
+export const RUNNING_HEAD = "First Consultation Kit · Draft for attorney review";
+export const NOTICE = "Synthetic EXAMPLE material. Not legal advice. No eligibility assessment.";
+export const QUESTIONS_NOTE = "Suggestions to bring to the meeting. They are not advice and not an eligibility decision.";
+export const PROJECTS_ALONE = "Projects alone do not decide any visa question.";
 
-export type Section = { anchor: string; number: string; title: string };
+export const subtitle = (p: Packet) => `Prepared by ${p.person.name} for a first meeting with an immigration attorney`;
 
-export const SECTIONS: Section[] = [
-  { anchor: "sec-profile", number: "1", title: "Profile and objective" },
-  { anchor: "sec-summary", number: "2", title: "Review summary" },
-  { anchor: "sec-contributions", number: "3", title: "Project contributions" },
-  { anchor: "sec-impact", number: "4", title: "Impact and evidence limitations" },
-  { anchor: "sec-chronology", number: "5", title: "Chronological record" },
-  { anchor: "sec-index", number: "6", title: "Evidence index" },
-  { anchor: "sec-gaps", number: "7", title: "Missing corroboration" },
-  { anchor: "sec-questions", number: "8", title: "Questions for the attorney" },
+export type Section = { anchor: string; number: string; title: string; children?: Section[] };
+
+export const PARTS: Section[] = [
+  { anchor: "part-summary", number: "Part 1", title: "One-page summary" },
+  {
+    anchor: "part-dossier",
+    number: "Part 2",
+    title: "Dossier",
+    children: [
+      { anchor: "sec-contributions", number: "2.1", title: "Contributions per project" },
+      { anchor: "sec-impact", number: "2.2", title: "Impact and limits" },
+      { anchor: "sec-chronology", number: "2.3", title: "Chronology" },
+      { anchor: "sec-index", number: "2.4", title: "Evidence index" },
+    ],
+  },
+  { anchor: "part-missing", number: "Part 3", title: "What is missing" },
+  { anchor: "part-questions", number: "Part 4", title: "Questions and notes for the consult" },
 ];
+
+const SUB = Object.fromEntries(PARTS.flatMap((p) => p.children ?? []).map((s) => [s.anchor, s])) as Record<string, Section>;
 
 /** Text each anchor's heading prints, in document order, so the PDF pass can find the page it landed on. */
 export function headingMarks(p: Packet): { anchor: string; text: string }[] {
   return [
-    ...SECTIONS.map((s) => ({ anchor: s.anchor, text: `${s.number}${s.title}` })),
+    ...PARTS.flatMap((s) => [s, ...(s.children ?? [])]).map((s) => ({ anchor: s.anchor, text: `${s.number}${s.title}` })),
     ...p.exhibits.map((e) => ({ anchor: e.anchor, text: `Annex${e.id}` })),
   ];
 }
@@ -36,39 +49,51 @@ const pn = (pages: PageMap | null, anchor: string) => `<span class="pn">${pages?
 
 const clsTag = (c: Classification) => `<span class="cls cls-${c.toLowerCase().replace(/[^a-z]+/g, "-")}">${esc(c)}</span>`;
 
+const exLink = (id: string) => `<a class="exl" href="#ex-${id}">${id}</a>`;
+
 function ref(c: Citation, pages: PageMap | null) {
   return `<a class="ref" href="#ex-${c.exhibitId}">Ex.&nbsp;<span class="refid">${c.exhibitId}</span></a><span class="refloc">, line ${c.line}, p.&nbsp;${pn(pages, `ex-${c.exhibitId}`)}</span>`;
 }
 
-function sectionHead(s: Section, lead?: string) {
+function head(s: Section, lead?: string) {
   return `<header class="sh"><h1 id="${s.anchor}"><span class="sn">${s.number}</span>${esc(s.title)}</h1>${lead ? `<p class="lead">${lead}</p>` : ""}</header>`;
 }
 
-function cover(p: Packet) {
+const MARKS = (Object.keys(CLASSIFICATION_MEANING) as (keyof typeof CLASSIFICATION_MEANING)[]).map(
+  (k) => `<tr><td>${clsTag(k)}</td><td>${esc(CLASSIFICATION_MEANING[k])}</td></tr>`,
+);
+const LEGEND = `<table class="legend"><tbody>${MARKS.join("")}<tr><td><span class="cls cls-synthetic">Synthetic EXAMPLE</span></td><td>Everything in this kit. Rin Okafor is a fictional builder and every file is synthetic, written for a demo.</td></tr></tbody></table>`;
+
+const PART_BLURB: Record<string, string> = {
+  "part-summary": "Profile, objective, main contributions, and what the record does and does not show.",
+  "part-dossier": "Contributions per project with attribution, impact and limits, chronology, evidence index.",
+  "part-missing": "A prioritized checklist of what still needs gathering, inside and outside the projects.",
+  "part-questions": "Suggested questions, with room for notes during the meeting.",
+};
+
+function cover(p: Packet, pages: PageMap | null) {
   const meta: [string, string][] = [
-    ["Person", p.person.name],
-    ["Generated", p.generated],
-    ["Ledger revision", String(p.ledgerRevision)],
-    ["Statements", String(p.summary.statements)],
-    ["Exhibits", `${p.summary.exhibits}, E-01 to ${p.exhibits.at(-1)?.id ?? "E-00"}`],
-    ["Projects", p.projects.map((x) => x.title).join(", ")],
+    ["Prepared by", esc(p.person.name)],
+    ["Date", `<span class="mono">${p.generated}</span>`],
+    ["Projects", esc(p.projects.map((x) => x.title).join(", "))],
+    ["Exhibits", `${p.summary.exhibits}, <span class="mono">E-01</span> to <span class="mono">${p.exhibits.at(-1)?.id ?? "E-00"}</span>`],
+    ["Statements confirmed", `${p.summary.statements}`],
+    ["Record revision", `<span class="mono">${p.ledgerRevision}</span>`],
   ];
-  const legend = (Object.keys(CLASSIFICATION_MEANING) as (keyof typeof CLASSIFICATION_MEANING)[])
-    .map((k) => `<tr><td>${clsTag(k)}</td><td>${esc(CLASSIFICATION_MEANING[k])}</td></tr>`)
-    .join("");
   return `<section class="sheet cover">
-  <div class="cover-top"><span class="wordmark">Proof of Work</span><span class="mono small">Draft · for attorney review</span></div>
+  <div class="cover-top"><span>Draft for attorney review</span><span class="mono">${p.generated}</span></div>
   <div class="cover-main">
-    <p class="kicker mono">Evidence packet</p>
     <h1 class="cover-title">${TITLE}</h1>
-    <p class="cover-name">${esc(p.person.name)}</p>
-    <p class="cover-sub">Draft prepared by the builder for attorney review</p>
-    <dl class="cover-meta">${meta.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>
+    <p class="cover-sub">${esc(subtitle(p))}</p>
+    <dl class="cover-meta">${meta.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("")}</dl>
   </div>
+  <ol class="cover-parts">${PARTS.map(
+    (s) => `<li><a href="#${s.anchor}"><span class="cp-n">${s.number}</span><span class="cp-t"><strong>${esc(s.title)}</strong><span>${PART_BLURB[s.anchor]}</span></span>${pn(pages, s.anchor)}</a></li>`,
+  ).join("")}<li><a href="#${p.exhibits[0]?.anchor ?? ""}"><span class="cp-n">Annexes</span><span class="cp-t"><strong>Source excerpts</strong><span>The literal text of each exhibit, with the quoted passages highlighted.</span></span>${pn(pages, p.exhibits[0]?.anchor ?? "")}</a></li></ol>
   <div class="cover-foot">
     <p class="legend-title">How each statement and exhibit is marked</p>
-    <table class="legend"><tbody>${legend}<tr><td><span class="cls cls-synthetic">Synthetic EXAMPLE</span></td><td>Everything in this packet. Rin Okafor is a fictional builder and every file is synthetic, written for a demo.</td></tr></tbody></table>
-    <p class="caveat">${CAVEAT}</p>
+    ${LEGEND}
+    <p class="notice">${NOTICE}</p>
   </div>
 </section>`;
 }
@@ -78,52 +103,52 @@ function contents(p: Packet, pages: PageMap | null) {
     `<li class="${cls}"><a href="#${anchor}"><span class="tn">${num}</span><span class="tt">${esc(title)}</span><span class="dots"></span>${pn(pages, anchor)}</a></li>`;
   return `<section class="sheet toc">
   <header class="sh"><h1 id="sec-contents">Contents</h1></header>
-  <ol class="toc-list">${SECTIONS.map((s) => row(s.anchor, s.number, s.title)).join("")}</ol>
-  <p class="toc-group">Annexes · literal source excerpts, one per exhibit</p>
-  <ol class="toc-list toc-annex">${p.exhibits.map((e) => row(e.anchor, e.id, e.title, "mono-num")).join("")}</ol>
+  <ol class="toc-list">${PARTS.map((s) => row(s.anchor, s.number, s.title, "toc-part") + (s.children ?? []).map((c) => row(c.anchor, c.number, c.title, "toc-sub")).join("")).join("")}</ol>
+  <p class="toc-group">Annexes. Literal source excerpts, one per exhibit</p>
+  <ol class="toc-list toc-annex">${p.exhibits.map((e) => row(e.anchor, e.id, e.title)).join("")}</ol>
 </section>`;
 }
 
-function profile(p: Packet, pages: PageMap | null) {
-  const rows = p.projects
-    .map(
-      (x) =>
-        `<tr><td class="strong">${esc(x.title)}</td><td>${esc(x.role ?? "unknown")}</td><td>${esc(x.summary ?? "")}</td><td class="mono nowrap">${x.exhibitIds[0]}–${x.exhibitIds.at(-1)}</td></tr>`,
-    )
-    .join("");
-  return `<section class="sheet">
-  ${sectionHead(SECTIONS[0]!)}
+function onePage(p: Packet, pages: PageMap | null) {
+  const byProject = p.projects.map((x) => ({ x, items: p.contributions.filter((c) => c.project === x.title) }));
+  return `<section class="sheet one">
+  ${head(PARTS[0]!, "The kit on one page, for a first look before the meeting.")}
   <dl class="facts">
     <div><dt>Name</dt><dd>${esc(p.person.name)}</dd></div>
     ${p.person.role ? `<div><dt>Role</dt><dd>${esc(p.person.role)}</dd></div>` : ""}
     ${p.person.location ? `<div><dt>Location</dt><dd>${esc(p.person.location)}</dd></div>` : ""}
-    <div><dt>Handle in the records</dt><dd class="mono">${esc(p.person.handle)}</dd></div>
   </dl>
-  ${p.person.bio ? `<h2>Background</h2><p class="prose">${esc(p.person.bio)}</p>` : ""}
+  ${p.person.bio ? `<p class="prose bio">${esc(p.person.bio)}</p>` : ""}
   <h2>Objective</h2>
-  <p class="prose">${esc(p.person.goal ?? "No objective recorded.")}</p>
-  <p class="note">The objective is the kind of role Rin is looking for, in her own words. This packet does not assess it.</p>
-  <h2>Projects in this packet</h2>
-  <table class="grid"><thead><tr><th>Project</th><th>Role recorded</th><th>What it is</th><th>Exhibits</th></tr></thead><tbody>${rows}</tbody></table>
-  <p class="note">Detailed contributions start on page ${pn(pages, "sec-contributions")}.</p>
+  <p class="prose">${esc(p.objective)}</p>
+  <h2>Main contributions</h2>
+  <div class="contribs">${byProject
+    .map(
+      ({ x, items }) => `<div class="cg"><p class="cg-name">${esc(x.title)}<span>${esc(x.role ?? "Role unknown")}</span></p><ul>${items
+        .map((c) => `<li><span class="ct">${esc(c.text)}</span><span class="cr">${c.exhibitIds.map(exLink).join(", ")}</span></li>`)
+        .join("")}</ul></div>`,
+    )
+    .join("")}</div>
+  <h2>What the record does and does not show</h2>
+  <ul class="record">${p.recordLines.map((l) => `<li class="${l.shows ? "yes" : "no"}"><span class="rk">${l.shows ? "Shows" : "Does not show"}</span><span>${esc(l.text)}</span></li>`).join("")}</ul>
+  <p class="note">Details and sources in Part 2 from page ${pn(pages, "part-dossier")}. What still needs gathering in Part 3 on page ${pn(pages, "part-missing")}.</p>
 </section>`;
 }
 
-function summary(p: Packet) {
-  const s = p.summary;
-  const counts = (Object.keys(CLASSIFICATION_MEANING) as (keyof typeof CLASSIFICATION_MEANING)[])
-    .map((k) => `<div><dt>${clsTag(k)}</dt><dd><span class="big">${s.byClass[k]}</span> of ${s.statements} statements</dd></div>`)
+function dossierOpener(p: Packet) {
+  const rows = p.projects
+    .map(
+      (x) =>
+        `<tr><td class="strong">${esc(x.title)}</td><td>${esc(x.role ?? "unknown")}</td><td>${esc(x.summary ?? "")}</td><td class="nowrap">${exLink(x.exhibitIds[0]!)} to ${exLink(x.exhibitIds.at(-1)!)}</td></tr>`,
+    )
     .join("");
   return `<section class="sheet">
-  ${sectionHead(SECTIONS[1]!, "What the record shows, what it does not, and how each piece is marked.")}
-  <dl class="tally">${counts}</dl>
-  <div class="two">
-    <div><h2>What the record shows</h2><ul class="bul">${s.shows.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>
-    <div><h2>What it does not show</h2><ul class="bul">${s.doesNotShow.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>
-  </div>
-  <h2>How evidence is classified</h2>
-  <p class="prose">Each statement below was confirmed by Rin and is tied to a literal passage in a file. A statement is <em>Independent</em> only when two separate origins back it. Files from Rin's own project repositories, including her commits, pull requests and notes, are <em>Repository records</em>: they show what the repository says, written or kept by people working on the project. Anything that rests on Rin's word alone is <em>Self-attested</em>. Work by other people is listed separately under each project and is never counted as Rin's.</p>
-  <p class="prose">Every file, name, number and date here is synthetic EXAMPLE material.</p>
+  ${head(PARTS[1]!, "The record behind Part 1: what Rin did, what others did, and the passage that backs each line.")}
+  <h2>Projects in this dossier</h2>
+  <table class="grid"><thead><tr><th>Project</th><th>Role recorded</th><th>What it is</th><th>Exhibits</th></tr></thead><tbody>${rows}</tbody></table>
+  <h2>How evidence is marked</h2>
+  ${LEGEND}
+  <p class="prose spaced">Each statement was confirmed by Rin and is tied to a literal passage in a file. A statement is <em>Independent</em> only when two separate origins back it. Files from Rin's own project repositories, including her commits, pull requests and notes, are <em>Repository records</em>. Anything that rests on Rin's word alone is <em>Self-attested</em>. Work by other people is listed under each project and is never counted as Rin's.</p>
 </section>`;
 }
 
@@ -139,7 +164,7 @@ function contributions(p: Packet, pages: PageMap | null) {
   const projects = p.projects
     .map(
       (x, i) => `<article class="proj" id="${x.anchor}">
-    <h2 class="proj-title"><span class="sn">3.${i + 1}</span>${esc(x.title)}<span class="proj-role">Role recorded: ${esc(x.role ?? "unknown")}</span></h2>
+    <h2 class="proj-title"><span class="sn">2.1.${i + 1}</span>${esc(x.title)}<span class="proj-role">Role recorded: ${esc(x.role ?? "unknown")}</span></h2>
     ${x.summary ? `<p class="prose">${esc(x.summary)}</p>` : ""}
     <p class="scope">${esc(x.rinScope)}</p>
     <h3>Rin's part</h3>
@@ -164,7 +189,7 @@ function contributions(p: Packet, pages: PageMap | null) {
     )
     .join("");
   return `<section class="sheet">
-  ${sectionHead(SECTIONS[2]!, "Per project: what Rin did, what others did, and the passage that backs each line.")}
+  ${head(SUB["sec-contributions"]!, "Per project: what Rin did, what others did, and the passage that backs each line.")}
   ${projects}
 </section>`;
 }
@@ -173,17 +198,12 @@ function impact(p: Packet, pages: PageMap | null) {
   const rows = p.outcomes
     .map((o) => `<tr><td class="strong nowrap">${esc(o.project)}</td><td><q>${esc(o.text)}</q></td><td class="nowrap">${ref(o.citation, pages)}</td></tr>`)
     .join("");
-  const impactStatements = p.projects.flatMap((x) => x.statements.filter((s) => s.kind === "impact").map((s) => ({ s, project: x.title })));
+  const impactStatements = p.projects.flatMap((x) => x.statements.filter((s) => s.kind === "impact"));
   return `<section class="sheet">
-  ${sectionHead(SECTIONS[3]!, "Results the files state, each with the limit the same file puts on it.")}
-  <h2>What the files say about results</h2>
+  ${head(SUB["sec-impact"]!, "Results the files state, each with the limit the same file puts on it.")}
   <table class="grid"><thead><tr><th>Project</th><th>Passage</th><th>Source</th></tr></thead><tbody>${rows}</tbody></table>
-  ${
-    impactStatements.length
-      ? `<h2>Confirmed impact statements</h2><ol class="stmts">${impactStatements.map(({ s }) => statement(s, pages)).join("")}</ol>`
-      : ""
-  }
-  <h2>Limitations</h2>
+  ${impactStatements.length ? `<h2>Confirmed impact statements</h2><ol class="stmts">${impactStatements.map((s) => statement(s, pages)).join("")}</ol>` : ""}
+  <h2>Limits</h2>
   <ul class="bul">
     ${p.limits.map((l) => `<li>${esc(l)}</li>`).join("")}
     <li>Nothing in the record shows the projects in production, with real users or with real data.</li>
@@ -200,7 +220,7 @@ function chronology(p: Packet, pages: PageMap | null) {
     )
     .join("");
   return `<section class="sheet">
-  ${sectionHead(SECTIONS[4]!, "Every dated commit and merged pull request in the exhibits, oldest first. Rows by other people are kept and marked.")}
+  ${head(SUB["sec-chronology"]!, "Every dated commit and merged pull request in the exhibits, oldest first. Rows by other people are kept and marked.")}
   <table class="grid chrono"><thead><tr><th>Date</th><th>Project</th><th>By</th><th>Event</th><th>Source</th></tr></thead><tbody>${rows}</tbody></table>
 </section>`;
 }
@@ -212,7 +232,7 @@ function index(p: Packet, pages: PageMap | null) {
       <td class="exid nowrap"><a href="#${e.anchor}">${e.id}</a></td>
       <td><span class="strong">${esc(e.title)}</span><span class="sub mono">${esc(e.url)}</span></td>
       <td class="nowrap">${esc(e.project)}</td>
-      <td>${clsTag(e.classification)}<span class="sub">Synthetic EXAMPLE</span></td>
+      <td>${clsTag(e.classification)}</td>
       <td class="mono nowrap">${e.retrieved}</td>
       <td class="mono hash">${e.contentHash}</td>
       <td class="num">${pn(pages, e.anchor)}</td>
@@ -220,24 +240,51 @@ function index(p: Packet, pages: PageMap | null) {
     )
     .join("");
   return `<section class="sheet">
-  ${sectionHead(SECTIONS[5]!, "One exhibit per source file. Hashes are the first 16 hex characters of the file's SHA-256 at retrieval.")}
-  <table class="grid index"><thead><tr><th>ID</th><th>Exhibit and locator</th><th>Project</th><th>Classification</th><th>Retrieved</th><th>Content hash</th><th class="num nowrap">Annex p.</th></tr></thead><tbody>${rows}</tbody></table>
+  ${head(SUB["sec-index"]!, "One exhibit per source file, all Synthetic EXAMPLE. Hashes are the first 16 hex characters of the file's SHA-256 at retrieval.")}
+  <table class="grid index"><thead><tr><th>ID</th><th>Exhibit and locator</th><th>Project</th><th>Marked</th><th>Retrieved</th><th>Content hash</th><th class="num nowrap">Annex p.</th></tr></thead><tbody>${rows}</tbody></table>
 </section>`;
 }
 
-function gaps(p: Packet) {
+export const checklistCounts = (p: Packet) => ({ total: p.checklist.length, high: p.checklist.filter((c) => c.priority === "High").length });
+
+function checkRows(items: ChecklistItem[]) {
+  return items
+    .map(
+      (c) => `<tr>
+      <td class="box-cell"><span class="box" aria-hidden="true"></span></td>
+      <td><span class="prio prio-${c.priority.toLowerCase()}">${c.priority}</span></td>
+      <td><span class="strong">${esc(c.item)}</span><span class="why">${esc(c.why)}</span></td>
+      <td><span class="status status-${c.scope}">${esc(c.status)}</span></td>
+      <td class="who">${esc(c.who)}</td>
+    </tr>`,
+    )
+    .join("");
+}
+
+function missing(p: Packet) {
+  const { total, high } = checklistCounts(p);
+  const group = (title: string, lead: string, items: ChecklistItem[]) =>
+    items.length
+      ? `<h2>${title}</h2><p class="note group-lead">${lead}</p><table class="grid check"><thead><tr><th></th><th>Priority</th><th>Item and why it matters</th><th>Status</th><th>Who would provide it</th></tr></thead><tbody>${checkRows(items)}</tbody></table>`
+      : "";
   return `<section class="sheet">
-  ${sectionHead(SECTIONS[6]!, "What would make the record stronger, most important first.")}
-  <table class="grid gaps"><thead><tr><th>Priority</th><th>Gap</th><th>Why</th></tr></thead><tbody>${p.gaps
-    .map((g) => `<tr><td><span class="prio prio-${g.priority.toLowerCase()}">${g.priority}</span></td><td class="strong">${esc(g.title)}</td><td>${esc(g.reason)}</td></tr>`)
-    .join("")}</tbody></table>
+  ${head(PARTS[2]!, `${total} items to gather, ${high} high priority. Bring each one if relevant. Nothing here is a form to fill in.`)}
+  <p class="alone">${PROJECTS_ALONE} <span>The projects are one part of what an attorney may want to see. The rest is listed here as unknown, because this tool does not know it and does not store it.</span></p>
+  ${group("From the record", "Gaps in the exhibits themselves, derived from the files in Part 2.", p.checklist.filter((c) => c.scope === "record"))}
+  ${group("Outside the projects", "Things an attorney may ask about. None of it is stored in this tool.", p.checklist.filter((c) => c.scope === "outside"))}
 </section>`;
 }
+
+const RULED = (n: number) => `<div class="ruled" aria-hidden="true">${"<span></span>".repeat(n)}</div>`;
 
 function questions(p: Packet) {
   return `<section class="sheet">
-  ${sectionHead(SECTIONS[7]!, "Open questions for a first consult. They ask for the attorney's judgment; this packet makes none.")}
-  <ol class="qs">${p.questions.map((q) => `<li>${esc(q)}</li>`).join("")}</ol>
+  ${head(PARTS[3]!, QUESTIONS_NOTE)}
+  <ol class="qs">${p.questions.map((q) => `<li><p>${esc(q)}</p>${RULED(3)}</li>`).join("")}</ol>
+</section>
+<section class="sheet notes">
+  <header class="sh"><h1>Notes</h1><p class="lead">For anything the attorney asks to bring next time.</p></header>
+  ${RULED(26)}
 </section>`;
 }
 
@@ -280,15 +327,15 @@ function annex(e: Exhibit) {
 
 export function renderPacketBody(p: Packet, pages: PageMap | null): string {
   return `<div class="pk">${[
-    cover(p),
+    cover(p, pages),
     contents(p, pages),
-    profile(p, pages),
-    summary(p),
+    onePage(p, pages),
+    dossierOpener(p),
     contributions(p, pages),
     impact(p, pages),
     chronology(p, pages),
     index(p, pages),
-    gaps(p),
+    missing(p),
     questions(p),
     ...p.exhibits.map(annex),
   ].join("\n")}</div>`;

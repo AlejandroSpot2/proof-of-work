@@ -368,7 +368,7 @@ function ReviewDrawer({
           Close
         </button>
       </div>
-      <p className={s.hint}>Each one is quoted word for word from a file. A correction reaches the portfolio and the attorney packet at once.</p>
+      <p className={s.hint}>Each one is quoted word for word from a file. A correction reaches the portfolio and the consultation kit at once.</p>
       <ul className={s.claims}>
         {claims
           .filter((c) => c.state !== "unverified")
