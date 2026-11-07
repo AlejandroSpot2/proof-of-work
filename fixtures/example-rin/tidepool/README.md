@@ -9,6 +9,7 @@ EXAMPLE project: synthetic, created for a demo. Not a real product.
 - Edits are events in an append-only local log, stamped with a hybrid logical clock.
 - Concurrent edits are resolved per field with last-writer-wins, ordered by the clock, so two people editing different fields of the same note both keep their change.
 - The storage adapter writes the log to IndexedDB in the browser and to SQLite on desktop.
+- The storage adapter was written by Contributor B (EXAMPLE).
 
 ## Status
 

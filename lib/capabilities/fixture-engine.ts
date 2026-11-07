@@ -60,10 +60,12 @@ const NEXT_BUILD = {
     { name: "Timeline rebuilt from a local event log", tags: ["event-sourcing"] },
     { name: "AI tagging that must match a schema", tags: ["structured-outputs"] },
     { name: "Note text treated as data, never as instructions", tags: ["prompt-injection"] },
+    { name: "Triage ranked by how many inspectors raised an issue", tags: ["prioritization"] },
   ],
   gaps: [
     "Production scale: nothing shows Tidepool or Quietroom with real users.",
     "Real-data quality: Quietroom was evaluated on 20 synthetic examples only.",
+    "Open question: has any part of this run with real users or real field data?",
   ],
 };
 

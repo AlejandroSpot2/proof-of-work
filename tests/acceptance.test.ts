@@ -200,6 +200,17 @@ describe("entrust question", () => {
     expect(projection.discarded.map((d) => d.name)).toEqual(["Invented", "Unapproved"]);
   });
 
+  it("'what next' links Tidepool sync and Quietroom AI, with prioritization only inferred", async () => {
+    const { db, token, workspaceId, profile } = await exampleWorkspace();
+    await approveAllAndEvaluate(db, token, workspaceId, profile.goal);
+    const next = deriveEntrust(snap(db, workspaceId)).nextBuild!;
+    const projects = new Set(next.parts.flatMap((p) => p.claims.map((c) => c.projectTitle)));
+    expect(projects).toEqual(new Set(["Tidepool", "Quietroom"]));
+    expect(next.parts.find((p) => p.name.startsWith("Triage"))!.support).toBe("inferred");
+    expect(next.parts.every((p) => p.evidence.length > 0)).toBe(true);
+    expect(next.gaps.join(" ")).toMatch(/synthetic/);
+  });
+
   it("'what next' proposal only cites approved evidence", async () => {
     const { db, token, workspaceId, profile } = await exampleWorkspace();
     const kerf = claimByText(db, workspaceId, "Co-maintains Kerf, including its release process");

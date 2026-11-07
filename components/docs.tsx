@@ -123,7 +123,7 @@ export function AttorneyDoc({ view, onOpen, compact }: { view: AttorneyView; onO
         {view.example && <span className="example-flag">EXAMPLE</span>}
         <h3 className={styles.docTitle}>{view.person.name}</h3>
         <p className="muted small">Private attorney-review dossier. Ledger revision {view.ledgerRevision}.</p>
-        <p className={styles.disclaimer}>{view.disclaimer}</p>
+        <p className={styles.disclaimer}>Attorney review needed. {view.disclaimer}</p>
       </header>
 
       <section className={styles.block}>
@@ -145,6 +145,17 @@ export function AttorneyDoc({ view, onOpen, compact }: { view: AttorneyView; onO
           </div>
         )}
       </section>
+
+      {view.gaps.length > 0 && (
+        <section className={styles.block}>
+          <h4 className={styles.blockTitle}>Gaps in the evidence</h4>
+          <ul className={styles.questions}>
+            {view.gaps.map((g) => (
+              <li key={g}>{g}</li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section className={styles.block}>
         <h4 className={styles.blockTitle}>Questions for your attorney</h4>
