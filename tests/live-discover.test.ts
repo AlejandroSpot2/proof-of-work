@@ -11,6 +11,7 @@ import { dbLedger, JEV_MODEL, normalizePeople, normalizePosts, parseRelevance, r
 import { OWNER_COOKIE } from "@/lib/auth";
 import peopleSample from "./fixtures/treg/people-search.json";
 import postsSample from "./fixtures/treg/posts-search.json";
+import postsFlat from "./fixtures/treg/posts-search-flat.json";
 import { liveBuilt } from "./helpers";
 
 const TOKEN = "treg_tok_SECRET_9f8e7d6c";
@@ -239,6 +240,23 @@ describe("Normalizing fails closed", () => {
     expect(rows[0]!.location).toBe("Denver, CO");
     const text = JSON.stringify(rows);
     expect(PII.filter((x) => text.includes(x))).toEqual([]);
+  });
+
+  it("keeps posts in the flat camelCase shape Treg really returns, with a built public address and the epoch date, and nothing else", () => {
+    const rows = normalizePosts(postsFlat, "anyapi.x.search.posts");
+    expect(rows).toEqual([
+      {
+        name: "Fieldcrew Ops",
+        headline: "Our inspectors lose notes with no signal. Has anyone shipped offline sync that merges edits? Write to",
+        location: null,
+        url: "https://x.com/fieldcrew_ops/status/1890000000000000101",
+        date: "2026-10-30",
+        provider: "anyapi.x.search.posts",
+      },
+      { name: "@kiln_tools", headline: "Release notes are still written by hand here.", location: null, url: "https://x.com/kiln_tools/status/1890000000000000102", date: "2026-10-30", provider: "anyapi.x.search.posts" },
+    ]);
+    const text = JSON.stringify(rows);
+    for (const x of ["pbs.example", "998877665544", "1234", "5100", "ops@fieldcrew.example", "No Address"]) expect(text).not.toContain(x);
   });
 
   it("refuses an answer without the expected list instead of guessing", () => {

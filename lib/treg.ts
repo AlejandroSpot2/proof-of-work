@@ -253,16 +253,25 @@ export function normalizePeople(body: unknown, servedBy: string | null): PublicR
 
 /** treg.x.search.posts: the author is the name, the post's own words are the text, its own date the date. */
 export function normalizePosts(body: unknown, servedBy: string | null): PublicRow[] {
-  return keep(
-    rowsOf(body, "posts").map((p) => {
+  const rows = rowsOf(body, "posts");
+  const kept = keep(
+    rows.map((p) => {
       const author = isObj(p.author) ? p.author : {};
-      const handle = first(author, ["username", "handle"]);
-      const name = nameOf(first(author, ["name"]) ?? p.author_name) ?? (typeof handle === "string" && /^\w{1,30}$/.test(handle) ? `@${handle}` : null);
-      const url = publicUrl(first(p, ["url", "post_url", "link"]));
+      const handle = first(author, ["username", "handle", "screen_name"]) ?? first(p, ["authorUsername", "author_username", "username", "screen_name"]);
+      const validHandle = typeof handle === "string" && /^\w{1,30}$/.test(handle) ? handle : null;
+      const name = nameOf(first(author, ["name"]) ?? first(p, ["authorName", "author_name"])) ?? (validHandle ? `@${validHandle}` : null);
+      // a post often carries its id and its author's handle but no link: its public address is built from those two only
+      const id = first(p, ["id", "id_str", "tweet_id", "rest_id"]);
+      const built = validHandle && (typeof id === "string" || typeof id === "number") && /^\d{5,25}$/.test(String(id)) ? `https://x.com/${validHandle}/status/${id}` : null;
+      const url = publicUrl(first(p, ["url", "post_url", "link"])) ?? publicUrl(built);
       if (!name || !url) return null;
-      return { name, headline: cleanText(first(p, ["text", "content"]), 500), location: locationOf(first(author, ["location"])), url, date: sourceDate(first(p, ["created_at", "published_at", "date"])), provider: providerOf(servedBy) };
+      const epoch = first(p, ["createdUtc", "created_utc"]);
+      const epochDate = typeof epoch === "number" && Number.isFinite(epoch) && epoch > 0 ? new Date(epoch > 1e12 ? epoch : epoch * 1000).toISOString().slice(0, 10) : null;
+      return { name, headline: cleanText(first(p, ["text", "content", "full_text"]), 500), location: locationOf(first(author, ["location"])), url, date: sourceDate(first(p, ["created_at", "published_at", "date"])) ?? epochDate, provider: providerOf(servedBy) };
     }),
   );
+  console.info(`[treg] posts received ${rows.length}, kept ${kept.length}`);
+  return kept;
 }
 
 /* Jev: relevance only. Never ability, quality, availability or eligibility, and no guarantees. */
