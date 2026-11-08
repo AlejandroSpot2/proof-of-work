@@ -1,0 +1,115 @@
+{
+  "example": true,
+  "disclaimer": "EXAMPLE. A prepared demo scenario. Each improvement names files that exist in Rin's EXAMPLE projects; what is true today is read from the portfolio, never set here.",
+  "goals": [
+    {
+      "id": "own-goal",
+      "from": "profile",
+      "label": { "en": "Rin's goal: founding engineer for a field-inspection app", "es": "La meta de Rin: ingeniería fundadora en una app de inspección de campo" },
+      "improvements": ["tidepool-demo", "production-pilot", "kerf-ownership", "quietroom-real-eval"]
+    },
+    {
+      "id": "fieldmark",
+      "from": "offer",
+      "label": { "en": "The Fieldmark (EXAMPLE) role", "es": "El puesto de Fieldmark (EXAMPLE)" },
+      "improvements": ["production-pilot", "own-deploys", "tidepool-demo"]
+    }
+  ],
+  "improvements": [
+    {
+      "id": "tidepool-demo",
+      "kind": "demo",
+      "title": { "en": "Publish a demo of Tidepool's offline merge", "es": "Publicar una demo de la fusión offline de Tidepool" },
+      "why": {
+        "en": "The merge is in PR-12 and the commits, but nobody can try it. The README says it was tested only on a synthetic benchmark.",
+        "es": "La fusión está en PR-12 y en los commits, pero nadie puede probarla. El README dice que solo se probó con una prueba sintética."
+      },
+      "proves": {
+        "en": "That two offline edits merge field by field, for anyone who opens the link.",
+        "es": "Que dos ediciones offline se fusionan campo por campo, para cualquiera que abra el enlace."
+      },
+      "ifDone": { "en": "Shown in the work, with a demo anyone can open", "es": "Mostrado en el trabajo, con una demo que cualquiera puede abrir" },
+      "buildsOn": [
+        { "project": "Tidepool", "locator": "PR-12.md" },
+        { "project": "Tidepool", "locator": "README.md" }
+      ],
+      "changes": ["offline", "sync"]
+    },
+    {
+      "id": "production-pilot",
+      "kind": "new-piece",
+      "title": { "en": "Run Tidepool with one real field team and keep a usage log", "es": "Usar Tidepool con un equipo de campo real y llevar un registro de uso" },
+      "why": {
+        "en": "No file shows real users, production traffic or on-call work. It is the one thing the files cannot back today.",
+        "es": "Ningún archivo muestra usuarios reales, tráfico de producción ni guardias. Es lo único que los archivos no pueden respaldar hoy."
+      },
+      "proves": {
+        "en": "Production use, which the portfolio marks as not shown yet.",
+        "es": "Uso en producción, que el portafolio marca como todavía no mostrado."
+      },
+      "ifDone": { "en": "Shown in the work, with a usage log as proof", "es": "Mostrado en el trabajo, con un registro de uso como prueba" },
+      "buildsOn": [
+        { "project": "Tidepool", "locator": "README.md" },
+        { "project": "Tidepool", "locator": "NOTES.md" }
+      ],
+      "changes": ["production"]
+    },
+    {
+      "id": "kerf-ownership",
+      "kind": "document",
+      "title": { "en": "Write down who owns what in Kerf", "es": "Dejar por escrito quién se encarga de qué en Kerf" },
+      "why": {
+        "en": "Kerf's README lists two maintainers but does not say who owns what. Rin's part rests on the commits alone.",
+        "es": "El README de Kerf nombra a dos personas que lo mantienen, pero no dice quién se encarga de qué. La parte de Rin se apoya solo en los commits."
+      },
+      "proves": {
+        "en": "That the release process is Rin's and the deploy engine is Contributor C's, in a file anyone can read.",
+        "es": "Que el proceso de versiones es de Rin y el motor de despliegue es de Contributor C, en un archivo que cualquiera puede leer."
+      },
+      "ifDone": { "en": "Shown in the work, backed by Kerf's own docs", "es": "Mostrado en el trabajo, respaldado por la documentación de Kerf" },
+      "buildsOn": [
+        { "project": "Kerf", "locator": "README.md" },
+        { "project": "Kerf", "locator": "RELEASING.md" }
+      ],
+      "changes": ["release"]
+    },
+    {
+      "id": "quietroom-real-eval",
+      "kind": "new-piece",
+      "title": { "en": "Evaluate Quietroom on real feedback", "es": "Evaluar Quietroom con comentarios reales" },
+      "why": {
+        "en": "Quietroom was evaluated on 20 synthetic examples only. Its quality on real feedback is unknown.",
+        "es": "Quietroom se evaluó solo con 20 ejemplos sintéticos. Su calidad con comentarios reales es desconocida."
+      },
+      "proves": {
+        "en": "How the drafts hold up on real user feedback, not only on a synthetic set.",
+        "es": "Cómo se comportan los borradores con comentarios reales, no solo con un conjunto sintético."
+      },
+      "ifDone": { "en": "Shown in the work, measured on real data", "es": "Mostrado en el trabajo, medido con datos reales" },
+      "buildsOn": [
+        { "project": "Quietroom", "locator": "NOTES.md" },
+        { "project": "Quietroom", "locator": "README.md" }
+      ],
+      "changes": ["schema"]
+    },
+    {
+      "id": "own-deploys",
+      "kind": "new-piece",
+      "title": { "en": "Set up the deploys for Tidepool's demo yourself", "es": "Montar por tu cuenta los despliegues de la demo de Tidepool" },
+      "why": {
+        "en": "Kerf's preview deploys are in the files, but Contributor C built them, so they cannot count for Rin.",
+        "es": "Los despliegues de vista previa de Kerf están en los archivos, pero los construyó Contributor C, así que no cuentan para Rin."
+      },
+      "proves": {
+        "en": "Deploy work that is Rin's own, with Rin's own commits.",
+        "es": "Trabajo de despliegue propio de Rin, con commits propios de Rin."
+      },
+      "ifDone": { "en": "Shown in the work, in Rin's own commits", "es": "Mostrado en el trabajo, en commits propios de Rin" },
+      "buildsOn": [
+        { "project": "Tidepool", "locator": "README.md" },
+        { "project": "Kerf", "locator": "README.md" }
+      ],
+      "changes": ["deploy"]
+    }
+  ]
+}

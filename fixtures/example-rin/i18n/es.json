@@ -1,0 +1,48 @@
+{
+  "example": true,
+  "disclaimer": "EXAMPLE. Prepared Spanish translations of the EXAMPLE portfolio's own words, keyed by the exact English text. Quotes from files, commit messages, file names, posting lines and names are never translated. Each translation keeps the numbers and names of its English text (tests/next-paths.test.ts checks it).",
+  "content": {
+    "Engineer building tools for small product teams, out of interest": "Construye herramientas para equipos de producto pequeños, por interés propio",
+    "Builds offline-first sync and AI features that check their own output.": "Construye sincronización offline y funciones de IA que revisan su propia salida.",
+    "Rin builds small tools for small teams. Three projects, read from their own files: what Rin did, what others did, and where the record stops.": "Rin construye herramientas pequeñas para equipos pequeños. Tres proyectos, leídos desde sus propios archivos: qué hizo Rin, qué hicieron otras personas y dónde termina el registro.",
+    "Outside the US · looking at roles in San Francisco": "Fuera de EE. UU. · buscando puestos en San Francisco",
+    "Founding engineer for our field-inspection app: offline sync, releases, and running it in production": "Ingeniería fundadora para nuestra app de inspección de campo: sincronización offline, versiones y operación en producción",
+
+    "An offline-first sync engine for field teams who work without signal.": "Un motor de sincronización offline para equipos de campo que trabajan sin señal.",
+    "Turns raw user feedback into drafted issues, using an AI model whose output must match a schema.": "Convierte comentarios de usuarios en borradores de incidencias, con un modelo de IA cuya salida debe cumplir un esquema.",
+    "A command-line tool that creates a preview of every pull request and removes it on merge.": "Una herramienta de línea de comandos que crea una vista previa de cada pull request y la elimina al fusionarla.",
+    "Author": "Autoría",
+    "Maintainer": "Mantenimiento",
+
+    "Authored Tidepool's per-field conflict resolution for offline edits": "Escribió la resolución de conflictos por campo de Tidepool para ediciones offline",
+    "Built event replay that rebuilds the timeline from a local log": "Construyó la reproducción de eventos que reconstruye la línea de tiempo desde un registro local",
+    "Built schema-validated issue drafting on top of an AI model": "Construyó la redacción de incidencias validada por esquema sobre un modelo de IA",
+    "Found and fixed a prompt-injection hole in feedback ingestion": "Encontró y corrigió una vulnerabilidad de inyección de prompts en la entrada de comentarios",
+    "Ranks product issues by how many distinct users raised them": "Ordena las incidencias de producto según cuántas personas distintas las plantearon",
+    "Wrote Kerf's getting-started guide and release checklist": "Escribió la guía de inicio y la lista de verificación de versiones de Kerf",
+    "Co-maintains Kerf's docs and release process": "Comparte el mantenimiento de la documentación y el proceso de versiones de Kerf",
+    "Runs Kerf's docs and release process; the deploy engine and its infrastructure are Contributor C's": "Lleva la documentación y el proceso de versiones de Kerf; el motor de despliegue y su infraestructura son de Contributor C",
+    "Measured offline replay on a synthetic benchmark only": "Midió la reproducción offline solo con una prueba sintética",
+    "Has Tidepool run with real users or real field data?": "¿Tidepool se ha usado con usuarios reales o con datos reales de campo?",
+    "Has Quietroom been run on real, non-synthetic feedback?": "¿Quietroom se ha probado con comentarios reales, no sintéticos?",
+    "Which parts of Kerf did you build, and which did Contributor C build?": "¿Qué partes de Kerf construiste tú y cuáles construyó Contributor C?",
+
+    "Build offline sync that merges conflicting edits": "Construir sincronización offline que fusiona ediciones en conflicto",
+    "Run the release process: changelog, version tags, release docs": "Llevar el proceso de versiones: changelog, etiquetas de versión y documentación de versiones",
+    "Run it in production for real users": "Operarlo en producción con usuarios reales",
+    "Shared with other maintainers, not one person's work alone.": "Compartido con otras personas que mantienen el proyecto; no es trabajo de una sola persona.",
+    "No file shows real users, production traffic or on-call work. Every benchmark and eval is synthetic.": "Ningún archivo muestra usuarios reales, tráfico de producción ni guardias. Todas las pruebas y evaluaciones son sintéticas.",
+    "Has any of this run in production with real users? A postmortem, usage log or on-call rotation would settle it.": "¿Algo de esto ha funcionado en producción con usuarios reales? Un postmortem, un registro de uso o una rotación de guardias lo resolvería.",
+
+    "Offline field-notes app with AI tagging": "App de notas de campo offline con etiquetado por IA",
+    "A bounded MVP: inspectors capture notes with no signal, edits merge per field when devices reconnect, and an AI model tags each note into a fixed schema on sync.": "Un MVP acotado: el equipo de inspección toma notas sin señal, las ediciones se fusionan por campo cuando los dispositivos se reconectan y un modelo de IA etiqueta cada nota con un esquema fijo al sincronizar.",
+    "Offline capture and per-field merge": "Captura offline y fusión por campo",
+    "Timeline rebuilt from a local event log": "Línea de tiempo reconstruida desde un registro local de eventos",
+    "AI tagging that must match a schema": "Etiquetado por IA que debe cumplir un esquema",
+    "Note text treated as data, never as instructions": "El texto de las notas se trata como datos, nunca como instrucciones",
+    "Triage ranked by how many inspectors raised an issue": "Prioridad según cuántas personas de inspección plantearon un problema",
+    "Production scale: nothing shows Tidepool or Quietroom with real users.": "Escala de producción: nada muestra Tidepool ni Quietroom con usuarios reales.",
+    "Real-data quality: Quietroom was evaluated on 20 synthetic examples only.": "Calidad con datos reales: Quietroom se evaluó solo con 20 ejemplos sintéticos.",
+    "Open question: has any part of this run with real users or real field data?": "Pregunta abierta: ¿alguna parte de esto ha funcionado con usuarios reales o con datos reales de campo?"
+  }
+}

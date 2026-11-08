@@ -1,0 +1,53 @@
+{
+  "example": true,
+  "disclaimer": "EXAMPLE. A fictional posting written for a demo, from the same fictional company as employers/employers.json. Not a real employer, job or offer. Whether each requirement is backed is computed from the portfolio, never set here.",
+  "id": "example://employers/fieldmark/careers/founding-engineer",
+  "company": "Fieldmark (EXAMPLE)",
+  "role": "Founding engineer, offline sync",
+  "location": "San Francisco, CA",
+  "retrieved": "2026-11-02",
+  "requirements": [
+    {
+      "id": "offline-sync",
+      "line": "You have built offline-first sync for an app people use without signal.",
+      "es": "Has construido sincronización offline para una app que se usa sin señal.",
+      "short": { "en": "offline-first sync", "es": "sincronización offline" },
+      "match": ["offline", "sync"]
+    },
+    {
+      "id": "conflicts",
+      "line": "You can merge conflicting edits from devices that reconnect.",
+      "es": "Sabes fusionar ediciones en conflicto de dispositivos que se reconectan.",
+      "short": { "en": "merging conflicting edits", "es": "fusión de ediciones en conflicto" },
+      "match": ["merg", "conflict"]
+    },
+    {
+      "id": "ai",
+      "line": "You ship AI features whose output is checked before anyone sees it.",
+      "es": "Lanzas funciones de IA cuya salida se revisa antes de que nadie la vea.",
+      "short": { "en": "AI output checked against a schema", "es": "salida de IA validada con un esquema" },
+      "match": ["schema"]
+    },
+    {
+      "id": "releases",
+      "line": "You own releases: changelogs, version tags and release notes.",
+      "es": "Te encargas de las versiones: changelogs, etiquetas de versión y notas de versión.",
+      "short": { "en": "running releases", "es": "gestión de versiones" },
+      "match": ["release"]
+    },
+    {
+      "id": "production",
+      "line": "You have run software in production for real users, including on-call.",
+      "es": "Has operado software en producción con usuarios reales, guardias incluidas.",
+      "short": { "en": "running it in production", "es": "operación en producción" },
+      "match": ["production"]
+    },
+    {
+      "id": "deploys",
+      "line": "You can set up preview environments and the deploys behind them.",
+      "es": "Sabes montar entornos de vista previa y los despliegues que los sostienen.",
+      "short": { "en": "deploy infrastructure", "es": "infraestructura de despliegue" },
+      "match": ["deploy", "preview"]
+    }
+  ]
+}
