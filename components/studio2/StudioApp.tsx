@@ -413,7 +413,7 @@ export function StudioApp() {
                 What it rests on
               </h2>
               <p className={s.factLine}>
-                <strong>{filesRead}</strong> files read · <strong>{confirmed}</strong> statements confirmed by {first}
+                <strong>{filesRead}</strong> files read · <strong>{confirmed}</strong> statements {example ? `confirmed by ${first}` : `confirmed by the build on ${first}’s behalf; review them`}
               </p>
               {model.provenance && (
                 <p className={s.hint}>

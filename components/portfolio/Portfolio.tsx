@@ -201,7 +201,9 @@ export function Portfolio({
                     <Tr shown={tr(x.summary)} />
                   </span>
                   <span className={p.indexMeta}>
-                    {period(x.period, lang) ?? ""} · {x.role && <Tr shown={tr(x.role)} />}
+                    {period(x.period, lang) ?? ""}
+                    {x.period && x.role ? " · " : ""}
+                    {x.role && <Tr shown={tr(x.role)} />}
                     {badge(x.slug)}
                   </span>
                   <span className={p.indexArrow} aria-hidden="true">
