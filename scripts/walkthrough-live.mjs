@@ -42,7 +42,7 @@ check((await modeNav().getByRole("link", { name: "Live" }).getAttribute("aria-cu
 const rail = page.getByRole("complementary", { name: "Sources" });
 const railText = await rail.innerText();
 check(/Statements with quotes\s*Needs setup/.test(railText), "readiness marks statements as needing setup");
-check(/Discover\s*Planned/.test(railText) && /Spanish translation\s*Needs setup/.test(railText) && /Apply for a role\s*Needs setup/.test(railText) && /Strengthen and cofounder\s*Demo only/.test(railText), "readiness: translation and Apply need the model, strengthen and cofounder are demo-only, Discover is planned");
+check(/Discover\s*Needs setup\s*TREG_TOKEN and TREG_MAX_SPEND_MICRO are not set/.test(railText) && /Spanish translation\s*Needs setup/.test(railText) && /Apply for a role\s*Needs setup/.test(railText) && /Strengthen and cofounder\s*Demo only/.test(railText), "readiness: translation and Apply need the model, strengthen and cofounder are demo-only, Discover names TREG_TOKEN and TREG_MAX_SPEND_MICRO");
 check(/AI_MODEL is not set/.test(await page.locator("body").innerText()), "the missing model is named, with what to do");
 check(await page.getByRole("button", { name: "Build portfolio" }).first().isDisabled(), "Build waits for a model instead of falling back");
 const visible = (await page.locator("aside, main").allInnerTexts()).join("\n");

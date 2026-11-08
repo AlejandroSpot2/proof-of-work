@@ -3,12 +3,13 @@
 import { Fragment, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { flushSync } from "react-dom";
 import type { PortfolioModel } from "@/lib/portfolio";
-import { content, localized, UI, type Lang, type Localized, type PathId, type Shown } from "@/lib/i18n";
+import { content, localized, localized as localizedText, UI, type Lang, type Localized, type PathId, type Shown } from "@/lib/i18n";
 import { discover, filterOptions, EXAMPLE_SIGNALS, NO_FILTERS, VIEWS, type Check, type Filters, type Reason, type Verdict, type View } from "@/lib/discover";
 import { Level, Tr } from "../portfolio/Portfolio";
 import { Radios } from "../Choice";
 import { SourceDialog, type SourceRequest } from "../SourceDialog";
 import { FileChip } from "./NextSteps";
+import { LiveDiscover } from "./LiveDiscover";
 import d from "./discover.module.css";
 import n from "./nextsteps.module.css";
 
@@ -20,13 +21,17 @@ type Query = { view: View; intent: string; filters: Filters };
 /** A run shows every card in list order, resolves them one by one, then sorts them into the two groups. */
 type Stage = { kind: "checking"; resolved: number } | { kind: "sorted" };
 type PillState = "pending" | "pass" | "fail";
-type Translate = (text: string) => Shown;
+export type Translate = (text: string) => Shown;
 
 const firstQuery = (view: View, lang: Lang): Query => ({ view, intent: EXAMPLE_SIGNALS[view].presets[0][lang], filters: NO_FILTERS });
 const animates = () => "startViewTransition" in document && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const anyFilter = (f: Filters) => f.skills.length > 0 || f.needs.length > 0 || f.location !== null;
 
 export function Discover({ model, lang, onAdapt }: { model: PortfolioModel; lang: Lang; onAdapt: (path: PathId) => void }) {
+  return model.example ? <ExampleDiscover model={model} lang={lang} onAdapt={onAdapt} /> : <LiveDiscover model={model} lang={lang} />;
+}
+
+function ExampleDiscover({ model, lang, onAdapt }: { model: PortfolioModel; lang: Lang; onAdapt: (path: PathId) => void }) {
   const w = UI[lang].discover;
   const first = model.person.firstName;
   const tr: Translate = (text) => content(text, lang, model.example);
@@ -102,14 +107,6 @@ export function Discover({ model, lang, onAdapt }: { model: PortfolioModel; lang
     e.preventDefault();
     run({ ...query, intent: text });
   };
-
-  if (!model.example) {
-    return (
-      <div className={d.root} lang={lang}>
-        <p className={n.note}>{w.live}</p>
-      </div>
-    );
-  }
 
   const card = (v: Verdict, pending: boolean) => (
     <Card key={v.signal.id} v={v} lang={lang} tr={tr} first={first} pending={pending} selected={current?.signal.id === v.signal.id} onSelect={() => select(v.signal.id)} />
@@ -312,7 +309,7 @@ function Card({ v, lang, tr, first, pending, selected, onSelect }: { v: Verdict;
   );
 }
 
-function Names({ names, tr }: { names: string[]; tr: Translate }) {
+export function Names({ names, tr }: { names: string[]; tr: Translate }) {
   return (
     <>
       {names.map((x, i) => (
@@ -325,9 +322,10 @@ function Names({ names, tr }: { names: string[]; tr: Translate }) {
   );
 }
 
-/** One sentence per reason, passed or failed; model names go through the content dictionary. */
-function Sentence({ reason, wants, lang, tr, first }: { reason: Reason; wants: Localized; lang: Lang; tr: Translate; first: string }) {
+/** One sentence per reason, passed or failed; model names go through the content dictionary. Live text is shown as written. */
+export function Sentence({ reason, wants, lang, tr, first, asWritten = false }: { reason: Reason; wants: Localized; lang: Lang; tr: Translate; first: string; asWritten?: boolean }) {
   const w = UI[lang].discover;
+  const localized = (l: Localized, at: Lang): Shown => (asWritten ? { text: l[at], translated: false } : localizedText(l, at));
   switch (reason.kind) {
     case "intent":
       return (
