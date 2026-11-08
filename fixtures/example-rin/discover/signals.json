@@ -1,0 +1,533 @@
+{
+  "example": true,
+  "disclaimer": "EXAMPLE. A prepared list of synthetic public signals written for a demo. Every person and organization is fictional, every source is synthetic, every date is fictional. No URL, post id, handle or contact exists for any of them. Whether a signal is kept is computed from the portfolio; nothing here marks anything as fitting.",
+  "plannedSource": "Treg",
+  "cofounders": {
+    "presets": [
+      {
+        "en": "Someone who has run field operations and production, to build the offline field-notes app",
+        "es": "Alguien que haya llevado operaciones de campo y producción, para construir la app de notas de campo offline"
+      },
+      {
+        "en": "A designer who knows how inspectors work",
+        "es": "Una persona de diseño que conozca cómo trabaja el equipo de inspección"
+      },
+      {
+        "en": "Anyone building developer tools",
+        "es": "Cualquiera que esté construyendo herramientas para desarrolladores"
+      }
+    ],
+    "signals": [
+      {
+        "id": "sol",
+        "ref": "next-steps/cofounder.json",
+        "source": {
+          "en": "Synthetic forum post",
+          "es": "Publicación sintética de foro"
+        },
+        "recency": {
+          "en": "5 days ago",
+          "es": "hace 5 días"
+        },
+        "quote": "I've led an inspection crew and run the backend of our app in production. Looking for someone who has made offline sync work for real.",
+        "quoteEs": "He dirigido un equipo de inspección y operado en producción el backend de nuestra app. Busco a alguien que haya hecho funcionar de verdad la sincronización offline.",
+        "location": null,
+        "topics": [
+          "field",
+          "inspection",
+          "production",
+          "offline"
+        ],
+        "topicsEs": [
+          "campo",
+          "inspección",
+          "producción",
+          "offline"
+        ],
+        "wants": [
+          "offline",
+          "merg",
+          "schema"
+        ],
+        "wantsLabel": {
+          "en": "offline sync and checked AI tagging",
+          "es": "sincronización offline y etiquetado por IA validado"
+        },
+        "brings": [
+          "production",
+          "field"
+        ],
+        "skills": [
+          "production",
+          "field-research"
+        ],
+        "unknowns": [
+          {
+            "en": "Whether Sol is looking for a cofounder now",
+            "es": "Si Sol busca ahora a alguien para cofundar"
+          }
+        ]
+      },
+      {
+        "id": "jun",
+        "name": "Jun Takeda (EXAMPLE)",
+        "first": "Jun",
+        "headline": {
+          "en": "Designs tablet apps for inspection crews, from field research",
+          "es": "Diseña apps de tableta para equipos de inspección, a partir de investigación de campo"
+        },
+        "source": {
+          "en": "Synthetic community thread",
+          "es": "Hilo sintético de comunidad"
+        },
+        "recency": {
+          "en": "2 weeks ago",
+          "es": "hace 2 semanas"
+        },
+        "quote": "Two years of field research with inspection crews and designing their tablet apps. I want to build with an engineer who can make offline actually work.",
+        "quoteEs": "Dos años de investigación de campo con equipos de inspección y diseñando sus apps de tableta. Quiero construir con alguien de ingeniería que haga funcionar de verdad el modo offline.",
+        "location": "San Francisco",
+        "topics": [
+          "field",
+          "inspection",
+          "design",
+          "offline"
+        ],
+        "topicsEs": [
+          "campo",
+          "inspección",
+          "diseño",
+          "offline"
+        ],
+        "wants": [
+          "offline",
+          "sync"
+        ],
+        "wantsLabel": {
+          "en": "offline sync",
+          "es": "sincronización offline"
+        },
+        "brings": [
+          "field",
+          "design"
+        ],
+        "skills": [
+          "design",
+          "field-research"
+        ],
+        "unknowns": [
+          {
+            "en": "Whether Jun wants a cofounder or a contract role",
+            "es": "Si Jun busca cofundar o un trabajo por contrato"
+          }
+        ],
+        "draft": {
+          "en": "Hi Jun,\n\nI'm {first}. I'm planning an offline field-notes app for inspectors. I have built the offline sync and per-field merge it needs; the proof is linked in my portfolio. Your post says you have spent two years in field research with inspection crews, which is the part I don't have.\n\nWould you be open to a short call to compare notes?\n\n{first}",
+          "es": "Hola, Jun:\n\nSoy {first}. Estoy planeando una app de notas de campo offline para equipos de inspección. Ya construí la sincronización offline y la fusión por campo que necesita; la prueba está enlazada en mi portafolio. Tu publicación dice que llevas dos años de investigación de campo con equipos de inspección, que es justo lo que a mí me falta.\n\n¿Te interesaría una llamada corta para comparar notas?\n\n{first}"
+        }
+      },
+      {
+        "id": "tomas",
+        "name": "Tomás Reyes (EXAMPLE)",
+        "first": "Tomás",
+        "headline": {
+          "en": "Builds offline-first sync engines",
+          "es": "Construye motores de sincronización offline"
+        },
+        "source": {
+          "en": "Synthetic Q&A post",
+          "es": "Publicación sintética de preguntas y respuestas"
+        },
+        "recency": {
+          "en": "9 days ago",
+          "es": "hace 9 días"
+        },
+        "quote": "I've shipped two offline-first sync engines. Looking for a cofounder for a field app who can handle the AI side.",
+        "quoteEs": "He lanzado dos motores de sincronización offline. Busco a alguien para cofundar una app de campo que se encargue de la parte de IA.",
+        "location": "Berlin",
+        "topics": [
+          "offline",
+          "sync",
+          "field"
+        ],
+        "topicsEs": [
+          "offline",
+          "sincronización",
+          "campo"
+        ],
+        "wants": [
+          "schema"
+        ],
+        "wantsLabel": {
+          "en": "AI features with checked output",
+          "es": "funciones de IA con salida validada"
+        },
+        "brings": [
+          "offline",
+          "sync"
+        ],
+        "skills": [
+          "offline-sync"
+        ],
+        "unknowns": []
+      },
+      {
+        "id": "ari",
+        "name": "Ari Lindqvist (EXAMPLE)",
+        "first": "Ari",
+        "headline": {
+          "en": "Trains vision models on crop-field imagery",
+          "es": "Entrena modelos de visión con imágenes de cultivos"
+        },
+        "source": {
+          "en": "Synthetic newsletter note",
+          "es": "Nota sintética de boletín"
+        },
+        "recency": {
+          "en": "3 weeks ago",
+          "es": "hace 3 semanas"
+        },
+        "quote": "Building models for field imagery. I need a cofounder who has trained vision models on GPUs at scale.",
+        "quoteEs": "Construyo modelos para imágenes de campo. Necesito a alguien para cofundar que haya entrenado modelos de visión en GPUs a escala.",
+        "location": "Berlin",
+        "topics": [
+          "field",
+          "imagery",
+          "models"
+        ],
+        "topicsEs": [
+          "campo",
+          "imágenes",
+          "modelos"
+        ],
+        "wants": [
+          "training",
+          "gpu",
+          "vision"
+        ],
+        "wantsLabel": {
+          "en": "training vision models on GPUs",
+          "es": "entrenar modelos de visión en GPUs"
+        },
+        "brings": [
+          "research",
+          "imagery"
+        ],
+        "skills": [
+          "ml-training"
+        ],
+        "unknowns": []
+      },
+      {
+        "id": "noor",
+        "name": "Noor Haddad (EXAMPLE)",
+        "first": "Noor",
+        "headline": {
+          "en": "Grows consumer social apps",
+          "es": "Hace crecer apps sociales de consumo"
+        },
+        "source": {
+          "en": "Synthetic forum post",
+          "es": "Publicación sintética de foro"
+        },
+        "recency": {
+          "en": "4 days ago",
+          "es": "hace 4 días"
+        },
+        "quote": "Growth lead looking for a technical cofounder for a consumer social app.",
+        "quoteEs": "Responsable de crecimiento que busca a alguien técnico para cofundar una app social de consumo.",
+        "location": "San Francisco",
+        "topics": [
+          "consumer",
+          "social",
+          "growth"
+        ],
+        "topicsEs": [
+          "consumo",
+          "social",
+          "crecimiento"
+        ],
+        "wants": [
+          "social",
+          "growth"
+        ],
+        "wantsLabel": {
+          "en": "a consumer social app",
+          "es": "una app social de consumo"
+        },
+        "brings": [
+          "growth",
+          "marketing"
+        ],
+        "skills": [
+          "growth"
+        ],
+        "unknowns": []
+      }
+    ],
+    "skills": [
+      {
+        "id": "production",
+        "en": "Production",
+        "es": "Producción"
+      },
+      {
+        "id": "field-research",
+        "en": "Field research",
+        "es": "Investigación de campo"
+      },
+      {
+        "id": "design",
+        "en": "Design",
+        "es": "Diseño"
+      },
+      {
+        "id": "offline-sync",
+        "en": "Offline sync",
+        "es": "Sincronización offline"
+      },
+      {
+        "id": "ml-training",
+        "en": "Model training",
+        "es": "Entrenamiento de modelos"
+      },
+      {
+        "id": "growth",
+        "en": "Growth",
+        "es": "Crecimiento"
+      }
+    ]
+  },
+  "clients": {
+    "presets": [
+      {
+        "en": "Small teams with offline notes, messy feedback or manual releases",
+        "es": "Equipos pequeños con notas offline, comentarios desordenados o versiones manuales"
+      },
+      {
+        "en": "Teams losing field notes when there is no signal",
+        "es": "Equipos que pierden notas de campo cuando no hay señal"
+      },
+      {
+        "en": "Teams drowning in user feedback",
+        "es": "Equipos desbordados por los comentarios de sus usuarios"
+      }
+    ],
+    "signals": [
+      {
+        "id": "harrow",
+        "name": "Harrow Field Services (EXAMPLE)",
+        "source": {
+          "en": "Synthetic forum post",
+          "es": "Publicación sintética de foro"
+        },
+        "recency": {
+          "en": "6 days ago",
+          "es": "hace 6 días"
+        },
+        "quote": "Our inspectors lose notes when there's no signal, and two people editing the same report overwrite each other.",
+        "quoteEs": "Nuestro equipo de inspección pierde notas cuando no hay señal, y dos personas que editan el mismo informe se sobrescriben.",
+        "location": "Sacramento, CA",
+        "need": "offline",
+        "needLabel": {
+          "en": "Notes lost offline, edits overwriting each other",
+          "es": "Notas perdidas sin conexión, ediciones que se sobrescriben"
+        },
+        "topics": [
+          "offline",
+          "notes",
+          "field",
+          "signal",
+          "inspection"
+        ],
+        "topicsEs": [
+          "offline",
+          "notas",
+          "campo",
+          "señal",
+          "inspección"
+        ],
+        "wants": [
+          "offline",
+          "merg"
+        ],
+        "wantsLabel": {
+          "en": "offline sync that merges edits",
+          "es": "sincronización offline que fusiona ediciones"
+        },
+        "unknowns": [
+          {
+            "en": "Which devices their crews use",
+            "es": "Qué dispositivos usan sus equipos"
+          }
+        ],
+        "draft": {
+          "en": "Hi,\n\nI read your note about inspectors losing notes with no signal and edits overwriting each other. I built an offline-first sync engine that merges edits per field. It has been tested only on a synthetic benchmark, never in production.\n\nIf this is still an open problem for you, would a short call be useful? No problem if not.\n\n{first}",
+          "es": "Hola:\n\nLeí su nota sobre el equipo de inspección que pierde notas sin señal y las ediciones que se sobrescriben. Construí un motor de sincronización offline que fusiona ediciones por campo. Solo se ha probado con una prueba sintética, nunca en producción.\n\nSi esto sigue siendo un problema abierto para ustedes, ¿les serviría una llamada corta? Sin problema si no.\n\n{first}"
+        }
+      },
+      {
+        "id": "bramble",
+        "name": "Bramble Support Desk (EXAMPLE)",
+        "source": {
+          "en": "Synthetic community thread",
+          "es": "Hilo sintético de comunidad"
+        },
+        "recency": {
+          "en": "11 days ago",
+          "es": "hace 11 días"
+        },
+        "quote": "Hundreds of feedback emails a week. We want them turned into tickets we can trust, without someone pasting text that changes the priority.",
+        "quoteEs": "Cientos de correos de comentarios por semana. Queremos convertirlos en tickets confiables, sin que alguien pegue un texto que cambie la prioridad.",
+        "location": "Remote",
+        "need": "feedback",
+        "needLabel": {
+          "en": "Feedback turned into trustworthy tickets",
+          "es": "Comentarios convertidos en tickets confiables"
+        },
+        "topics": [
+          "feedback",
+          "tickets",
+          "support",
+          "messy"
+        ],
+        "topicsEs": [
+          "comentarios",
+          "tickets",
+          "soporte",
+          "desordenados"
+        ],
+        "wants": [
+          "schema",
+          "instruction"
+        ],
+        "wantsLabel": {
+          "en": "drafts checked against a schema, feedback treated as data",
+          "es": "borradores validados con un esquema y comentarios tratados como datos"
+        },
+        "unknowns": [
+          {
+            "en": "What their feedback looks like for real",
+            "es": "Cómo son de verdad sus comentarios"
+          }
+        ],
+        "draft": {
+          "en": "Hi,\n\nI saw your thread about turning feedback emails into tickets you can trust. I built a tool that drafts issues which must match a schema, and treats feedback text as data so it cannot change priorities. It was evaluated on 20 synthetic examples only.\n\nIf this is still an open problem for you, would a short call be useful? No problem if not.\n\n{first}",
+          "es": "Hola:\n\nVi su hilo sobre convertir correos de comentarios en tickets confiables. Construí una herramienta que redacta incidencias que deben cumplir un esquema y trata el texto de los comentarios como datos, para que no pueda cambiar prioridades. Solo se evaluó con 20 ejemplos sintéticos.\n\nSi esto sigue siendo un problema abierto para ustedes, ¿les serviría una llamada corta? Sin problema si no.\n\n{first}"
+        }
+      },
+      {
+        "id": "pinecrest",
+        "name": "Pinecrest Clinic Network (EXAMPLE)",
+        "source": {
+          "en": "Synthetic Q&A post",
+          "es": "Publicación sintética de preguntas y respuestas"
+        },
+        "recency": {
+          "en": "3 days ago",
+          "es": "hace 3 días"
+        },
+        "quote": "We need patient records to sync offline between clinics, HIPAA-compliant and already proven in production.",
+        "quoteEs": "Necesitamos que los historiales de pacientes se sincronicen offline entre clínicas, con cumplimiento HIPAA y ya probado en producción.",
+        "location": "Portland, OR",
+        "need": "compliance",
+        "needLabel": {
+          "en": "Compliant patient-record sync",
+          "es": "Sincronización de historiales con cumplimiento normativo"
+        },
+        "topics": [
+          "records",
+          "offline",
+          "clinic",
+          "sync"
+        ],
+        "topicsEs": [
+          "historiales",
+          "offline",
+          "clínica",
+          "sincronización"
+        ],
+        "wants": [
+          "hipaa",
+          "production"
+        ],
+        "wantsLabel": {
+          "en": "HIPAA compliance and production experience",
+          "es": "cumplimiento HIPAA y experiencia en producción"
+        },
+        "unknowns": []
+      },
+      {
+        "id": "corvid",
+        "name": "Corvid Labs (EXAMPLE)",
+        "source": {
+          "en": "Synthetic forum post",
+          "es": "Publicación sintética de foro"
+        },
+        "recency": {
+          "en": "8 days ago",
+          "es": "hace 8 días"
+        },
+        "quote": "Our releases are still manual: someone writes the changelog by hand and tags the version. We'd like that scripted.",
+        "quoteEs": "Nuestras versiones siguen siendo manuales: alguien escribe el changelog a mano y etiqueta la versión. Queremos automatizarlo.",
+        "location": "San Francisco, CA",
+        "need": "releases",
+        "needLabel": {
+          "en": "A manual release process to script",
+          "es": "Un proceso de versiones manual para automatizar"
+        },
+        "topics": [
+          "releases",
+          "changelog",
+          "manual",
+          "versions"
+        ],
+        "topicsEs": [
+          "versiones",
+          "changelog",
+          "manuales",
+          "manual"
+        ],
+        "wants": [
+          "release"
+        ],
+        "wantsLabel": {
+          "en": "a scripted release process",
+          "es": "un proceso de versiones automatizado"
+        },
+        "unknowns": [
+          {
+            "en": "How large their codebase and team are",
+            "es": "Qué tamaño tienen su código y su equipo"
+          }
+        ],
+        "draft": {
+          "en": "Hi,\n\nI saw that your releases are still manual. I run the release process for a small CLI, shared with another maintainer: the changelog, version tags and release docs are scripted.\n\nIf this is still an open problem for you and comparing notes would help, I'd be glad to. No problem if not.\n\n{first}",
+          "es": "Hola:\n\nVi que sus versiones siguen siendo manuales. Llevo el proceso de versiones de una CLI pequeña, en conjunto con otra persona que la mantiene: el changelog, las etiquetas de versión y la documentación de versiones están automatizados.\n\nSi esto sigue siendo un problema abierto para ustedes y comparar notas les sirve, con gusto. Sin problema si no.\n\n{first}"
+        }
+      }
+    ],
+    "needs": [
+      {
+        "id": "offline",
+        "en": "Offline sync",
+        "es": "Sincronización offline"
+      },
+      {
+        "id": "feedback",
+        "en": "Feedback to tickets",
+        "es": "Comentarios a tickets"
+      },
+      {
+        "id": "releases",
+        "en": "Releases",
+        "es": "Versiones"
+      },
+      {
+        "id": "compliance",
+        "en": "Compliance",
+        "es": "Cumplimiento normativo"
+      }
+    ]
+  }
+}
