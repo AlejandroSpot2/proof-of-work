@@ -19,7 +19,7 @@ type Tab = "portfolio" | "discover" | "next";
 const TABS: Tab[] = ["portfolio", "discover", "next"];
 const ROLE: Record<string, string> = { author: "Rin's own", co_author: "Shared", contributor: "Contribution", reviewer: "Reviewed", unknown: "Unclear" };
 
-const READY_WORD = { ready: "Live", "needs-setup": "Needs setup", "demo-only": "Demo only", planned: "Planned" } as const;
+const READY_WORD = { ready: "Live", "needs-setup": "Needs setup", "demo-only": "Demo only" } as const;
 
 export function StudioApp() {
   const ws = useWorkspace("/studio");

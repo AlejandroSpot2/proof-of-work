@@ -1,0 +1,22 @@
+{
+  "_note": "Synthetic sample, shape not confirmed. Written for offline tests from the Treg catalog's outline of treg.x.search.posts ({output: {posts[], next_cursor}}). Every account, URL, email and phone number here is invented.",
+  "output": {
+    "posts": [
+      {
+        "id": "1890000000000000001",
+        "text": "Our field techs lose notes when there is no signal. Anyone built offline sync that merges edits? DM me or email ops@harrowfield.example, +1 (415) 555-0101",
+        "url": "https://x.com/harrowfield_ops/status/1890000000000000001?s=20",
+        "created_at": "2026-10-30T08:12:00Z",
+        "author": { "name": "Harrow Field Ops", "username": "harrowfield_ops", "email": "ops@harrowfield.example", "phone": "+1 (415) 555-0101", "location": "Denver, CO" }
+      },
+      {
+        "id": "1890000000000000002",
+        "content": "Release day again and our changelog is still written by hand.",
+        "link": "https://x.com/corvid_tools/status/1890000000000000002",
+        "author": { "username": "corvid_tools" }
+      },
+      { "id": "1890000000000000003", "text": "no link on this one", "author": { "name": "Lost Post" } }
+    ],
+    "next_cursor": null
+  }
+}

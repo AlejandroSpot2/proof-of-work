@@ -1,4 +1,5 @@
 import type { ExtractedPosting } from "@/lib/requirements";
+import type { DiscoverDeps } from "@/lib/discover-live";
 import { and, eq, inArray } from "drizzle-orm";
 import type { Db } from "@/lib/db/client";
 import * as t from "@/lib/db/schema";
@@ -25,6 +26,7 @@ export type Deps = {
   /** One translation per text, same order; an empty string means "not translated". */
   translate(texts: string[], lang: "es"): Promise<{ translations: string[]; engine: string }>;
   extractRequirements(posting: string): Promise<ExtractedPosting>;
+  discover: DiscoverDeps;
   now(): number;
 };
 

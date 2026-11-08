@@ -33,6 +33,9 @@ type ReasonOf = {
 export type CheckId = keyof ReasonOf;
 export type Check = { [K in CheckId]: { id: K; pass: boolean; reason: ReasonOf[K] } }[CheckId];
 
+/** Where a live signal came from. Prepared EXAMPLE signals have none. The date is the source's own, never the fetch time. */
+export type Origin = { kind: "profile" | "post"; url: string; provider: string; date: string | null };
+
 type Person = CofounderFixture["person"];
 type Common = {
   id: string;
@@ -46,11 +49,29 @@ type Common = {
   wants: string[];
   wantsLabel: Localized;
   unknowns: Localized[];
+  origin?: Origin;
 };
 /** "next-steps": the draft is the one Rin's next steps write for the same person, so both tabs show one text. */
 export type CofounderSignal = Common & { view: "cofounders"; person: Person; brings: string[]; skills: string[]; draft: Localized | "next-steps" | null };
 export type ClientSignal = Common & { view: "clients"; name: string; need: string; needLabel: Localized; draft: Localized | null };
-type Signal = CofounderSignal | ClientSignal;
+export type Signal = CofounderSignal | ClientSignal;
+
+/** A public profile or post as the Treg boundary keeps it: no email, phone or contact field gets this far. */
+export type PublicRow = { name: string; headline: string | null; location: string | null; url: string; date: string | null; provider: string };
+
+/** Who answered a search or a relevance check, what it cost when Treg measured it, and when it was fetched. */
+export type CallProvenance = { mode: "demo" | "live"; source: string; provider: string | null; callId: string | null; costMicro: number | null; at: number };
+
+export const RELEVANCE_LABELS = ["relevant", "unclear", "not_relevant"] as const;
+export type RelevanceLabel = (typeof RELEVANCE_LABELS)[number];
+/** Jev's only part: one relevance label per signal. It never changes a check, a verdict or the order. */
+export type Relevance =
+  | { status: "labeled"; labels: Record<string, RelevanceLabel>; provenance: CallProvenance }
+  | { status: "none"; reason: "demo" | "no-signals" | "cancelled" }
+  | { status: "failed"; message: string };
+
+/** A search as it is cached: relevance is null until it has been checked once. */
+export type StoredRun = { view: View; query: string; signals: Signal[]; search: CallProvenance; relevance: Relevance | null };
 
 type Option = { id: string; label: Localized };
 type Presets = [Localized, ...Localized[]];
@@ -76,6 +97,7 @@ export type SignalView = {
   brings: Localized[];
   unknowns: Localized[];
   draft: Localized | null;
+  origin: Origin | null;
 };
 export type Verdict = { signal: SignalView; kept: boolean; checks: Check[]; failed: Check | null; backing: Backing[]; projects: string[] };
 
@@ -157,7 +179,7 @@ const STOPWORDS = new Set(
 );
 const PREFIX = 5;
 
-const intentWords = (intent: string) => [...new Set(intent.toLowerCase().match(/[a-záéíóúñü]+/g) ?? [])].filter((w) => w.length >= 4 && !STOPWORDS.has(w));
+export const contentWords = (text: string) => [...new Set(text.toLowerCase().match(/[a-záéíóúñü]+/g) ?? [])].filter((w) => w.length >= 4 && !STOPWORDS.has(w));
 const hitsTopic = (word: string, topic: string) => word === topic || (word.length >= PREFIX && topic.length >= PREFIX && word.slice(0, PREFIX) === topic.slice(0, PREFIX));
 const unique = (xs: string[]) => [...new Set(xs)];
 
@@ -173,8 +195,8 @@ function filtersReason(s: Signal, f: Filters): ReasonOf["filters"] {
 }
 
 /** Every check runs and is returned; the first failing one is the reason shown. Kept only when none fails. */
-export function discover(model: PortfolioModel, view: View, intent: string, filters: Filters, data = EXAMPLE_SIGNALS): { kept: Verdict[]; dropped: Verdict[] } {
-  const words = intentWords(intent);
+export function discover(model: PortfolioModel, view: View, intent: string, filters: Filters, signals: Signal[] = EXAMPLE_SIGNALS[view].signals): { kept: Verdict[]; dropped: Verdict[] } {
+  const words = contentWords(intent);
   const pool = poolOf(model);
   const gapsToFill = unique([...pool.filter((c) => c.support === "unknown").map((c) => c.name), ...(model.nextBuild?.gaps ?? [])]);
   const shown = unique(pool.filter(evidenced).map((c) => c.name));
@@ -182,7 +204,6 @@ export function discover(model: PortfolioModel, view: View, intent: string, filt
   const first = model.person.firstName;
   const fill = (d: Localized): Localized => ({ en: d.en.replaceAll("{first}", first), es: d.es.replaceAll("{first}", first) });
 
-  const signals: Signal[] = data[view].signals;
   const verdicts = signals.map((s): Verdict => {
     const topics = [...s.topics, ...s.topicsEs];
     const hit = words.filter((w) => topics.some((t) => hitsTopic(w, t)));
@@ -214,7 +235,7 @@ export function discover(model: PortfolioModel, view: View, intent: string, filt
     const failed = checks.find((c) => !c.pass) ?? null;
     const kept = failed === null;
     const draft = s.draft === "next-steps" ? nextStepsDraft : s.draft && fill(s.draft);
-    const common = { id: s.id, view, wants: s.wantsLabel, source: s.source, recency: s.recency, quote: s.quote, quoteEs: s.quoteEs, location: s.location, draft: kept ? draft : null };
+    const common = { id: s.id, view, wants: s.wantsLabel, source: s.source, recency: s.recency, quote: s.quote, quoteEs: s.quoteEs, location: s.location, draft: kept ? draft : null, origin: s.origin ?? null };
     const signal: SignalView =
       s.view === "cofounders"
         ? { ...common, name: s.person.name, first: s.person.first, headline: s.person.headline, need: null, brings: s.person.brings, unknowns: [AVAILABILITY, ...s.unknowns] }
@@ -228,3 +249,53 @@ export function discover(model: PortfolioModel, view: View, intent: string, filt
     dropped: verdicts.filter((v) => !v.kept),
   };
 }
+
+/** Outside text stays in its own language: the same words on both sides, never marked as translated. */
+const asWritten = (text: string): Localized => ({ en: text, es: text });
+const excerpt = (text: string) => (text.length > 90 ? `“${text.slice(0, 88).trimEnd()}…”` : `“${text}”`);
+
+const LIVE_SOURCE: Record<Origin["kind"], Localized> = { profile: { en: "Public profile", es: "Perfil público" }, post: { en: "Public post on X", es: "Publicación pública en X" } };
+const NO_DATE: Localized = { en: "Date not stated", es: "Fecha no indicada" };
+const LIVE_DRAFT: Record<View, (them: string, url: string) => Localized> = {
+  cofounders: (them, url) => ({
+    en: `Hi ${them}, I found your public profile (${url}). I am looking for someone to build my next project with, and every line of my portfolio links to the file it comes from. Would you be open to a short call?\n\n{first}`,
+    es: `Hola, ${them}: encontré tu perfil público (${url}). Busco a alguien con quien construir mi próximo proyecto, y cada línea de mi portafolio enlaza al archivo del que sale. ¿Te interesaría una llamada corta?\n\n{first}`,
+  }),
+  clients: (them, url) => ({
+    en: `Hi ${them}, I read your public post (${url}). My portfolio shows work close to what you describe, and every line links to the file it comes from. Would a short call help?\n\n{first}`,
+    es: `Hola, ${them}: leí tu publicación pública (${url}). Mi portafolio muestra trabajo cercano a lo que describes, y cada línea enlaza al archivo del que sale. ¿Te serviría una llamada corta?\n\n{first}`,
+  }),
+};
+
+/**
+ * A normalized public row as a Discover signal. Its own words are its topics and what it asks for or brings, so the
+ * same code checks run on it as on the EXAMPLE list. Availability, budget and interest stay unknown (added by discover).
+ */
+export function liveSignal(view: View, row: PublicRow, index: number): Signal {
+  const text = row.headline ?? "";
+  const words = contentWords(text);
+  const stems = unique(words.map((w) => w.slice(0, PREFIX)));
+  const kind: Origin["kind"] = view === "cofounders" ? "profile" : "post";
+  const common: Common = {
+    id: `${kind}-${index + 1}`,
+    source: LIVE_SOURCE[kind],
+    recency: row.date ? asWritten(row.date) : NO_DATE,
+    quote: text,
+    quoteEs: "",
+    location: row.location,
+    topics: words,
+    topicsEs: [],
+    wants: stems,
+    wantsLabel: asWritten(excerpt(text)),
+    unknowns: [],
+    origin: { kind, url: row.url, provider: row.provider, date: row.date },
+  };
+  const them = row.name.split(/\s+/)[0] || row.name;
+  const draft = LIVE_DRAFT[view](them, row.url);
+  return view === "cofounders"
+    ? { ...common, view, person: { name: row.name, first: them, headline: asWritten(text), brings: [] }, brings: stems, skills: [], draft }
+    : { ...common, view, name: row.name, need: "", needLabel: asWritten(text), draft };
+}
+
+/** Micro-USD as dollars, with only the decimals the amount needs: 1000000 is $1.00, 500 is $0.0005. */
+export const usd = (micro: number) => `$${(micro / 1e6).toFixed(micro % 10_000 === 0 ? 2 : 6).replace(/(\.\d{2}\d*?)0+$/, "$1")}`;

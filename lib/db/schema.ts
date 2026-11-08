@@ -12,6 +12,7 @@ import type {
   ImportReport,
 } from "@/lib/domain/types";
 import type { SourceKind, SourceStatus, GithubMeta, Authorship } from "@/lib/ingest/types";
+import type { StoredRun, View } from "@/lib/discover";
 
 export const workspaces = sqliteTable("workspaces", {
   id: text("id").primaryKey(),
@@ -131,4 +132,31 @@ export const presentations = sqliteTable("presentations", {
   tokenHash: text("token_hash").notNull().unique(),
   createdAt: integer("created_at").notNull(),
   revokedAt: integer("revoked_at"),
+});
+
+/** Every paid Treg call, reserved at its most before it is sent. Spent is the measured cost, or the reservation while the cost is unknown. */
+export const tregCalls = sqliteTable("treg_calls", {
+  id: text("id").primaryKey(),
+  workspaceId: text("workspace_id").notNull(),
+  feature: text("feature").notNull(),
+  endpoint: text("endpoint").notNull(),
+  status: text("status").$type<"pending" | "done" | "failed">().notNull(),
+  reservedMicro: integer("reserved_micro").notNull(),
+  costMicro: integer("cost_micro"),
+  callId: text("call_id"),
+  servedBy: text("served_by"),
+  httpStatus: integer("http_status"),
+  createdAt: integer("created_at").notNull(),
+});
+
+/** One Discover result per workspace, mode, view, query and source: a repeated search is never paid twice and never crosses workspaces. */
+export const discoverResults = sqliteTable("discover_results", {
+  key: text("key").primaryKey(),
+  workspaceId: text("workspace_id").notNull(),
+  mode: text("mode").$type<Mode>().notNull(),
+  view: text("view").$type<View>().notNull(),
+  query: text("query").notNull(),
+  source: text("source").notNull(),
+  run: text("run", { mode: "json" }).$type<StoredRun>().notNull(),
+  createdAt: integer("created_at").notNull(),
 });

@@ -26,7 +26,7 @@ export type WorkspaceState = {
   example: ExampleInfo | null;
   /** Live only: whether the model is configured, and what each feature can do live today. */
   model?: { ready: true; label: string } | { ready: false; reason: string } | null;
-  readiness?: { feature: string; status: "ready" | "needs-setup" | "demo-only" | "planned"; detail: string }[] | null;
+  readiness?: { feature: string; status: "ready" | "needs-setup" | "demo-only"; detail: string }[] | null;
 };
 
 export type LiveSource = { projectId: string; url: string; locator: string; status: string; statusDetail: string };

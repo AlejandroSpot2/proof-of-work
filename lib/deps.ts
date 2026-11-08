@@ -10,6 +10,7 @@ import { fetchGithubProject, parseGithubRepoUrl } from "@/lib/ingest/github";
 import { fetchWebSource } from "@/lib/ingest/web";
 import { translateWithDictionary, translateWithModel } from "@/lib/translate";
 import { extractByRules, extractWithModel } from "@/lib/requirements";
+import { fixtureDiscover, tregDiscover } from "@/lib/discover-live";
 
 const blocked = (url: string, reason: string): FetchedSource => ({ url, kind: "web", status: "blocked", statusDetail: reason, locator: "page", text: "" });
 
@@ -28,6 +29,7 @@ export const fixtureDeps: Deps = {
   },
   translate: (texts) => translateWithDictionary(texts),
   extractRequirements: (posting) => extractByRules(posting),
+  discover: fixtureDiscover,
   now: () => Date.now(),
 };
 
@@ -51,6 +53,7 @@ export const liveDeps: Deps = {
   },
   translate: (texts) => translateWithModel(texts),
   extractRequirements: (posting) => extractWithModel(posting),
+  discover: tregDiscover(),
   now: () => Date.now(),
 };
 
