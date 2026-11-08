@@ -23,7 +23,9 @@ export const workspaces = sqliteTable("workspaces", {
   portfolioSettings: text("portfolio_settings", { mode: "json" }).$type<PortfolioSettings | null>(),
 });
 
-export type PortfolioSettings = { headline?: string; intro?: string; hidden?: string[]; builtAt?: number };
+/** Where a build came from: Demo (the recorded EXAMPLE) or Live (the configured model), and when. */
+export type Provenance = { mode: "demo" | "live"; engine: string; at: number };
+export type PortfolioSettings = { headline?: string; intro?: string; hidden?: string[]; builtAt?: number; cv?: string; provenance?: Provenance };
 
 export const sessions = sqliteTable("sessions", {
   id: text("id").primaryKey(),

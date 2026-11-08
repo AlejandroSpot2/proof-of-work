@@ -36,7 +36,8 @@ const chrome = (inner: string) =>
   `<div style="width:100%;padding:0 0.85in;font-family:Geist,Arial,sans-serif;font-size:7pt;color:#565c68;display:flex;justify-content:space-between;-webkit-print-color-adjust:exact;">${inner}</div>`;
 
 const HEADER = (name: string) => chrome(`<span>${name} · ${RUNNING_HEAD}</span><span></span>`);
-const FOOTER = chrome(`<span>Synthetic EXAMPLE material · Not legal advice</span><span>Page <span class="pageNumber"></span> of <span class="totalPages"></span></span>`);
+const FOOTER = (example: boolean) =>
+  chrome(`<span>${example ? "Synthetic EXAMPLE material · " : ""}Not legal advice</span><span>Page <span class="pageNumber"></span> of <span class="totalPages"></span></span>`);
 
 const g = globalThis as unknown as { __pow_pdf_browser?: Promise<Browser>; __pow_pdf_cache?: Map<string, Promise<RenderedPacket>> };
 
@@ -71,7 +72,7 @@ async function printPdf(packet: Packet, pages: PageMap | null): Promise<Buffer> 
       printBackground: true,
       displayHeaderFooter: true,
       headerTemplate: HEADER(packet.person.name.replace(/</g, "&lt;")),
-      footerTemplate: FOOTER,
+      footerTemplate: FOOTER(packet.example),
       margin: { top: "0.85in", bottom: "0.8in", left: "0.85in", right: "0.85in" },
       outline: true,
       tagged: true,
@@ -140,11 +141,18 @@ export function packetFor(db: Db, workspaceId: string): Promise<RenderedPacket> 
 
 export const PDF_FILENAME = "rin-okafor-first-consultation-kit-EXAMPLE.pdf";
 
+/** The EXAMPLE keeps its marked name; a real workspace gets the person's own name and no EXAMPLE mark. */
+export function pdfFilename(packet: Packet): string {
+  if (packet.example) return PDF_FILENAME;
+  const slug = packet.person.name.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60) || "builder";
+  return `${slug}-first-consultation-kit.pdf`;
+}
+
 export function pdfResponse(r: RenderedPacket): Response {
   return new Response(new Uint8Array(r.pdf), {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="${PDF_FILENAME}"`,
+      "Content-Disposition": `attachment; filename="${pdfFilename(r.packet)}"`,
       "Cache-Control": "private, no-store",
     },
   });

@@ -1,5 +1,5 @@
 import { getDb } from "@/lib/db/client";
-import { ownerCookie } from "@/lib/auth";
+import { ownerCookie, rememberCookie } from "@/lib/auth";
 import { createWorkspace, importProjects, reviewClaim, setGoal, evaluateGoal, createPresentation } from "@/lib/workspace";
 import { updatePortfolioSettings } from "@/lib/portfolio";
 import { loadProfile } from "@/lib/fixtures/rin";
@@ -32,9 +32,14 @@ export async function GET(req: Request) {
     await evaluateGoal(db, token, fixtureDeps);
     updatePortfolioSettings(db, workspaceId, { builtAt: Date.now() });
   }
+  const headers = new Headers({ "Cache-Control": "no-store" });
+  headers.append("Set-Cookie", ownerCookie(token));
+  headers.append("Set-Cookie", rememberCookie("fixture", token));
   if (stage === "published") {
     const pres = createPresentation(db, token, "portfolio");
-    return new Response(null, { status: 303, headers: { Location: `/p/${pres.token}`, "Set-Cookie": ownerCookie(token), "Cache-Control": "no-store" } });
+    headers.set("Location", `/p/${pres.token}`);
+    return new Response(null, { status: 303, headers });
   }
-  return new Response(null, { status: 303, headers: { Location: target, "Set-Cookie": ownerCookie(token), "Cache-Control": "no-store" } });
+  headers.set("Location", target);
+  return new Response(null, { status: 303, headers });
 }

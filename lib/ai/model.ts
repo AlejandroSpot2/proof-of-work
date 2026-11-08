@@ -9,8 +9,8 @@ const PROVIDERS = {
 
 export type ModelStatus = { ready: true; label: string } | { ready: false; reason: string };
 
-function parse(): { provider: keyof typeof PROVIDERS; id: string } | null {
-  const raw = process.env.AI_MODEL?.trim();
+function parse(env: Record<string, string | undefined> = process.env): { provider: keyof typeof PROVIDERS; id: string } | null {
+  const raw = env.AI_MODEL?.trim();
   if (!raw) return null;
   const [provider, ...rest] = raw.split(":");
   const id = rest.join(":");
@@ -18,10 +18,10 @@ function parse(): { provider: keyof typeof PROVIDERS; id: string } | null {
   return { provider: provider as keyof typeof PROVIDERS, id };
 }
 
-export function modelStatus(): ModelStatus {
-  const p = parse();
+export function modelStatus(env: Record<string, string | undefined> = process.env): ModelStatus {
+  const p = parse(env);
   if (!p) return { ready: false, reason: "AI_MODEL is not set as <provider>:<model-id>." };
-  if (!process.env[PROVIDERS[p.provider].keyVar]) return { ready: false, reason: `${PROVIDERS[p.provider].keyVar} is not set.` };
+  if (!env[PROVIDERS[p.provider].keyVar]) return { ready: false, reason: `${PROVIDERS[p.provider].keyVar} is not set.` };
   return { ready: true, label: `${p.provider}:${p.id}` };
 }
 

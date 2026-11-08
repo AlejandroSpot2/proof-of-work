@@ -11,6 +11,9 @@ const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replac
 export const TITLE = "First Consultation Kit";
 export const RUNNING_HEAD = "First Consultation Kit · Draft for attorney review";
 export const NOTICE = "Synthetic EXAMPLE material. Not legal advice. No eligibility assessment.";
+export const LIVE_NOTICE = "Not legal advice. No eligibility assessment.";
+export const noticeFor = (p: Packet) => (p.example ? NOTICE : LIVE_NOTICE);
+export const firstName = (p: Packet) => p.person.name.replace(/\s*\(EXAMPLE\)\s*/, "").split(" ")[0] ?? p.person.name;
 export const QUESTIONS_NOTE = "Suggestions to bring to the meeting. They are not advice and not an eligibility decision.";
 export const PROJECTS_ALONE = "Projects alone do not decide any visa question.";
 
@@ -62,7 +65,8 @@ function head(s: Section, lead?: string) {
 const MARKS = (Object.keys(CLASSIFICATION_MEANING) as (keyof typeof CLASSIFICATION_MEANING)[]).map(
   (k) => `<tr><td>${clsTag(k)}</td><td>${esc(CLASSIFICATION_MEANING[k])}</td></tr>`,
 );
-const LEGEND = `<table class="legend"><tbody>${MARKS.join("")}<tr><td><span class="cls cls-synthetic">Synthetic EXAMPLE</span></td><td>Everything in this kit. Rin Okafor is a fictional builder and every file is synthetic, written for a demo.</td></tr></tbody></table>`;
+const legend = (p: Packet) =>
+  `<table class="legend"><tbody>${MARKS.join("")}${p.example ? `<tr><td><span class="cls cls-synthetic">Synthetic EXAMPLE</span></td><td>Everything in this kit. Rin Okafor is a fictional builder and every file is synthetic, written for a demo.</td></tr>` : ""}</tbody></table>`;
 
 const PART_BLURB: Record<string, string> = {
   "part-summary": "Profile, objective, main contributions, and what the record does and does not show.",
@@ -92,8 +96,8 @@ function cover(p: Packet, pages: PageMap | null) {
   ).join("")}<li><a href="#${p.exhibits[0]?.anchor ?? ""}"><span class="cp-n">Annexes</span><span class="cp-t"><strong>Source excerpts</strong><span>The literal text of each exhibit, with the quoted passages highlighted.</span></span>${pn(pages, p.exhibits[0]?.anchor ?? "")}</a></li></ol>
   <div class="cover-foot">
     <p class="legend-title">How each statement and exhibit is marked</p>
-    ${LEGEND}
-    <p class="notice">${NOTICE}</p>
+    ${legend(p)}
+    <p class="notice">${noticeFor(p)}</p>
   </div>
 </section>`;
 }
@@ -143,12 +147,12 @@ function dossierOpener(p: Packet) {
     )
     .join("");
   return `<section class="sheet">
-  ${head(PARTS[1]!, "The record behind Part 1: what Rin did, what others did, and the passage that backs each line.")}
+  ${head(PARTS[1]!, `The record behind Part 1: what ${firstName(p)} did, what others did, and the passage that backs each line.`)}
   <h2>Projects in this dossier</h2>
   <table class="grid"><thead><tr><th>Project</th><th>Role recorded</th><th>What it is</th><th>Exhibits</th></tr></thead><tbody>${rows}</tbody></table>
   <h2>How evidence is marked</h2>
-  ${LEGEND}
-  <p class="prose spaced">Each statement was confirmed by Rin and is tied to a literal passage in a file. A statement is <em>Independent</em> only when two separate origins back it. Files from Rin's own project repositories, including her commits, pull requests and notes, are <em>Repository records</em>. Anything that rests on Rin's word alone is <em>Self-attested</em>. Work by other people is listed under each project and is never counted as Rin's.</p>
+  ${legend(p)}
+  <p class="prose spaced">Each statement was confirmed by ${firstName(p)} and is tied to a literal passage in a file. A statement is <em>Independent</em> only when two separate origins back it. Files from ${firstName(p)}'s own project repositories, including the commits, pull requests and notes in them, are <em>Repository records</em>. Anything that rests on ${firstName(p)}'s word alone is <em>Self-attested</em>. Work by other people is listed under each project and is never counted as ${firstName(p)}'s.</p>
 </section>`;
 }
 
@@ -167,7 +171,7 @@ function contributions(p: Packet, pages: PageMap | null) {
     <h2 class="proj-title"><span class="sn">2.1.${i + 1}</span>${esc(x.title)}<span class="proj-role">Role recorded: ${esc(x.role ?? "unknown")}</span></h2>
     ${x.summary ? `<p class="prose">${esc(x.summary)}</p>` : ""}
     <p class="scope">${esc(x.rinScope)}</p>
-    <h3>Rin's part</h3>
+    <h3>${firstName(p)}'s part</h3>
     <ol class="stmts">${x.statements.map((s) => statement(s, pages)).join("")}</ol>
     <h3>Others' part</h3>
     ${
@@ -189,7 +193,7 @@ function contributions(p: Packet, pages: PageMap | null) {
     )
     .join("");
   return `<section class="sheet">
-  ${head(SUB["sec-contributions"]!, "Per project: what Rin did, what others did, and the passage that backs each line.")}
+  ${head(SUB["sec-contributions"]!, `Per project: what ${firstName(p)} did, what others did, and the passage that backs each line.`)}
   ${projects}
 </section>`;
 }
@@ -207,7 +211,7 @@ function impact(p: Packet, pages: PageMap | null) {
   <ul class="bul">
     ${p.limits.map((l) => `<li>${esc(l)}</li>`).join("")}
     <li>Nothing in the record shows the projects in production, with real users or with real data.</li>
-    <li>No result has been reproduced by anyone other than Rin.</li>
+    <li>No result has been reproduced by anyone other than ${firstName(p)}.</li>
   </ul>
 </section>`;
 }
@@ -216,7 +220,7 @@ function chronology(p: Packet, pages: PageMap | null) {
   const rows = p.chronology
     .map(
       (r) =>
-        `<tr class="${r.isRin ? "rin" : "other"}"><td class="mono nowrap">${r.date}</td><td class="nowrap">${esc(r.project)}</td><td class="nowrap">${r.isRin ? `<span class="who-rin">Rin</span>` : `<span class="mono">${esc(r.who)}</span>`}</td><td>${esc(r.event)}</td><td class="nowrap">${ref(r.citation, pages)}</td></tr>`,
+        `<tr class="${r.isRin ? "rin" : "other"}"><td class="mono nowrap">${r.date}</td><td class="nowrap">${esc(r.project)}</td><td class="nowrap">${r.isRin ? `<span class="who-rin">${esc(firstName(p))}</span>` : `<span class="mono">${esc(r.who)}</span>`}</td><td>${esc(r.event)}</td><td class="nowrap">${ref(r.citation, pages)}</td></tr>`,
     )
     .join("");
   return `<section class="sheet">
@@ -240,7 +244,7 @@ function index(p: Packet, pages: PageMap | null) {
     )
     .join("");
   return `<section class="sheet">
-  ${head(SUB["sec-index"]!, "One exhibit per source file, all Synthetic EXAMPLE. Hashes are the first 16 hex characters of the file's SHA-256 at retrieval.")}
+  ${head(SUB["sec-index"]!, `One exhibit per source file${p.example ? ", all Synthetic EXAMPLE" : ""}. Hashes are the first 16 hex characters of the file's SHA-256 at retrieval.`)}
   <table class="grid index"><thead><tr><th>ID</th><th>Exhibit and locator</th><th>Project</th><th>Marked</th><th>Retrieved</th><th>Content hash</th><th class="num nowrap">Annex p.</th></tr></thead><tbody>${rows}</tbody></table>
 </section>`;
 }
@@ -298,11 +302,11 @@ function excerptLine(l: ExcerptLine) {
   return `<div class="ln${hl}"><span class="lno">${l.n}</span><span class="ltx">${html || "&nbsp;"}</span></div>`;
 }
 
-function annex(e: Exhibit) {
+function annex(e: Exhibit, p: Packet) {
   const meta: [string, string, boolean][] = [
     ["Project", e.project, false],
     ["File", e.locator, true],
-    ["Fixture URL", e.url, true],
+    [p.example ? "Fixture URL" : "URL", e.url, true],
     ["Content hash", e.contentHash, true],
     ["Retrieved", e.retrieved, true],
     ["Authorship", e.authorship, false],
@@ -311,12 +315,12 @@ function annex(e: Exhibit) {
   <header class="annex-head">
     <h1 id="${e.anchor}"><span class="annex-label">Annex</span><span class="annex-id">${e.id}</span></h1>
     <p class="annex-title">${esc(e.title)}</p>
-    <div class="annex-tags">${clsTag(e.classification)}<span class="cls cls-synthetic">Synthetic EXAMPLE</span></div>
+    <div class="annex-tags">${clsTag(e.classification)}${p.example ? `<span class="cls cls-synthetic">Synthetic EXAMPLE</span>` : ""}</div>
   </header>
   <dl class="annex-meta">${meta.map(([k, v, mono]) => `<div><dt>${k}</dt><dd${mono ? ' class="mono"' : ""}>${esc(v)}</dd></div>`).join("")}${
     e.citedBy.length ? `<div><dt>Backs</dt><dd>${e.citedBy.map(esc).join("<br>")}</dd></div>` : ""
   }</dl>
-  <p class="excerpt-label">${e.fullText ? "Full text of the file" : "Excerpt, lines around each quoted passage"}${e.quotes.length ? ". Blue: passages that back Rin's statements. Grey: passages cited for others' work, dates or stated limits." : "."}</p>
+  <p class="excerpt-label">${e.fullText ? "Full text of the file" : "Excerpt, lines around each quoted passage"}${e.quotes.length ? `. Blue: passages that back ${firstName(p)}'s statements. Grey: passages cited for others' work, dates or stated limits.` : "."}</p>
   <div class="excerpt">${e.excerpt.map(excerptLine).join("")}</div>
   ${e.illustration ? `<figure class="illo">${e.illustration.svg}<figcaption>${esc(e.illustration.caption)}</figcaption></figure>` : ""}
 </section>`;
@@ -334,6 +338,6 @@ export function renderPacketBody(p: Packet, pages: PageMap | null): string {
     index(p, pages),
     missing(p),
     questions(p),
-    ...p.exhibits.map(annex),
+    ...p.exhibits.map((e) => annex(e, p)),
   ].join("\n")}</div>`;
 }

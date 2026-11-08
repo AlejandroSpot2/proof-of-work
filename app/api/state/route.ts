@@ -3,6 +3,7 @@ import { ownerWorkspace } from "@/lib/workspace";
 import { attorneyView, deriveEntrust, loadSnapshot, portfolioView } from "@/lib/views/project";
 import { loadCv, loadProfile } from "@/lib/fixtures/rin";
 import { modelStatus } from "@/lib/ai/model";
+import { liveReadiness } from "@/lib/readiness";
 import { handle, json, sessionFrom } from "@/lib/http";
 import { opportunitiesFor } from "@/lib/opportunities";
 import { nextStepsFor } from "@/lib/next-steps";
@@ -27,6 +28,7 @@ export async function GET(req: Request) {
       nextSteps: nextStepsFor(entrust, opportunities, attorney.questions.length, firstName),
       example: profile && { disclaimer: profile.disclaimer, goal: profile.goal, role: profile.role, bio: profile.bio, projects: profile.projects, correction: profile.exampleCorrection, cv: loadCv() },
       model: ws.mode === "live" ? modelStatus() : null,
+      readiness: ws.mode === "live" ? liveReadiness() : null,
     });
   });
 }

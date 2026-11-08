@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 import { getDb } from "@/lib/db/client";
 import { buildPacket, type Classification, type Packet, type PageMap } from "@/lib/packet/model";
-import { PDF_FILENAME, packetFor } from "@/lib/packet/pdf";
-import { NOTICE, PARTS, PROJECTS_ALONE, QUESTIONS_NOTE, TITLE, checklistCounts, renderPacketBody, subtitle } from "@/components/packet/document";
+import { packetFor, pdfFilename } from "@/lib/packet/pdf";
+import { noticeFor, PARTS, PROJECTS_ALONE, QUESTIONS_NOTE, TITLE, checklistCounts, renderPacketBody, subtitle } from "@/components/packet/document";
 import { PACKET_CSS } from "@/components/packet/styles";
 import s from "./screen.module.css";
 
@@ -204,7 +204,7 @@ export async function PacketScreen({ workspaceId, downloadHref, leading }: { wor
         {leading}
         <span className={s.barTitle}>{TITLE}</span>
         <span className={s.spacer} />
-        <a className={s.download} href={downloadHref} download={PDF_FILENAME}>
+        <a className={s.download} href={downloadHref} download={pdfFilename(packet)}>
           Download PDF
         </a>
       </header>
@@ -217,7 +217,7 @@ export async function PacketScreen({ workspaceId, downloadHref, leading }: { wor
             <span>{rendered ? `${rendered.pageCount} pages, Letter` : "Page count unavailable"}</span>
             <span>Draft for attorney review. Not ready to file.</span>
           </p>
-          <p className={s.notice}>{NOTICE}</p>
+          <p className={s.notice}>{noticeFor(packet)}</p>
           {!rendered && <p className={s.notice}>Page numbers are not available because the PDF renderer could not start. The download may fail too.</p>}
         </section>
         <div className={s.parts}>

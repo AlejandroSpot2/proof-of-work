@@ -761,3 +761,100 @@
     transition: none;
   }
 }
+
+/* Demo / Live switch: two plain links, the active one filled */
+.modeSwitch {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 999px;
+  border: 1px solid var(--edge);
+  background: #fff;
+}
+
+.modeSwitch a {
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.modeSwitch a[aria-current="page"] {
+  background: var(--ink);
+  color: #fff;
+}
+
+/* Live setup in the rail: what works live today, the goal, the pasted CV */
+.livePanel {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.ready summary {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ready ul {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.ready li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 8px;
+  font-size: 13px;
+}
+
+.readyName {
+  font-weight: 500;
+}
+
+.readyStatus {
+  justify-self: end;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  background: var(--surface);
+  color: var(--muted);
+}
+
+.ready li[data-status="ready"] .readyStatus {
+  background: var(--accent);
+  color: #fff;
+}
+
+.ready li[data-status="needs-setup"] .readyStatus {
+  background: var(--ink);
+  color: #fff;
+}
+
+.readyDetail {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.liveField {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.liveField input,
+.liveField textarea {
+  border-radius: 10px;
+  border: 1px solid var(--edge);
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  resize: vertical;
+}

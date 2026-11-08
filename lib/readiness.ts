@@ -1,0 +1,27 @@
+import { modelStatus } from "@/lib/ai/model";
+
+/** One row per feature: what works in Live today, what needs setup, and what is still Demo only. Never the whole app as "live". */
+export type FeatureStatus = "ready" | "needs-setup" | "demo-only" | "planned";
+export type Readiness = { feature: string; status: FeatureStatus; detail: string }[];
+
+export function liveReadiness(env: Record<string, string | undefined> = process.env): Readiness {
+  const model = modelStatus(env);
+  const modelRow = model.ready
+    ? { status: "ready" as const, detail: `Uses ${model.label}. Every statement must quote its file word for word.` }
+    : { status: "needs-setup" as const, detail: `${model.reason} Add it to .env.local and restart the server. Nothing is filled in without it.` };
+  return [
+    {
+      feature: "Sources from public GitHub",
+      status: "ready",
+      detail: env.GITHUB_TOKEN ? "Read-only, with your GitHub token." : "Read-only and unauthenticated: GitHub allows about 60 requests an hour. GITHUB_TOKEN in .env.local raises it.",
+    },
+    { feature: "Statements with quotes", ...modelRow },
+    { feature: "Capabilities for your goal", ...modelRow },
+    { feature: "Review and correct", status: "ready", detail: "Nothing reaches the portfolio until it is confirmed." },
+    { feature: "Portfolio and share link", status: "ready", detail: "Read-only and revocable." },
+    { feature: "Consultation kit (PDF)", status: "ready", detail: "Built from your confirmed statements and files only." },
+    { feature: "Spanish translation", status: "demo-only", detail: "Live content stays in its original language for now; only interface words switch." },
+    { feature: "Next steps", status: "demo-only", detail: "Apply, strengthen and cofounder use the prepared EXAMPLE for now." },
+    { feature: "Discover", status: "planned", detail: "Planned source: Treg, not connected. No live search." },
+  ];
+}

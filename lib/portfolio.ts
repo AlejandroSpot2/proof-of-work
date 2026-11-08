@@ -44,6 +44,9 @@ export type PortfolioModel = {
   hidden: string[];
   ledgerRevision: number;
   builtAt: number | null;
+  /** Owner only: the pasted CV (the "before", never evidence) and where the last build came from. */
+  cv: string | null;
+  provenance: t.Provenance | null;
 };
 
 const COMMIT_LINE = /^(\S+)\s+([^:\s]+):\s+(.*?)(?:\s+\((\d{4}-\d{2}-\d{2})\))?$/;
@@ -176,6 +179,8 @@ export function buildPortfolio(db: Db, workspaceId: string, opts: { audience: "o
     hidden: settings.hidden ?? [],
     ledgerRevision: ws.ledgerRevision,
     builtAt: settings.builtAt ?? null,
+    cv: opts.audience === "owner" ? (settings.cv ?? null) : null,
+    provenance: opts.audience === "owner" ? (settings.provenance ?? null) : null,
   };
 }
 
@@ -184,11 +189,12 @@ function fmtMonth(iso: string) {
   return `${["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][Number(m) - 1]} ${y}`;
 }
 
-export function updatePortfolioSettings(db: Db, workspaceId: string, patch: { headline?: string; intro?: string; hidden?: string[]; builtAt?: number }) {
+export function updatePortfolioSettings(db: Db, workspaceId: string, patch: { headline?: string; intro?: string; hidden?: string[]; builtAt?: number; cv?: string; provenance?: t.Provenance }) {
   const ws = db.select().from(t.workspaces).where(eq(t.workspaces.id, workspaceId)).get();
   if (!ws) return;
   const next = { ...(ws.portfolioSettings ?? {}), ...patch };
   if (next.headline !== undefined) next.headline = next.headline.slice(0, 140);
   if (next.intro !== undefined) next.intro = next.intro.slice(0, 400);
+  if (next.cv !== undefined) next.cv = next.cv.slice(0, 6000);
   db.update(t.workspaces).set({ portfolioSettings: next }).where(eq(t.workspaces.id, workspaceId)).run();
 }

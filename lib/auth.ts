@@ -30,3 +30,10 @@ export function readCookie(header: string | null, name: string): string | null {
 export function ownerCookie(token: string): string {
   return `${OWNER_COOKIE}=${encodeURIComponent(token)}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${60 * 60 * 12}`;
 }
+
+/** Each mode remembers its own workspace, so switching Demo ↔ Live never loses the other one. */
+export const MODE_COOKIE = { fixture: "pow_demo", live: "pow_live" } as const;
+
+export function rememberCookie(mode: keyof typeof MODE_COOKIE, token: string): string {
+  return `${MODE_COOKIE[mode]}=${encodeURIComponent(token)}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${60 * 60 * 12}`;
+}

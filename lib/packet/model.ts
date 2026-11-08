@@ -17,8 +17,8 @@ export const CLASSIFICATION_OF: Record<ClaimState, Classification> = {
 
 export const CLASSIFICATION_MEANING: Record<Exclude<Classification, "Unverified">, string> = {
   Independent: "Backed by files from two independent origins.",
-  "Repository record": "A file in the project's own repository that is Rin's by its own content: her commit lines, or a note or pull request whose header names her.",
-  "Self-attested": "Rests on Rin's own word. No file says it.",
+  "Repository record": "A file in the project's own repository that is the person's by its own content: their commit lines, or a note or pull request whose header names them.",
+  "Self-attested": "Rests on the person's own word. No file says it.",
 };
 
 export type PageMap = Record<string, number>;
@@ -163,11 +163,11 @@ function titleOf(src: SourceRow, project: string): string {
   return h ? (h.toLowerCase().startsWith(project.toLowerCase()) ? h : `${project}: ${h}`) : `${project} ${src.locator}`;
 }
 
-function authorshipOf(src: SourceRow, handle: string): string {
+function authorshipOf(src: SourceRow, handle: string, who: string): string {
   if (src.locator === "contributors") return "Commit counts per author, derived from the commit log.";
-  if (src.authorship === "line-prefix") return `Commit log. Lines prefixed "${handle}:" are Rin's; other lines are other people's.`;
-  if (src.authorship === "all-by-handle") return "The file's header names Rin as its author.";
-  return "Project file. It does not name its author, so it backs context, not Rin's authorship.";
+  if (src.authorship === "line-prefix") return `Commit log. Lines prefixed "${handle}:" are ${who}'s; other lines are other people's.`;
+  if (src.authorship === "all-by-handle") return `The file's header names ${who} as its author.`;
+  return `Project file. It does not name its author, so it backs context, not ${who}'s authorship.`;
 }
 
 /** Finds each quote in the source line by line, literally. Quotes in fixtures sit on one line. */
@@ -216,6 +216,7 @@ export function buildPacket(db: Db, workspaceId: string, now = Date.now()): Pack
   const example = snap.workspace.mode === "fixture";
   const profile = example ? loadProfile() : null;
   const handle = snap.workspace.githubHandle;
+  const who = snap.workspace.personName.replace(/\s*\(EXAMPLE\)\s*/, "").split(" ")[0] || snap.workspace.personName;
 
   const rows = new Map<string, SourceRow>();
   const sourceRow = (id: string) => {
@@ -321,8 +322,8 @@ export function buildPacket(db: Db, workspaceId: string, now = Date.now()): Pack
     const words = [...new Set(tags.map((tag) => TAG_WORDS[tag] ?? tag.replace(/-/g, " ")))].filter(Boolean);
     const otherNames = [...new Set(others.filter((o) => !o.what.startsWith("Reviewed")).map((o) => o.who))];
     const rinScope =
-      `Rin's part in this record: ${words.join(", ") || "not stated"}.` +
-      (otherNames.length ? ` Commits by ${otherNames.join(" and ")} are listed below as others' work and are not claimed as Rin's.` : "");
+      `${who}'s part in this record: ${words.join(", ") || "not stated"}.` +
+      (otherNames.length ? ` Commits by ${otherNames.join(" and ")} are listed below as others' work and are not claimed as ${who}'s.` : "");
 
     return {
       anchor: `proj-${p.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
@@ -358,7 +359,7 @@ export function buildPacket(db: Db, workspaceId: string, now = Date.now()): Pack
         contentHash: s.contentHash,
         retrieved: ymd(s.fetchedAt),
         classification: "Repository record",
-        authorship: authorshipOf(row, handle),
+        authorship: authorshipOf(row, handle, who),
         quotes,
         citedBy: citedBy.get(s.id) ?? [],
         excerpt: lines,
@@ -385,14 +386,14 @@ export function buildPacket(db: Db, workspaceId: string, now = Date.now()): Pack
   const synthetic = outcomes.filter((o) => /synthetic/i.test(o.text));
 
   const shows = [
-    `${all.length} confirmed statements about Rin's work across ${projects.length} projects, each tied to a literal passage in a file.`,
+    `${all.length} confirmed statements about ${who}'s work across ${projects.length} projects, each tied to a literal passage in a file.`,
     ...(shared.length
       ? [`${shared.length} of them ${shared.length === 1 ? "describes" : "describe"} shared work; the people who did the rest are named from the commit log.`]
       : []),
     `${chronology.length} dated events from commit logs and merged pull requests, from ${chronology[0]?.date ?? "unknown"} to ${chronology.at(-1)?.date ?? "unknown"}.`,
   ];
   const doesNotShow = [
-    ...(byClass.Independent === 0 ? ["No statement is backed by an independent origin. Every exhibit is a file in a repository where Rin committed."] : []),
+    ...(byClass.Independent === 0 ? [`No statement is backed by an independent origin. Every exhibit is a file in a repository where ${who} committed.`] : []),
     ...view.gaps,
     ...(synthetic.length ? ["Results are measured on synthetic data only; they are stated with that limit below."] : []),
   ];
@@ -407,9 +408,9 @@ export function buildPacket(db: Db, workspaceId: string, now = Date.now()): Pack
             priority: "High",
             scope: "record",
             item: "An independent account of any contribution",
-            why: `All ${exhibits.length} exhibits are files from repositories where Rin committed. None comes from a second, independent origin.`,
+            why: `All ${exhibits.length} exhibits are files from repositories where ${who} committed. None comes from a second, independent origin.`,
             status: "Missing from the record",
-            who: "Rin, from people outside the projects who saw the work, if any exist",
+            who: `${who}, from people outside the projects who saw the work, if any exist`,
           } satisfies ChecklistItem,
         ]
       : []),
@@ -420,7 +421,7 @@ export function buildPacket(db: Db, workspaceId: string, now = Date.now()): Pack
         item: "Evidence of production use or real users",
         why: c.limits[0] ?? `Nothing in the files shows: ${c.name}.`,
         status: "Missing from the record",
-        who: "Rin, if any deployment, usage or customer record exists",
+        who: `${who}, if any deployment, usage or customer record exists`,
       }),
     ),
     ...(syntheticProjects.length
@@ -431,7 +432,7 @@ export function buildPacket(db: Db, workspaceId: string, now = Date.now()): Pack
             item: "Results measured on real data",
             why: `${syntheticProjects.map((pr) => `${pr} (Ex. ${syntheticExhibits(pr)})`).join(" and ")} report benchmarks and evals on synthetic data only.`,
             status: "Only synthetic results",
-            who: "Rin, if any real-data run exists",
+            who: `${who}, if any real-data run exists`,
           } satisfies ChecklistItem,
         ]
       : []),
@@ -442,9 +443,9 @@ export function buildPacket(db: Db, workspaceId: string, now = Date.now()): Pack
           priority: "Medium",
           scope: "record",
           item: `${x.title}: a record of who owns what`,
-          why: `${x.title}'s files name its maintainers but not the split. Rin's part rests on commit author lines and her own description.`,
+          why: `${x.title}'s files name its maintainers but not the split. ${who}'s part rests on commit author lines and their own description.`,
           status: "Partly self-described",
-          who: `Rin, or ${x.title}'s other maintainer, from project records`,
+          who: `${who}, or ${x.title}'s other maintainer, from project records`,
         }),
       ),
     ...(reviewers.length
@@ -453,9 +454,9 @@ export function buildPacket(db: Db, workspaceId: string, now = Date.now()): Pack
             priority: "Low",
             scope: "record",
             item: "Reviewers' own words about the work",
-            why: `${reviewers.join(" and ")} reviewed Rin's pull requests, but the record holds only their handles.`,
+            why: `${reviewers.join(" and ")} reviewed ${who}'s pull requests, but the record holds only their handles.`,
             status: "Handles only",
-            who: "Rin, if the reviewers are willing",
+            who: `${who}, if the reviewers are willing`,
           } satisfies ChecklistItem,
         ]
       : []),
@@ -465,7 +466,7 @@ export function buildPacket(db: Db, workspaceId: string, now = Date.now()): Pack
       item: "An outside timestamp for key dates",
       why: "Commit and merge dates are recorded by the repositories themselves.",
       status: "Repository dates only",
-      who: "Rin, from release pages or archives, if relevant",
+      who: `${who}, from release pages or archives, if relevant`,
     },
   ];
   const outside: ChecklistItem[] = [
@@ -475,15 +476,15 @@ export function buildPacket(db: Db, workspaceId: string, now = Date.now()): Pack
       item: "Current immigration status and history",
       why: "Usually among the first things an attorney asks. It frames everything else in this kit.",
       status: "Unknown",
-      who: "Rin, to discuss with the attorney directly. Not stored here.",
+      who: `${who}, to discuss with the attorney directly. Not stored here.`,
     },
     {
       priority: "High",
       scope: "outside",
       item: "A job offer or prospective employer",
-      why: "The roles in this app are fictional EXAMPLEs. Whether a real offer exists is not known here.",
+      why: example ? "The roles in this app are fictional EXAMPLEs. Whether a real offer exists is not known here." : "Whether a real offer exists is not known here.",
       status: "Unknown",
-      who: "Rin, if an offer or an employer conversation exists",
+      who: `${who}, if an offer or an employer conversation exists`,
     },
     {
       priority: "Medium",
@@ -491,7 +492,7 @@ export function buildPacket(db: Db, workspaceId: string, now = Date.now()): Pack
       item: "Employment history and any employer letters",
       why: "Paid work sits outside these projects. This tool does not draft letters.",
       status: "Not collected by this tool",
-      who: "Rin and her current or former employers",
+      who: `${who} and their current or former employers`,
     },
     {
       priority: "Medium",
@@ -499,7 +500,7 @@ export function buildPacket(db: Db, workspaceId: string, now = Date.now()): Pack
       item: "Education credentials",
       why: "Degrees and transcripts sit outside the projects.",
       status: "Unknown",
-      who: "Rin, bring if relevant",
+      who: `${who}, bring if relevant`,
     },
     {
       priority: "Low",
@@ -507,7 +508,7 @@ export function buildPacket(db: Db, workspaceId: string, now = Date.now()): Pack
       item: "Recognition or publications",
       why: "None appear in this record, and nothing here should be presented as recognition.",
       status: "None in this record",
-      who: "Rin, bring if any exist",
+      who: `${who}, bring if any exist`,
     },
   ];
   const rank: Record<Priority, number> = { High: 0, Medium: 1, Low: 2 };
@@ -515,7 +516,7 @@ export function buildPacket(db: Db, workspaceId: string, now = Date.now()): Pack
 
   const questions = [
     ...view.questions.filter((q) => !q.startsWith("Do these gaps matter")),
-    "Which corroboration, if any, should Rin look for first: a reviewer's own account, release records, or records of real use?",
+    `Which corroboration, if any, should ${who} look for first: a reviewer's own account, release records, or records of real use?`,
     ...(synthetic.length ? ["Should results measured on synthetic data be included at all, and with what wording?"] : []),
     "Which items in Part 3 are worth gathering before a second meeting, and which can wait?",
     "In what form should the source files be kept for your review: exports, archived links or copies with their content hashes?",
@@ -534,10 +535,10 @@ export function buildPacket(db: Db, workspaceId: string, now = Date.now()): Pack
     synthetic.length ? "results on real data (every benchmark and eval is synthetic)" : null,
   ].filter((x): x is string => !!x);
   const recordLines = [
-    { shows: true, text: `${all.length} statements Rin confirmed across ${projects.length} projects, each tied to a literal passage in one of ${exhibits.length} exhibits.` },
+    { shows: true, text: `${all.length} statements ${who} confirmed across ${projects.length} projects, each tied to a literal passage in one of ${exhibits.length} exhibits.` },
     {
       shows: true,
-      text: `Who did what: ${shared.length ? `${shared.length} ${shared.length === 1 ? "statement is" : "statements are"} shared work, and ` : ""}others' commits are named and not counted as Rin's.`,
+      text: `Who did what: ${shared.length ? `${shared.length} ${shared.length === 1 ? "statement is" : "statements are"} shared work, and ` : ""}others' commits are named and not counted as ${who}'s.`,
     },
     {
       shows: false,

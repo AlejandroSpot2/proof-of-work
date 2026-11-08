@@ -19,6 +19,8 @@ type Tab = "portfolio" | "discover" | "next";
 const TABS: Tab[] = ["portfolio", "discover", "next"];
 const ROLE: Record<string, string> = { author: "Rin's own", co_author: "Shared", contributor: "Contribution", reviewer: "Reviewed", unknown: "Unclear" };
 
+const READY_WORD = { ready: "Live", "needs-setup": "Needs setup", "demo-only": "Demo only", planned: "Planned" } as const;
+
 export function StudioApp() {
   const ws = useWorkspace("/studio");
   const [model, setModel] = useState<PortfolioModel | null>(null);
@@ -39,6 +41,24 @@ export function StudioApp() {
   /** Set only by Discover's call to action; choosing a tab yourself opens next steps as before. */
   const [adapt, setAdapt] = useState<{ path: PathId; n: number } | null>(null);
   const [lang, setLang] = useState<Lang>("en");
+  const [goalText, setGoalText] = useState<string | null>(null);
+  const [cvText, setCvText] = useState<string | null>(null);
+  const workspaceId = ws.state?.snapshot.workspace.id;
+  const draftKey = workspaceId ? `pow-live-drafts:${workspaceId}` : null;
+  useEffect(() => {
+    if (!draftKey) return;
+    try {
+      const saved = JSON.parse(localStorage.getItem(draftKey) ?? "null");
+      if (Array.isArray(saved?.drafts) && saved.drafts.length) setDrafts(saved.drafts);
+      if (typeof saved?.goal === "string") setGoalText(saved.goal);
+    } catch {}
+  }, [draftKey]);
+  useEffect(() => {
+    if (!draftKey) return;
+    try {
+      localStorage.setItem(draftKey, JSON.stringify({ drafts, goal: goalText }));
+    } catch {}
+  }, [draftKey, drafts, goalText]);
   const canvasRef = useRef<HTMLDivElement>(null);
   const railRef = useRef<HTMLElement>(null);
 
@@ -75,6 +95,8 @@ export function StudioApp() {
   const first = person.replace(/\s*\(EXAMPLE\)\s*/, "").split(" ")[0] ?? person;
   const projects = state.snapshot.projects;
   const built = projects.length > 0 && !!model && model.capabilities.length > 0;
+  const needsModel = !example && state.model?.ready === false;
+  const beforeCv = example ? example.cv : (cvText ?? model?.cv ?? "");
   const building = ws.busy === "build";
   const claims = projects.flatMap((p) => p.claims);
   const confirmed = claims.filter((c) => c.reviewStatus === "approved").length;
@@ -93,6 +115,10 @@ export function StudioApp() {
     ws.run("build", async () => {
       const list = example ? example.projects : drafts.filter((d) => d.title.trim() && d.url.trim()).map((d) => ({ title: d.title.trim(), role: "", url: d.url.trim() }));
       if (!list.length) throw new Error("Add at least one project with a link.");
+      const goalNow = (goalText ?? ws.state?.snapshot.goal?.text ?? "").trim();
+      const cvNow = cvText ?? model?.cv ?? "";
+      if (!example && !goalNow) throw new Error("Add the role you are aiming for. It is never filled in for you.");
+      if (!example && ws.state?.model && !ws.state.model.ready) throw new Error(`Statements need a model. ${ws.state.model.reason} Add it to .env.local and restart the server.`);
       const res = await fetch("/api/import", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -122,15 +148,15 @@ export function StudioApp() {
       const st = await (await fetch("/api/state", { cache: "no-store" })).json();
       const proposed = (st.snapshot.projects as { claims: SnapshotClaim[] }[]).flatMap((p) => p.claims).filter((c) => c.reviewStatus === "proposed" && c.state !== "unverified");
       for (const c of proposed) await post(`/api/claims/${c.id}`, { action: "approve" });
-      await post("/api/goal", { text: example?.goal ?? st.snapshot.goal?.text ?? "Founding engineer" });
-      await post("/api/portfolio", { builtAt: Date.now() });
+      await post("/api/goal", { text: example?.goal ?? goalNow });
+      await post("/api/portfolio", { builtAt: Date.now(), ...(example ? {} : { cv: cvNow }) });
       await loadModel();
       setTab("portfolio");
       setReading(null);
       setPendingReveal(true);
     });
 
-  const edit = async (patch: { headline?: string; intro?: string; hidden?: string[] }) => {
+  const edit = async (patch: { headline?: string; intro?: string; hidden?: string[]; cv?: string }) => {
     const r = await post("/api/portfolio", patch).catch(() => null);
     if (r) setModel(r);
   };
@@ -169,6 +195,14 @@ export function StudioApp() {
           Proof of Work
         </a>
         <span className={s.crumb}>Studio</span>
+        <nav className={s.modeSwitch} aria-label="Demo or Live">
+          <a href="/api/mode?to=demo" aria-current={example ? "page" : undefined}>
+            Demo
+          </a>
+          <a href="/api/mode?to=live" aria-current={example ? undefined : "page"}>
+            Live
+          </a>
+        </nav>
         <span className={s.scope}>
           {example && <span className={s.example}>EXAMPLE</span>} {person.replace(" (EXAMPLE)", "")}
         </span>
@@ -229,6 +263,41 @@ export function StudioApp() {
           <p className={s.railSub}>{example ? `${first}'s three projects, prepared as EXAMPLE files so the demo is reproducible. Nothing is fetched from the network.` : "Public GitHub repositories or https pages, read through the bounded importer."}</p>
         </div>
 
+        {!example && (
+          <section className={s.livePanel} aria-label="Live setup">
+            {state.readiness && (
+              <details className={s.ready} open={!built}>
+                <summary>What works live today</summary>
+                <ul>
+                  {state.readiness.map((r) => (
+                    <li key={r.feature} data-status={r.status}>
+                      <span className={s.readyName}>{r.feature}</span>
+                      <span className={s.readyStatus}>{READY_WORD[r.status]}</span>
+                      <span className={s.readyDetail}>{r.detail}</span>
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            )}
+            <label className={s.liveField}>
+              The role you are aiming for
+              <input value={goalText ?? state.snapshot.goal?.text ?? ""} onChange={(e) => setGoalText(e.target.value)} placeholder="For example: founding engineer at an early-stage startup" />
+            </label>
+            <label className={s.liveField}>
+              Your CV, pasted (optional)
+              <textarea
+                rows={5}
+                value={cvText ?? model?.cv ?? ""}
+                onChange={(e) => setCvText(e.target.value)}
+                onBlur={() => {
+                  if (cvText !== null) void edit({ cv: cvText });
+                }}
+                placeholder="Paste the text of your CV. It is the before, never evidence."
+              />
+            </label>
+          </section>
+        )}
+
         {example || projects.length ? (
           <ol className={s.sources}>
             {sourceRows.map((p) => (
@@ -260,7 +329,7 @@ export function StudioApp() {
         )}
 
         <div className={s.buildBox}>
-          <button type="button" className={s.build} disabled={!!ws.busy} onClick={build}>
+          <button type="button" className={s.build} disabled={!!ws.busy || needsModel} onClick={build}>
             {building ? (reading && reading.length ? `Read ${reading.length} files…` : "Reading the sources…") : built ? "Rebuild from sources" : "Build portfolio"}
           </button>
           {built && (
@@ -280,6 +349,11 @@ export function StudioApp() {
             {example ? "Uses the prepared EXAMPLE sources and the recorded statements, no AI model. " : "Live: claims come from the configured model; a failure is shown, never replaced. "}
             Building confirms {first}’s statements on {first}’s behalf; review or correct them anytime.
           </p>
+          {needsModel && state.model && !state.model.ready && (
+            <p className={s.error} role="status">
+              Statements need a model. {state.model.reason} Add it to .env.local and restart the server.
+            </p>
+          )}
           {ws.error && (
             <p className={s.error} role="alert">
               {ws.error}
@@ -312,6 +386,11 @@ export function StudioApp() {
               <p className={s.factLine}>
                 <strong>{filesRead}</strong> files read · <strong>{confirmed}</strong> statements confirmed by {first}
               </p>
+              {model.provenance && (
+                <p className={s.hint}>
+                  {model.provenance.mode === "demo" ? "Demo" : "Live"} · {model.provenance.engine} · built {new Date(model.provenance.at).toLocaleString()}
+                </p>
+              )}
               <button type="button" className={s.ghostBtn} onClick={() => setReview(true)}>
                 Review statements
               </button>
@@ -372,12 +451,16 @@ export function StudioApp() {
         ) : (
           <div className={s.before}>
             <p className={s.beforeLabel}>Before</p>
-            <h2 className={s.beforeTitle}>This is all a reader gets today.</h2>
-            <pre className={s.cv}>{(example?.cv ?? "").replace(/^#+ /gm, "").trim()}</pre>
+            <h2 className={s.beforeTitle}>{example || beforeCv ? "This is all a reader gets today." : "Start with your own projects."}</h2>
+            {example || beforeCv ? (
+              <pre className={s.cv}>{beforeCv.replace(/^#+ /gm, "").trim()}</pre>
+            ) : (
+              <p className={s.beforeNote}>Add your projects and the role you are aiming for in the rail. Paste your CV there too if you want to compare it with what your files show. Nothing is filled in for you.</p>
+            )}
             <p className={s.beforeNote}>
               Every line is a claim, and none of them shows who did what. Build the portfolio to see what {first}’s files actually show.
             </p>
-            <button type="button" className={s.build} disabled={!!ws.busy} onClick={build}>
+            <button type="button" className={s.build} disabled={!!ws.busy || needsModel} onClick={build}>
               {building ? "Reading the sources…" : "Build portfolio"}
             </button>
           </div>

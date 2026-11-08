@@ -1,5 +1,5 @@
 import { getDb } from "@/lib/db/client";
-import { ownerCookie } from "@/lib/auth";
+import { ownerCookie, rememberCookie } from "@/lib/auth";
 import { createWorkspace } from "@/lib/workspace";
 import { loadProfile } from "@/lib/fixtures/rin";
 import { handle, json, readJson } from "@/lib/http";
@@ -24,6 +24,9 @@ export async function POST(req: Request) {
       return json({ error: "A name and a valid GitHub handle are required." }, { status: 400 });
     }
     const { token } = createWorkspace(getDb(), input);
-    return json({ ok: true }, { headers: { "Set-Cookie": ownerCookie(token) } });
+    const headers = new Headers({ "Content-Type": "application/json", "Cache-Control": "no-store" });
+    headers.append("Set-Cookie", ownerCookie(token));
+    headers.append("Set-Cookie", rememberCookie(input.mode, token));
+    return new Response(JSON.stringify({ ok: true }), { headers });
   });
 }
