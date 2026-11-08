@@ -42,7 +42,7 @@ check((await modeNav().getByRole("link", { name: "Live" }).getAttribute("aria-cu
 const rail = page.getByRole("complementary", { name: "Sources" });
 const railText = await rail.innerText();
 check(/Statements with quotes\s*Needs setup/.test(railText), "readiness marks statements as needing setup");
-check(/Discover\s*Planned/.test(railText) && /Spanish translation\s*Demo only/.test(railText), "readiness keeps Discover planned and translation demo-only, never all live");
+check(/Discover\s*Planned/.test(railText) && /Spanish translation\s*Needs setup/.test(railText) && /Apply for a role\s*Needs setup/.test(railText) && /Strengthen and cofounder\s*Demo only/.test(railText), "readiness: translation and Apply need the model, strengthen and cofounder are demo-only, Discover is planned");
 check(/AI_MODEL is not set/.test(await page.locator("body").innerText()), "the missing model is named, with what to do");
 check(await page.getByRole("button", { name: "Build portfolio" }).first().isDisabled(), "Build waits for a model instead of falling back");
 const visible = (await page.locator("aside, main").allInnerTexts()).join("\n");
@@ -78,6 +78,9 @@ await page.goto(`${BASE}/packet`);
 await page.waitForLoadState("networkidle");
 const kit = await page.locator("body").innerText();
 check(!/EXAMPLE|Rin Okafor|Synthetic/.test(kit), "the live consultation kit page shows no EXAMPLE marks");
+check(/Nothing to put in a kit yet\./.test(kit) && !/0 statements/.test(kit), "the live kit before a build is an empty state, not a zero summary");
+const pdf = (await page.request.get(`${BASE}/api/packet/pdf`)).status();
+check(pdf === 409, `the live PDF before a build is refused with what to do (${pdf})`);
 await shot("04-live-kit");
 
 const phone = await browser.newContext({ viewport: { width: 390, height: 844 }, storageState: await context.storageState() });
