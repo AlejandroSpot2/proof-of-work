@@ -54,14 +54,19 @@ export const EXAMPLE_STRENGTHEN: StrengthenFixture = {
 export const EXAMPLE_COFOUNDER: CofounderFixture = cofounderJson;
 
 type Evidenced = PortfolioCapability & { support: "demonstrated" | "inferred" };
-const evidenced = (c: PortfolioCapability): c is Evidenced => c.support !== "unknown" && c.proof.length > 0;
+export const evidenced = (c: PortfolioCapability): c is Evidenced => c.support !== "unknown" && c.proof.length > 0;
 
 /** Names only: a statement's text can mention work it disowns ("the deploy engine is Contributor C's"). */
-const poolOf = (model: PortfolioModel) => [...model.capabilities, ...(model.nextBuild?.parts ?? [])];
+export const poolOf = (model: PortfolioModel) => [...model.capabilities, ...(model.nextBuild?.parts ?? [])];
 
 const uniqueBy = <T>(xs: T[], key: (x: T) => string) => xs.filter((x, i) => xs.findIndex((y) => key(y) === key(x)) === i);
 
 export type Backing = { name: string; support: "demonstrated" | "inferred"; projects: string[]; proof: ProofItem[] };
+
+/** The pool items that back a match: evidenced, with proof, one per name. */
+export const backingOf = (hits: PortfolioCapability[]): Backing[] =>
+  uniqueBy(hits.filter(evidenced), (c) => c.name).map(({ name, support, projects, proof }) => ({ name, support, projects, proof }));
+
 export type GapReason =
   | { kind: "not-shown"; capability: string; limit: string | null }
   | { kind: "others"; who: string; project: string; commits: [Commit, ...Commit[]] }
@@ -92,7 +97,7 @@ export function applyPlan(model: PortfolioModel, offer: OfferFixture): ApplyPlan
   const pool = poolOf(model);
   const requirements = offer.requirements.map((r): RequirementResult => {
     const hits = pool.filter((c) => mentions(c.name, r.match));
-    const backing = uniqueBy(hits.filter(evidenced), (c) => c.name).map((c) => ({ name: c.name, support: c.support, projects: c.projects, proof: c.proof }));
+    const backing = backingOf(hits);
     const status: RequirementStatus = backing.length ? { kind: "backed", backing } : { kind: "gap", reason: gapReason(model, hits, r.match) };
     return { id: r.id, line: r.line, lineEs: r.es, short: r.short, status };
   });

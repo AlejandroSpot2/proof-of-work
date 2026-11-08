@@ -23,9 +23,9 @@ type PanelProps = { model: PortfolioModel; lang: Lang; onLang: (lang: Lang) => v
 
 const PATHS: PathId[] = ["apply", "strengthen", "cofounder"];
 
-export function NextSteps({ model, lang, onLang }: { model: PortfolioModel; lang: Lang; onLang: (lang: Lang) => void }) {
+export function NextSteps({ model, lang, onLang, initialPath }: { model: PortfolioModel; lang: Lang; onLang: (lang: Lang) => void; initialPath?: PathId }) {
   const w = UI[lang].next;
-  const [path, setPath] = useState<PathId | null>(null);
+  const [path, setPath] = useState<PathId | null>(initialPath ?? null);
   const [source, setSource] = useState<SourceRequest | null>(null);
 
   if (!model.example) {
@@ -72,7 +72,7 @@ export function NextSteps({ model, lang, onLang }: { model: PortfolioModel; lang
 
 const fileKey = (q: ProofItem) => `${q.projectTitle}|${q.locator}`;
 
-function FileChip({ project, locator, onClick }: { project: string; locator: string; onClick?: () => void }) {
+export function FileChip({ project, locator, onClick }: { project: string; locator: string; onClick?: () => void }) {
   const label = (
     <>
       {project} · <span className={n.mono}>{locator}</span>

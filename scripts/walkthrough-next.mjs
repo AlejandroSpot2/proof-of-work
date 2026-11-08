@@ -55,7 +55,7 @@ const scan = (text, where) => {
 
 {
   const { context, page } = await studio({ width: 1440, height: 900 });
-  check((await page.getByRole("tab").count()) === 2, "the Studio canvas has two tabs: the portfolio and the next steps");
+  check((await page.getByRole("tab").count()) === 3, "the Studio canvas has three tabs: the portfolio, discover and the next steps");
   check(await page.getByRole("link", { name: "Consultation kit", exact: true }).isVisible(), "the header still links to the consultation kit by its exact name");
 
   for (const lang of ["en", "es"]) {

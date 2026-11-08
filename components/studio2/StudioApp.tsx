@@ -3,19 +3,20 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
 import type { PortfolioModel } from "@/lib/portfolio";
 import type { SnapshotClaim } from "@/lib/views/project";
-import type { Lang } from "@/lib/i18n";
+import type { Lang, PathId } from "@/lib/i18n";
 import { Portfolio } from "../portfolio/Portfolio";
 import { CorrectionDialog } from "../CorrectionDialog";
 import { SourceDialog, type SourceRequest } from "../SourceDialog";
 import { LangSwitch } from "../Choice";
 import { post, useWorkspace } from "../guided/useWorkspace";
+import { Discover } from "./Discover";
 import { NextSteps } from "./NextSteps";
 import { Swarm } from "./Swarm";
 import s from "./studio2.module.css";
 
 type LiveDraft = { title: string; url: string };
-type Tab = "portfolio" | "next";
-const TABS: Tab[] = ["portfolio", "next"];
+type Tab = "portfolio" | "discover" | "next";
+const TABS: Tab[] = ["portfolio", "discover", "next"];
 const ROLE: Record<string, string> = { author: "Rin's own", co_author: "Shared", contributor: "Contribution", reviewer: "Reviewed", unknown: "Unclear" };
 
 export function StudioApp() {
@@ -35,6 +36,8 @@ export function StudioApp() {
   ]);
   const [reading, setReading] = useState<{ title: string; locator: string; status: string }[] | null>(null);
   const [tab, setTab] = useState<Tab>("portfolio");
+  /** Set only by Discover's call to action; choosing a tab yourself opens next steps as before. */
+  const [adapt, setAdapt] = useState<{ path: PathId; n: number } | null>(null);
   const [lang, setLang] = useState<Lang>("en");
   const canvasRef = useRef<HTMLDivElement>(null);
   const railRef = useRef<HTMLElement>(null);
@@ -132,11 +135,21 @@ export function StudioApp() {
     if (r) setModel(r);
   };
 
+  const chooseTab = (t: Tab) => {
+    setAdapt(null);
+    setTab(t);
+  };
+
   const onTabKey = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
     const next = TABS[(TABS.indexOf(tab) + (e.key === "ArrowRight" ? 1 : -1) + TABS.length) % TABS.length]!;
-    setTab(next);
+    chooseTab(next);
     document.getElementById(`tab-${next}`)?.focus();
+  };
+
+  const adaptPortfolio = (path: PathId) => {
+    setAdapt({ path, n: (adapt?.n ?? 0) + 1 });
+    setTab("next");
   };
 
   const createShare = () =>
@@ -335,9 +348,9 @@ export function StudioApp() {
                     aria-controls="canvas-panel"
                     tabIndex={tab === t ? 0 : -1}
                     className={s.tab}
-                    onClick={() => setTab(t)}
+                    onClick={() => chooseTab(t)}
                   >
-                    {t === "portfolio" ? "Portfolio" : `${first}'s next steps`}
+                    {t === "portfolio" ? "Portfolio" : t === "discover" ? "Discover" : `${first}'s next steps`}
                   </button>
                 ))}
               </div>
@@ -349,8 +362,10 @@ export function StudioApp() {
             <div role="tabpanel" id="canvas-panel" aria-labelledby={`tab-${tab}`}>
               {tab === "portfolio" ? (
                 <Portfolio model={model} lang={lang} mode="preview" onEdit={(patch) => void edit(patch)} />
+              ) : tab === "discover" ? (
+                <Discover model={model} lang={lang} onAdapt={adaptPortfolio} />
               ) : (
-                <NextSteps model={model} lang={lang} onLang={setLang} />
+                <NextSteps key={adapt?.n ?? 0} model={model} lang={lang} onLang={setLang} initialPath={adapt?.path} />
               )}
             </div>
           </>
