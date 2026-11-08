@@ -8,6 +8,7 @@ import { buildPacket } from "@/lib/packet/model";
 import { renderPacketBody, noticeFor, LIVE_NOTICE } from "@/components/packet/document";
 import { pdfFilename, PDF_FILENAME } from "@/lib/packet/pdf";
 import { liveReadiness } from "@/lib/readiness";
+import { fixtureDeps } from "@/lib/deps";
 import { approveAllAndEvaluate, exampleWorkspace } from "./helpers";
 
 const COMMITS = "a1b2c3d ada: Merge per-field edits when devices reconnect (2025-01-02)\nd4e5f6a ada: Keep every edit in a local log first (2025-01-09)";
@@ -15,6 +16,7 @@ const COMMITS = "a1b2c3d ada: Merge per-field edits when devices reconnect (2025
 /** A real workspace's dependencies with no network: one GitHub-like source, and a model that either answers or fails. */
 function liveDeps(propose: Deps["proposeClaims"]): Deps {
   return {
+    ...fixtureDeps,
     async fetchSources(url) {
       return [{ url, kind: "github", status: "ok", statusDetail: "", locator: "commits by @ada", text: COMMITS, authorship: "all-by-handle" }];
     },

@@ -42,6 +42,35 @@ export function StudioApp() {
   const [adapt, setAdapt] = useState<{ path: PathId; n: number } | null>(null);
   const [lang, setLang] = useState<Lang>("en");
   const [goalText, setGoalText] = useState<string | null>(null);
+  const [translation, setTranslation] = useState<{ entries: Record<string, string>; engine: string } | null>(null);
+  const [translating, setTranslating] = useState(false);
+  const [translateError, setTranslateError] = useState<string | null>(null);
+  const liveWorkspace = !!ws.state && !ws.state.example;
+  useEffect(() => {
+    if (lang !== "es" || !liveWorkspace) return;
+    let off = false;
+    fetch("/api/translate", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((d) => {
+        if (!off) setTranslation(d.translation ? { entries: d.translation.entries, engine: d.translation.engine } : null);
+      })
+      .catch(() => {});
+    return () => {
+      off = true;
+    };
+  }, [lang, liveWorkspace, model?.ledgerRevision]);
+  const translateNow = async () => {
+    setTranslating(true);
+    setTranslateError(null);
+    try {
+      const r = await post("/api/translate", { lang: "es" });
+      setTranslation({ entries: r.translation.entries, engine: r.translation.engine });
+    } catch (e) {
+      setTranslateError((e as Error).message);
+    } finally {
+      setTranslating(false);
+    }
+  };
   const [cvText, setCvText] = useState<string | null>(null);
   const workspaceId = ws.state?.snapshot.workspace.id;
   const draftKey = workspaceId ? `pow-live-drafts:${workspaceId}` : null;
@@ -438,13 +467,38 @@ export function StudioApp() {
               </a>
               <LangSwitch label="Language" lang={lang} onLang={setLang} className={s.langSwitch} />
             </div>
+            {!example && lang === "es" && (
+              <div className={s.translateBar} role="status">
+                {translation ? (
+                  <span>Translated with {translation.engine}, cached for this version. Quotes, files and names stay as written.</span>
+                ) : state.model?.ready ? (
+                  <span>Spanish for your portfolio's own words takes one call to {state.model.label}. Nothing is translated until you ask.</span>
+                ) : (
+                  <span>Translation needs a model. {state.model && !state.model.ready ? state.model.reason : ""} Until then only the interface words switch.</span>
+                )}
+                {state.model?.ready && (
+                  <button type="button" className={s.textBtn} disabled={translating} onClick={() => void translateNow()}>
+                    {translating ? "Translating…" : translation ? "Update the translation" : "Translate to Spanish"}
+                  </button>
+                )}
+                {translateError && <span className={s.error}>{translateError}</span>}
+              </div>
+            )}
             <div role="tabpanel" id="canvas-panel" aria-labelledby={`tab-${tab}`}>
               {tab === "portfolio" ? (
-                <Portfolio model={model} lang={lang} mode="preview" onEdit={(patch) => void edit(patch)} />
+                <Portfolio model={model} lang={lang} mode="preview" translations={example ? null : translation} onEdit={(patch) => void edit(patch)} />
               ) : tab === "discover" ? (
                 <Discover model={model} lang={lang} onAdapt={adaptPortfolio} />
               ) : (
-                <NextSteps key={adapt?.n ?? 0} model={model} lang={lang} onLang={setLang} initialPath={adapt?.path} />
+                <NextSteps
+                  key={adapt?.n ?? 0}
+                  model={model}
+                  lang={lang}
+                  onLang={setLang}
+                  initialPath={adapt?.path}
+                  translations={example ? null : translation}
+                  liveModel={state.model ? (state.model.ready ? { ready: true } : { ready: false, reason: state.model.reason }) : null}
+                />
               )}
             </div>
           </>

@@ -12,6 +12,7 @@ import {
   EXAMPLE_OFFER,
   EXAMPLE_STRENGTHEN,
   type GapReason,
+  type OfferFixture,
   type RequirementResult,
 } from "@/lib/next-paths";
 import { Level, Portfolio, Tr } from "../portfolio/Portfolio";
@@ -23,7 +24,21 @@ type PanelProps = { model: PortfolioModel; lang: Lang; onLang: (lang: Lang) => v
 
 const PATHS: PathId[] = ["apply", "strengthen", "cofounder"];
 
-export function NextSteps({ model, lang, onLang, initialPath }: { model: PortfolioModel; lang: Lang; onLang: (lang: Lang) => void; initialPath?: PathId }) {
+export function NextSteps({
+  model,
+  lang,
+  onLang,
+  initialPath,
+  translations,
+  liveModel,
+}: {
+  model: PortfolioModel;
+  lang: Lang;
+  onLang: (lang: Lang) => void;
+  initialPath?: PathId;
+  translations?: { entries: Record<string, string>; engine: string } | null;
+  liveModel?: { ready: boolean; reason?: string } | null;
+}) {
   const w = UI[lang].next;
   const [path, setPath] = useState<PathId | null>(initialPath ?? null);
   const [source, setSource] = useState<SourceRequest | null>(null);
@@ -31,7 +46,14 @@ export function NextSteps({ model, lang, onLang, initialPath }: { model: Portfol
   if (!model.example) {
     return (
       <div className={n.root} lang={lang}>
-        <p className={n.note}>{w.live}</p>
+        <header className={n.head}>
+          <h2 className={n.heading}>{w.heading}</h2>
+          <p className={n.note}>Live: Apply for a role reads a posting you paste. Strengthen and cofounder are Demo only for now.</p>
+        </header>
+        <section className={n.panel} aria-label={w.path.apply.title}>
+          <LiveApplyPanel model={model} lang={lang} onLang={onLang} translations={translations ?? null} liveModel={liveModel ?? null} onOpen={(sourceId, quote) => setSource({ sourceId, quote })} />
+        </section>
+        {source && <SourceDialog req={source} onClose={() => setSource(null)} />}
       </div>
     );
   }
@@ -127,7 +149,7 @@ function ApplyPanel({ model, lang, onLang, onOpen }: PanelProps) {
       <p className={n.score}>{w.score(plan.backed, plan.total)}</p>
       <ol className={n.reqs}>
         {plan.requirements.map((r) => (
-          <Requirement key={r.id} r={r} lang={lang} example={model.example} onOpen={onOpen} />
+          <Requirement key={r.id} r={r} lang={lang} tr={(text) => content(text, lang, model.example)} onOpen={onOpen} />
         ))}
       </ol>
 
@@ -152,7 +174,114 @@ function ApplyPanel({ model, lang, onLang, onOpen }: PanelProps) {
   );
 }
 
-function Requirement({ r, lang, example, onOpen }: { r: RequirementResult; lang: Lang; example: boolean; onOpen: PanelProps["onOpen"] }) {
+type Extracted = { role: string | null; company: string | null; requirements: { line: string; short: string; match: string[] }[]; engine: string };
+
+/** A pasted posting as an offer: the posting's own lines, matched against the real ledger by applyPlan. */
+function offerFrom(x: Extracted): OfferFixture {
+  return {
+    id: "pasted",
+    company: x.company ?? "",
+    role: x.role ?? "",
+    location: "",
+    retrieved: new Date().toISOString().slice(0, 10),
+    requirements: x.requirements.map((r, i) => ({ id: `r${i + 1}`, line: r.line, es: "", short: { en: r.short, es: r.short }, match: r.match })),
+  };
+}
+
+function LiveApplyPanel({
+  model,
+  lang,
+  onLang,
+  onOpen,
+  translations,
+  liveModel,
+}: PanelProps & { translations: { entries: Record<string, string>; engine: string } | null; liveModel: { ready: boolean; reason?: string } | null }) {
+  const w = UI[lang].next;
+  const [posting, setPosting] = useState("");
+  const [read, setRead] = useState<{ extracted: Extracted; provenance: { engine: string; at: number } } | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const plan = useMemo(() => (read ? applyPlan(model, offerFrom(read.extracted)) : null), [model, read]);
+  const tr = (text: string) => content(text, lang, false, translations?.entries);
+  const blocked = liveModel ? !liveModel.ready : false;
+  const submit = async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/apply", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ posting }) });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error ?? `HTTP ${res.status}`);
+      setRead({ extracted: data.extracted, provenance: data.provenance });
+    } catch (e) {
+      setRead(null);
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
+  const intro: Shown | null = plan ? { text: adaptedIntro(plan, model, lang), translated: false } : null;
+  const badges = plan ? Object.fromEntries(plan.projects.filter((x) => x.backs.length > 0).map((x) => [x.slug, w.backs(x.backs.length, plan.total)])) : {};
+  return (
+    <>
+      <div className={n.applyTop}>
+        <label className={n.pasteField}>
+          <span className={n.label}>Paste the job posting</span>
+          <textarea rows={7} value={posting} onChange={(e) => setPosting(e.target.value)} placeholder="Paste the text of the posting, including the part that lists what they ask for. It is read, never stored or answered." />
+        </label>
+        <div className={n.langRow}>
+          <span className={n.label}>{w.outputLanguage}</span>
+          <LangSwitch label={w.outputLanguage} lang={lang} onLang={onLang} className={n.lang} />
+        </div>
+      </div>
+      <div className={n.pasteActions}>
+        <button type="button" className={n.copy} disabled={busy || blocked || posting.trim().split(/\s+/).length < 8} onClick={submit}>
+          {busy ? "Reading the posting…" : "Read the requirements"}
+        </button>
+        {blocked && liveModel?.reason && <p className={n.reason}>Reading a posting needs a model. {liveModel.reason} Add it to .env.local and restart the server.</p>}
+        {error && (
+          <p className={n.reason} role="alert">
+            {error}
+          </p>
+        )}
+        {read && <p className={n.label}>Read by {read.provenance.engine} · {new Date(read.provenance.at).toLocaleString()} · only lines copied from the posting are kept</p>}
+      </div>
+      {plan && intro && (
+        <>
+          <p className={n.score}>{w.score(plan.backed, plan.total)}</p>
+          <ol className={n.reqs}>
+            {plan.requirements.map((r) => (
+              <Requirement key={r.id} r={r} lang={lang} tr={tr} onOpen={onOpen} />
+            ))}
+          </ol>
+          <section className={n.block} aria-labelledby="ns-live-intro">
+            <h3 id="ns-live-intro" className={n.h3}>
+              {w.intro}
+            </h3>
+            <p className={n.introText}>
+              <Tr shown={intro} />
+            </p>
+          </section>
+          <section className={n.block} aria-labelledby="ns-live-portfolio">
+            <h3 id="ns-live-portfolio" className={n.h3}>
+              {w.forRole}
+            </h3>
+            <div className={n.frame}>
+              <Portfolio
+                model={model}
+                lang={lang}
+                mode="preview"
+                translations={translations}
+                focus={{ order: plan.projects.map((x) => x.slug), badges, intro, label: plan.offer.company ? w.adaptedFor(plan.offer.company) : "Adapted for this posting" }}
+              />
+            </div>
+          </section>
+        </>
+      )}
+    </>
+  );
+}
+
+function Requirement({ r, lang, tr, onOpen }: { r: RequirementResult; lang: Lang; tr: (text: string) => Shown; onOpen: PanelProps["onOpen"] }) {
   const w = UI[lang].next;
   const files = r.status.kind === "backed" ? r.status.backing.flatMap((b) => b.proof).filter((q, i, all) => all.findIndex((x) => fileKey(x) === fileKey(q)) === i) : [];
   return (
@@ -161,10 +290,10 @@ function Requirement({ r, lang, example, onOpen }: { r: RequirementResult; lang:
         {r.status.kind === "backed" ? w.backed : w.gap}
       </span>
       <div className={n.reqBody}>
-        <p className={n.line} lang="en">
+        <p className={n.line} lang={r.lineEs ? "en" : undefined}>
           “{r.line}”
         </p>
-        {lang === "es" && (
+        {lang === "es" && r.lineEs && (
           <p className={n.lineEs}>
             <Tr shown={{ text: r.lineEs, translated: true }} />
           </p>
@@ -176,18 +305,18 @@ function Requirement({ r, lang, example, onOpen }: { r: RequirementResult; lang:
             ))}
           </div>
         ) : (
-          <Reason reason={r.status.reason} lang={lang} example={example} />
+          <Reason reason={r.status.reason} lang={lang} tr={tr} />
         )}
       </div>
     </li>
   );
 }
 
-function Reason({ reason, lang, example }: { reason: GapReason; lang: Lang; example: boolean }) {
+function Reason({ reason, lang, tr }: { reason: GapReason; lang: Lang; tr: (text: string) => Shown }) {
   const w = UI[lang].next;
   switch (reason.kind) {
     case "not-shown":
-      return <p className={n.reason}>{reason.limit ? <Tr shown={content(reason.limit, lang, example)} /> : w.notShown}</p>;
+      return <p className={n.reason}>{reason.limit ? <Tr shown={tr(reason.limit)} /> : w.notShown}</p>;
     case "others": {
       const [first, ...rest] = reason.commits;
       return (

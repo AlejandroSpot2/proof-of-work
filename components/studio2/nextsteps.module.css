@@ -655,3 +655,28 @@
     transition: none;
   }
 }
+
+/* Live Apply: the pasted posting */
+.pasteField {
+  display: grid;
+  gap: 6px;
+  flex: 1 1 420px;
+}
+
+.pasteField textarea {
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  padding: 12px 14px;
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.5;
+  background: #fff;
+  resize: vertical;
+}
+
+.pasteActions {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+  margin-top: 12px;
+}

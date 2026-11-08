@@ -53,6 +53,7 @@ export function Portfolio({
   onEdit,
   lang: controlledLang,
   focus,
+  translations,
 }: {
   model: PortfolioModel;
   sourceToken?: string | null;
@@ -60,11 +61,13 @@ export function Portfolio({
   onEdit?: (patch: { headline?: string; intro?: string }) => void;
   lang?: Lang;
   focus?: PortfolioFocus;
+  /** Live only: the model's cached Spanish for this portfolio's own words. */
+  translations?: { entries: Record<string, string>; engine: string } | null;
 }) {
   const [ownLang, setOwnLang] = useState<Lang>("en");
   const lang = controlledLang ?? ownLang;
   const w = UI[lang];
-  const tr: Translate = (text) => content(text, lang, model.example);
+  const tr: Translate = (text) => content(text, lang, model.example, translations?.entries);
   const [open, setOpen] = useState<string | null>(null);
   const [proof, setProof] = useState<Proof | null>(null);
   const [source, setSource] = useState<SourceRequest | null>(null);
@@ -127,6 +130,13 @@ export function Portfolio({
         {controlledLang === undefined && <LangSwitch label={w.language} lang={lang} onLang={setOwnLang} className={p.lang} />}
       </header>
       {model.example && w.translatedNote && <p className={p.esNote}>{w.translatedNote}</p>}
+      {!model.example && lang === "es" && (
+        <p className={p.esNote}>
+          {translations
+            ? `Versión en español, traducida con ${translations.engine}. El texto con subrayado punteado está traducido; las citas, los archivos y los nombres se muestran tal como están.`
+            : "Solo las palabras de la interfaz están en español. El contenido sigue en su idioma original hasta que pidas la traducción."}
+        </p>
+      )}
 
       <section className={p.hero} data-swarm="hero">
         <div className={p.heroText}>

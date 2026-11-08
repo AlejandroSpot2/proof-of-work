@@ -189,6 +189,24 @@ function Questions({ p }: { p: Packet }) {
 /** The kit on screen: the four parts as expandable sections built from the same model as the PDF, then the typeset pages themselves. */
 export async function PacketScreen({ workspaceId, downloadHref, leading }: { workspaceId: string; downloadHref: string; leading?: ReactNode }) {
   const db = getDb();
+  const draft = buildPacket(db, workspaceId);
+  if (draft && !draft.example && draft.summary.statements === 0) {
+    return (
+      <main className={s.screen}>
+        <header className={s.bar}>
+          {leading}
+          <span className={s.barTitle}>{TITLE}</span>
+        </header>
+        <div className={s.wrap}>
+          <section className={s.hero}>
+            <h1>Nothing to put in a kit yet.</h1>
+            <p className={s.sub}>The kit uses only statements you confirmed, each with the file that backs it. Build your portfolio in the Studio first; nothing is filled in for you.</p>
+            <p className={s.notice}>{noticeFor(draft)}</p>
+          </section>
+        </div>
+      </main>
+    );
+  }
   const rendered = await packetFor(db, workspaceId)?.catch((err: unknown) => {
     console.error("kit render failed", err);
     return null;

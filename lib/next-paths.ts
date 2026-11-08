@@ -117,11 +117,11 @@ type IntroParts = { role: string; company: string; first: string; backed: number
 
 const INTRO: Record<Lang, (a: IntroParts) => string[]> = {
   en: (a) => [
-    `For the “${a.role}” role at ${a.company}, ${a.first}'s files back ${a.backed} of the ${a.total} requirements${a.shown.length ? `: ${join(a.shown, "and")}` : ""}.`,
+    `For ${a.role ? `the “${a.role}” role` : "this role"}${a.company ? ` at ${a.company}` : ""}, ${a.first}'s files back ${a.backed} of the ${a.total} requirements${a.shown.length ? `: ${join(a.shown, "and")}` : ""}.`,
     a.missing.length ? `They do not show ${join(a.missing, "or")} yet.` : "",
   ],
   es: (a) => [
-    `Para el puesto «${a.role}» en ${a.company}, los archivos de ${a.first} respaldan ${a.backed} de los ${a.total} requisitos${a.shown.length ? `: ${join(a.shown, "y")}` : ""}.`,
+    `Para ${a.role ? `el puesto «${a.role}»` : "este puesto"}${a.company ? ` en ${a.company}` : ""}, los archivos de ${a.first} respaldan ${a.backed} de los ${a.total} requisitos${a.shown.length ? `: ${join(a.shown, "y")}` : ""}.`,
     a.missing.length ? `Todavía no muestran ${join(a.missing, "ni")}.` : "",
   ],
 };

@@ -8,6 +8,8 @@ import { inferWithModel } from "@/lib/capabilities/infer";
 import { checkUrl, defaultAllowlist } from "@/lib/ingest/url";
 import { fetchGithubProject, parseGithubRepoUrl } from "@/lib/ingest/github";
 import { fetchWebSource } from "@/lib/ingest/web";
+import { translateWithDictionary, translateWithModel } from "@/lib/translate";
+import { extractByRules, extractWithModel } from "@/lib/requirements";
 
 const blocked = (url: string, reason: string): FetchedSource => ({ url, kind: "web", status: "blocked", statusDetail: reason, locator: "page", text: "" });
 
@@ -24,6 +26,8 @@ export const fixtureDeps: Deps = {
   async inferCapabilities(goal, claims) {
     return { proposal: inferWithFixtureRules(goal, claims), engine: "fixture rules (no model)" };
   },
+  translate: (texts) => translateWithDictionary(texts),
+  extractRequirements: (posting) => extractByRules(posting),
   now: () => Date.now(),
 };
 
@@ -45,6 +49,8 @@ export const liveDeps: Deps = {
   async inferCapabilities(goal, claims) {
     return inferWithModel(goal, claims);
   },
+  translate: (texts) => translateWithModel(texts),
+  extractRequirements: (posting) => extractWithModel(posting),
   now: () => Date.now(),
 };
 

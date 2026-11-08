@@ -1,3 +1,4 @@
+import type { ExtractedPosting } from "@/lib/requirements";
 import { and, eq, inArray } from "drizzle-orm";
 import type { Db } from "@/lib/db/client";
 import * as t from "@/lib/db/schema";
@@ -21,6 +22,9 @@ export type Deps = {
     sources: StoredSourceForPrompt[];
   }): Promise<ClaimProposal>;
   inferCapabilities(goal: string, claims: LedgerClaim[]): Promise<{ proposal: ProposedCapabilities; engine: string }>;
+  /** One translation per text, same order; an empty string means "not translated". */
+  translate(texts: string[], lang: "es"): Promise<{ translations: string[]; engine: string }>;
+  extractRequirements(posting: string): Promise<ExtractedPosting>;
   now(): number;
 };
 

@@ -20,8 +20,13 @@ export function liveReadiness(env: Record<string, string | undefined> = process.
     { feature: "Review and correct", status: "ready", detail: "Nothing reaches the portfolio until it is confirmed." },
     { feature: "Portfolio and share link", status: "ready", detail: "Read-only and revocable." },
     { feature: "Consultation kit (PDF)", status: "ready", detail: "Built from your confirmed statements and files only." },
-    { feature: "Spanish translation", status: "demo-only", detail: "Live content stays in its original language for now; only interface words switch." },
-    { feature: "Next steps", status: "demo-only", detail: "Apply, strengthen and cofounder use the prepared demo data for now." },
+    model.ready
+      ? { feature: "Spanish translation", status: "ready", detail: `On request, with ${model.label}: one call per portfolio version, then cached. Quotes, files and names are never translated.` }
+      : { feature: "Spanish translation", status: "needs-setup", detail: `${model.reason} Until then only the interface words switch.` },
+    model.ready
+      ? { feature: "Apply for a role", status: "ready", detail: `Paste a posting; ${model.label} reads its requirements, and your confirmed statements decide what is backed.` }
+      : { feature: "Apply for a role", status: "needs-setup", detail: `${model.reason} Reading a posting needs it.` },
+    { feature: "Strengthen and cofounder", status: "demo-only", detail: "These use the prepared demo data for now." },
     { feature: "Discover", status: "planned", detail: "Planned source: Treg, not connected. No live search." },
   ];
 }

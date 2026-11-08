@@ -25,7 +25,8 @@ export const workspaces = sqliteTable("workspaces", {
 
 /** Where a build came from: Demo (the recorded EXAMPLE) or Live (the configured model), and when. */
 export type Provenance = { mode: "demo" | "live"; engine: string; at: number };
-export type PortfolioSettings = { headline?: string; intro?: string; hidden?: string[]; builtAt?: number; cv?: string; provenance?: Provenance };
+export type CachedTranslation = { lang: "es"; entries: Record<string, string>; engine: string; at: number; revision: number };
+export type PortfolioSettings = { headline?: string; intro?: string; hidden?: string[]; builtAt?: number; cv?: string; provenance?: Provenance; translations?: { es?: CachedTranslation } };
 
 export const sessions = sqliteTable("sessions", {
   id: text("id").primaryKey(),

@@ -10,8 +10,8 @@ export type Shown = { text: string; translated: boolean };
 const ES_CONTENT = new Map(Object.entries(es.content));
 
 /** A content string of the EXAMPLE portfolio, in Spanish only when a prepared translation exists for that exact text. */
-export function content(text: string, lang: Lang, example: boolean): Shown {
-  const translation = lang === "es" && example ? ES_CONTENT.get(text) : undefined;
+export function content(text: string, lang: Lang, example: boolean, live?: Record<string, string> | null): Shown {
+  const translation = lang !== "es" ? undefined : example ? ES_CONTENT.get(text) : live?.[text.trim()];
   return translation === undefined ? { text, translated: false } : { text: translation, translated: true };
 }
 

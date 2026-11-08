@@ -858,3 +858,17 @@
   font-weight: 400;
   resize: vertical;
 }
+
+/* Live, Spanish: the translation is asked for, never automatic */
+.translateBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin: 12px 16px 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #fff;
+  font-size: 14px;
+  color: var(--muted);
+}
