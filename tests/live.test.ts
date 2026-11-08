@@ -69,8 +69,33 @@ describe("Live readiness says what to fix, per feature", () => {
     const ready = liveReadiness({ AI_MODEL: "anthropic:some-model", ANTHROPIC_API_KEY: "x" });
     expect(ready.find((r) => r.feature === "Statements with quotes")!.status).toBe("ready");
     expect(ready.some((r) => r.status !== "ready")).toBe(true);
-    expect(ready.find((r) => r.feature === "Discover")!.status).toBe("planned");
+    expect(ready.find((r) => r.feature === "Discover")!.status).toBe("needs-setup");
     expect(JSON.stringify(ready)).not.toContain("x\"");
+  });
+
+  it("keeps Discover off until both the Treg token and a spend cap are set, says what to set, and never shows the token", () => {
+    const discover = (env: Record<string, string>) => liveReadiness(env).find((r) => r.feature === "Discover")!;
+    const none = discover({});
+    expect(none.status).toBe("needs-setup");
+    expect(none.detail).toMatch(/TREG_TOKEN and TREG_MAX_SPEND_MICRO are not set/);
+
+    const tokenOnly = discover({ TREG_TOKEN: "tok_secret_123" });
+    expect(tokenOnly.status).toBe("needs-setup");
+    expect(tokenOnly.detail).toMatch(/^TREG_MAX_SPEND_MICRO is not set/);
+    expect(tokenOnly.detail).not.toContain("tok_secret_123");
+
+    expect(discover({ TREG_TOKEN: "tok_secret_123", TREG_MAX_SPEND_MICRO: "-5" }).status).toBe("needs-setup");
+    expect(discover({ TREG_TOKEN: "tok_secret_123", TREG_MAX_SPEND_MICRO: "0" }).status).toBe("needs-setup");
+
+    const ready = discover({ TREG_TOKEN: "tok_secret_123", TREG_MAX_SPEND_MICRO: "2500000" });
+    expect(ready.status).toBe("ready");
+    expect(ready.detail).toContain("$2.50");
+    expect(ready.detail).not.toContain("tok_secret_123");
+    for (const env of [{}, { TREG_TOKEN: "t" }, { TREG_TOKEN: "t", TREG_MAX_SPEND_MICRO: "1" }] as Record<string, string>[]) {
+      const row = discover(env);
+      expect(row.status).not.toBe("planned");
+      expect(row.detail).not.toMatch(/Discovery via Treg/);
+    }
   });
 });
 

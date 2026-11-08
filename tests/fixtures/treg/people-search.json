@@ -1,0 +1,36 @@
+{
+  "_note": "Synthetic sample, shape not confirmed. Written for offline tests from the Treg catalog's outline of treg.people.search ({output: {people[], count, next_cursor}, raw, _treg}). Every person, URL, email and phone number here is invented.",
+  "output": {
+    "people": [
+      {
+        "name": "Mara Quell",
+        "headline": "Field operations lead; ran offline inspection crews and production backends",
+        "location": "Lisbon, Portugal",
+        "profile_url": "https://www.linkedin.com/in/mara-quell-example?trk=people-search&email=mara@quell.example",
+        "email": "mara@quell.example",
+        "phone": "+351 912 345 678",
+        "contact": { "email": "mara.q@mail.example", "whatsapp": "+351912345678" },
+        "personal_emails": ["mq@home.example"],
+        "social": { "twitter": "https://x.com/maraq_example" },
+        "updated_at": "2026-09-14T10:00:00Z"
+      },
+      {
+        "full_name": "Ivo Brandt",
+        "title": "Product designer for inspection tools. Reach me at ivo@brandt.example or 415-555-0134, see https://ivo.example/cv",
+        "location": { "name": "Berlin" },
+        "linkedin_url": "https://linkedin.com/in/ivo-brandt-example",
+        "mobile_phone": "+49 151 23456789",
+        "work_email": "ivo@company.example"
+      },
+      { "name": "No Url Person", "headline": "Engineer", "email": "nourl@x.example" },
+      { "headline": "Nameless profile", "profile_url": "https://linkedin.com/in/nameless-example" },
+      { "name": "spam@inbox.example", "profile_url": "https://linkedin.com/in/spam-example" },
+      { "name": "Plain Http", "profile_url": "http://insecure.example/in/plain" },
+      { "name": "Mailto Person", "profile_url": "mailto:someone@x.example" }
+    ],
+    "count": 7,
+    "next_cursor": "c_2"
+  },
+  "raw": { "provider_payload": { "emails": ["raw@x.example"], "phones": ["+1 650 555 0199"] } },
+  "_treg": { "route": "synthetic", "providers_tried": 1 }
+}

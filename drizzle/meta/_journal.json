@@ -15,6 +15,13 @@
       "when": 1794087495715,
       "tag": "0001_portfolio_settings",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1794102625066,
+      "tag": "0002_discover_live",
+      "breakpoints": true
     }
   ]
 }
