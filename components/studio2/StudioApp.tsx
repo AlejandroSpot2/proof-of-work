@@ -457,9 +457,11 @@ export function StudioApp() {
             ) : (
               <p className={s.beforeNote}>Add your projects and the role you are aiming for in the rail. Paste your CV there too if you want to compare it with what your files show. Nothing is filled in for you.</p>
             )}
-            <p className={s.beforeNote}>
+            {(example || beforeCv) && (
+              <p className={s.beforeNote}>
               Every line is a claim, and none of them shows who did what. Build the portfolio to see what {first}’s files actually show.
             </p>
+            )}
             <button type="button" className={s.build} disabled={!!ws.busy || needsModel} onClick={build}>
               {building ? "Reading the sources…" : "Build portfolio"}
             </button>

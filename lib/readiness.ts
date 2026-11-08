@@ -21,7 +21,7 @@ export function liveReadiness(env: Record<string, string | undefined> = process.
     { feature: "Portfolio and share link", status: "ready", detail: "Read-only and revocable." },
     { feature: "Consultation kit (PDF)", status: "ready", detail: "Built from your confirmed statements and files only." },
     { feature: "Spanish translation", status: "demo-only", detail: "Live content stays in its original language for now; only interface words switch." },
-    { feature: "Next steps", status: "demo-only", detail: "Apply, strengthen and cofounder use the prepared EXAMPLE for now." },
+    { feature: "Next steps", status: "demo-only", detail: "Apply, strengthen and cofounder use the prepared demo data for now." },
     { feature: "Discover", status: "planned", detail: "Planned source: Treg, not connected. No live search." },
   ];
 }
