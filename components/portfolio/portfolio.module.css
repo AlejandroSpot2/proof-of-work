@@ -46,6 +46,87 @@
   color: var(--ink);
 }
 
+.lang {
+  display: inline-flex;
+  margin-left: clamp(14px, 2cqi, 28px);
+  padding: 3px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.lang button {
+  min-width: 40px;
+  height: 30px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background 160ms var(--ease), color 160ms var(--ease);
+}
+
+.lang button:hover {
+  color: var(--ink);
+}
+
+.lang button[aria-pressed="true"] {
+  background: var(--ink);
+  color: #fff;
+}
+
+.esNote {
+  margin-top: -6px;
+  padding: 0 var(--pad) 12px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--muted);
+  max-width: calc(90ch + 2 * var(--pad));
+}
+
+/* A prepared translation: marked, so it never passes for the original words. */
+.root [data-translated] {
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in srgb, currentColor 32%, transparent);
+  text-underline-offset: 0.2em;
+}
+
+.badge {
+  display: inline-block;
+  margin-left: 10px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: #1b33b5;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+  vertical-align: 1px;
+}
+
+.focusIntro {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+}
+
+.focusLabel {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+}
+
 /* Hero */
 .hero {
   display: grid;
@@ -965,6 +1046,9 @@
   .topNav {
     display: none;
   }
+  .lang {
+    margin-left: auto;
+  }
   .history li {
     grid-template-columns: 90px minmax(0, 1fr);
   }
@@ -978,7 +1062,8 @@
   .indexArrow,
   .cover,
   .partChip,
-  .primary {
+  .primary,
+  .lang button {
     transition: none;
   }
   .drawer[open] {

@@ -1,16 +1,21 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
 import type { PortfolioModel } from "@/lib/portfolio";
 import type { SnapshotClaim } from "@/lib/views/project";
+import type { Lang } from "@/lib/i18n";
 import { Portfolio } from "../portfolio/Portfolio";
 import { CorrectionDialog } from "../CorrectionDialog";
 import { SourceDialog, type SourceRequest } from "../SourceDialog";
+import { LangSwitch } from "../Choice";
 import { post, useWorkspace } from "../guided/useWorkspace";
+import { NextSteps } from "./NextSteps";
 import { Swarm } from "./Swarm";
 import s from "./studio2.module.css";
 
 type LiveDraft = { title: string; url: string };
+type Tab = "portfolio" | "next";
+const TABS: Tab[] = ["portfolio", "next"];
 const ROLE: Record<string, string> = { author: "Rin's own", co_author: "Shared", contributor: "Contribution", reviewer: "Reviewed", unknown: "Unclear" };
 
 export function StudioApp() {
@@ -29,8 +34,15 @@ export function StudioApp() {
     { title: "", url: "" },
   ]);
   const [reading, setReading] = useState<{ title: string; locator: string; status: string }[] | null>(null);
+  const [tab, setTab] = useState<Tab>("portfolio");
+  const [lang, setLang] = useState<Lang>("en");
   const canvasRef = useRef<HTMLDivElement>(null);
   const railRef = useRef<HTMLElement>(null);
+
+  /** Layout effect: the canvas is back at the top before the swarm measures its targets. */
+  useLayoutEffect(() => {
+    canvasRef.current?.scrollTo({ top: 0 });
+  }, [tab]);
 
   const loadModel = useCallback(async () => {
     const r = await fetch("/api/portfolio", { cache: "no-store" });
@@ -46,6 +58,7 @@ export function StudioApp() {
     if (!readyToReveal) return;
     const id = requestAnimationFrame(() => {
       setPendingReveal(false);
+      setTab("portfolio");
       setSwarm(true);
     });
     return () => cancelAnimationFrame(id);
@@ -109,6 +122,7 @@ export function StudioApp() {
       await post("/api/goal", { text: example?.goal ?? st.snapshot.goal?.text ?? "Founding engineer" });
       await post("/api/portfolio", { builtAt: Date.now() });
       await loadModel();
+      setTab("portfolio");
       setReading(null);
       setPendingReveal(true);
     });
@@ -116,6 +130,13 @@ export function StudioApp() {
   const edit = async (patch: { headline?: string; intro?: string; hidden?: string[] }) => {
     const r = await post("/api/portfolio", patch).catch(() => null);
     if (r) setModel(r);
+  };
+
+  const onTabKey = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+    const next = TABS[(TABS.indexOf(tab) + (e.key === "ArrowRight" ? 1 : -1) + TABS.length) % TABS.length]!;
+    setTab(next);
+    document.getElementById(`tab-${next}`)?.focus();
   };
 
   const createShare = () =>
@@ -230,7 +251,15 @@ export function StudioApp() {
             {building ? (reading && reading.length ? `Read ${reading.length} files…` : "Reading the sources…") : built ? "Rebuild from sources" : "Build portfolio"}
           </button>
           {built && (
-            <button type="button" className={s.textBtn} onClick={() => setSwarm(true)} disabled={swarm}>
+            <button
+              type="button"
+              className={s.textBtn}
+              onClick={() => {
+                setTab("portfolio");
+                setSwarm(true);
+              }}
+              disabled={swarm}
+            >
               Replay the reveal
             </button>
           )}
@@ -293,9 +322,38 @@ export function StudioApp() {
 
       <main className={s.canvas} ref={canvasRef} aria-label="Portfolio preview">
         {built && model ? (
-          <div className={s.preview}>
-            <Portfolio model={model} mode="preview" onEdit={(patch) => void edit(patch)} />
-          </div>
+          <>
+            <div className={s.tabs}>
+              <div role="tablist" aria-label="Canvas" className={s.tablist} onKeyDown={onTabKey}>
+                {TABS.map((t) => (
+                  <button
+                    key={t}
+                    type="button"
+                    role="tab"
+                    id={`tab-${t}`}
+                    aria-selected={tab === t}
+                    aria-controls="canvas-panel"
+                    tabIndex={tab === t ? 0 : -1}
+                    className={s.tab}
+                    onClick={() => setTab(t)}
+                  >
+                    {t === "portfolio" ? "Portfolio" : `${first}'s next steps`}
+                  </button>
+                ))}
+              </div>
+              <a className={s.kitLink} href="/packet">
+                Next: consultation kit <span aria-hidden="true">→</span>
+              </a>
+              <LangSwitch label="Language" lang={lang} onLang={setLang} className={s.langSwitch} />
+            </div>
+            <div role="tabpanel" id="canvas-panel" aria-labelledby={`tab-${tab}`}>
+              {tab === "portfolio" ? (
+                <Portfolio model={model} lang={lang} mode="preview" onEdit={(patch) => void edit(patch)} />
+              ) : (
+                <NextSteps model={model} lang={lang} onLang={setLang} />
+              )}
+            </div>
+          </>
         ) : (
           <div className={s.before}>
             <p className={s.beforeLabel}>Before</p>

@@ -3,6 +3,7 @@ import path from "node:path";
 import type { Entrust } from "@/lib/views/project";
 import type { Support } from "@/lib/domain/types";
 import { SIGNAL_COPY, type EmployerRecord } from "@/lib/signals";
+import { mentions } from "@/lib/match";
 
 export type Opportunity = Omit<EmployerRecord, "matches"> & {
   signal: { label: string; caveat: string };
@@ -24,7 +25,7 @@ export function opportunitiesFor(entrust: Entrust, records = loadEmployerRecords
   const pool = [...entrust.capabilities, ...(entrust.nextBuild?.parts ?? [])].filter((c) => c.support !== "unknown");
   return records.map(({ matches, ...r }) => {
     const fit = pool
-      .filter((c) => matches.some((m) => new RegExp(`\\b${m.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`, "i").test(c.name)))
+      .filter((c) => mentions(c.name, matches))
       .map((c) => ({
         name: c.name,
         support: c.support,

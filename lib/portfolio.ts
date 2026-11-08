@@ -26,7 +26,7 @@ export type PortfolioProject = {
   openQuestion: string | null;
   files: string[];
   proof: ProofItem[];
-  documents: { locator: string; title: string; body: string }[];
+  documents: { locator: string; title: string; body: string; sourceId: string }[];
 };
 
 export type PortfolioCapability = { key: string; name: string; support: Support; projects: string[]; proof: ProofItem[]; limit: string | null };
@@ -109,7 +109,7 @@ export function buildPortfolio(db: Db, workspaceId: string, opts: { audience: "o
         .map((s) => {
           const [head, ...rest] = s.snippetStore.trim().split("\n");
           const body = rest.filter((l) => !/^\s*```/.test(l)).join("\n").trim().slice(0, 1400);
-          return { locator: s.locator, title: (head ?? s.locator).replace(/^#+\s*/, ""), body };
+          return { locator: s.locator, title: (head ?? s.locator).replace(/^#+\s*/, ""), body, sourceId: s.id };
         });
       const commits = parseCommits(commitText, ws.githubHandle);
       const otherMap = new Map<string, Commit[]>();
